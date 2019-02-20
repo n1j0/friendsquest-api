@@ -4,25 +4,27 @@ A barebones Node.js app using [Express 4](http://expressjs.com/).
 
 ## Running Locally
 
-Make sure you have [Node.js](http://nodejs.org/) and dokku-cli installed
+Make sure you have [Node.js](http://nodejs.org/) and dokku-cli installed (gem install dokku-cli)
 
-
-Your app should now be running on [localhost:5000](http://localhost:5000/).
+Your app should be able to run on [localhost:5000](http://localhost:5000/).
 
 ## Deploying to Dokku
 
 ```
-git remote add dokku dokku@<dokku-server>:dokku-node-js-example
+git remote add dokku ssh://dokku@projects.multimediatechnology.at:5412/<PROJECTNAME>
 git push dokku master
-# open dokku-node-js-example.<dokku-server>
+# open https://<PROJECTNAME>.projects.multimediatechnology.at
 ```
 
-## Documentation
+## Important Configuration
 
-For more information about using Node.js on Heroku, see these Dev Center articles:
+1) Read Environment Variables in your node app:
 
-- [10 Habits of a Happy Node Hacker](https://blog.heroku.com/archives/2014/3/11/node-habits)
-- [Getting Started with Node.js on Heroku](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
-- [Heroku Node.js Support](https://devcenter.heroku.com/articles/nodejs-support)
-- [Node.js on Heroku](https://devcenter.heroku.com/categories/nodejs)
-- [Using WebSockets on Heroku with Node.js](https://devcenter.heroku.com/articles/node-websockets)
+    $PORT  (process.env.PORT in node.js) = port number you should bind to
+    $DATABASE_URL  (process.env.DATABASE_URL) = information on connecting to database
+
+2) Set Node and npm version in package.json
+
+3) Make sure the buildpack is set:
+
+    dokku config:set BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-nodejs
