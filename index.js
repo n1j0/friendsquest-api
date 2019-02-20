@@ -1,11 +1,31 @@
 var express = require('express')
 var app = express();
+const { Pool, Client } = require('pg')
+const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/sciendivi_development'
+
+
+const pool = new Pool({
+  connectionString: connectionString
+});
 
 app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
-  response.send('Hello World!')
+  pool.connect((err, client, done) => {
+    if (err) {
+      response.send(`ERROR ${err.stack}`);
+    } else {
+      client.query('SELECT NOW() as now', (err,res) => {
+        done();
+        if (err) {
+          response.send(`ERROR ${err.stack}`);
+        } else {
+          response.send(`Hello World at ${res.rows[0].now}`);
+        }
+      });
+    }
+  })
 })
 
 app.listen(app.get('port'), function() {
