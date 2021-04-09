@@ -20,8 +20,8 @@ git push dokku master
 
 1) Read Environment Variables in your node app:
 
-    $PORT  (process.env.PORT in node.js) = port number you should bind to
-    $DATABASE_URL  (process.env.DATABASE_URL) = information on connecting to database
+* $PORT  (process.env.PORT in node.js) = port number you should bind to
+* $DATABASE_URL  (process.env.DATABASE_URL) = information on connecting to database
 
 2) Set Node and npm version in package.json
 
