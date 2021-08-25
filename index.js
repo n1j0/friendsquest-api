@@ -1,7 +1,7 @@
 var express = require('express')
 var app = express();
 const { Pool, Client } = require('pg')
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/sciendivi_development'
+const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/dokku_development'
 
 
 const pool = new Pool({
