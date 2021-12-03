@@ -1,19 +1,19 @@
 {
   "name": "node-js-sample",
   "version": "0.1.0",
-  "description": "A sample Node.js app using Express 4",
+  "description": "A sample Node.js app using Express and Postgres",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.0.0",
-    "pg": "^7.8.1",
-    "pg-connection-string": "^2.0.0"
+    "express": "^4.17.0",
+    "pg": "^8.7.1",
+    "pg-connection-string": "^2.5.0"
   },
   "engines": {
-    "node": "11.0.0",
-    "npm": "^6.4.1"
+    "node": "14.5.0",
+    "npm": "^7.6.3"
   },
   "repository": {
     "type": "git",
