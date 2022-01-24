@@ -8,7 +8,7 @@ const pool = new Pool({
   connectionString: connectionString
 });
 
-app.set('port', (process.env.PORT || 5000))
+app.set('port', (process.env.PORT || 3000))
 app.use(express.static(__dirname + '/public'))
 
 app.get('/', function(request, response) {
@@ -21,7 +21,7 @@ app.get('/', function(request, response) {
         if (err) {
           response.send(`ERROR ${err.stack}`);
         } else {
-          response.send(`Hello World at ${res.rows[0].now}`);
+          response.send(`Hello World from the postgres server at ${res.rows[0].now}`);
         }
       });
     }
