@@ -21,7 +21,7 @@ app.get('/', function(request, response) {
         if (err) {
           response.send(`ERROR ${err.stack}`);
         } else {
-          response.send(`Hello World from the postgres server at ${res.rows[0].now}`);
+          response.send(`<h1>Hello World</h1> <p>from the postgres server at ${res.rows[0].now}`);
         }
       });
     }
