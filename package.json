@@ -12,7 +12,7 @@
     "pg-connection-string": "^2.5.0"
   },
   "engines": {
-    "node": "18.x.x",
+    "node": "17.x.x",
     "npm": "^8.19.1"
   },
   "license": "MIT"
