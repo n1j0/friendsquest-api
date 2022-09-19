@@ -1,6 +1,6 @@
-var express = require('express')
-var app = express();
-const { Pool, Client } = require('pg')
+const express = require('express')
+const app = express();
+const { Pool } = require('pg')
 const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/dokku_development'
 
 
