@@ -12,8 +12,8 @@
     "pg-connection-string": "^2.5.0"
   },
   "engines": {
-    "node": "17.x.x",
-    "npm": "^8.19.1"
+    "node": "16.x.x",
+    "npm": "^8.x.x"
   },
   "license": "MIT"
 }
