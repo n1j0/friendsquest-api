@@ -1,12 +1,14 @@
 {
-  "name": "node-js-sample",
-  "version": "0.1.0",
-  "description": "A sample Node.js app using Express and Postgres",
-  "main": "index.js",
+  "name": "friendsquest-api",
+  "version": "0.0.1",
+  "description": "API for FriendsQuest-APP",
+  "main": "./.out/index.js",
   "scripts": {
-    "start": "node index.js"
+    "dev": "nodemon --ext ts --loader ts-node/esm --experimental-specifier-resolution node ./src --require dotenv/config dotenv_config_path=../.env",
+    "prod": "tsc && node ./.out/index.js"
   },
   "dependencies": {
+    "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "pg": "^8.8.0",
     "pg-connection-string": "^2.5.0"
@@ -15,5 +17,11 @@
     "node": "16.x.x",
     "npm": "^8.x.x"
   },
-  "license": "MIT"
+  "type": "module",
+  "devDependencies": {
+    "@types/express": "^4.17.14",
+    "@types/node": "^18.7.18",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
+  }
 }
