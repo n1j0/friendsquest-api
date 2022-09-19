@@ -10,7 +10,9 @@
     "moduleResolution": "node",
     "types": [
       "node",
-      "express"
+      "express",
+      "swagger-ui-express",
+      "swagger-jsdoc"
     ]
   },
   "include": [
