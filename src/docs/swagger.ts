@@ -12,4 +12,4 @@ const options = {
     apis: ['./src/routes/*.ts'],
 }
 
-export const openapiSpecification = await swaggerJsdoc(options)
+export const openapiSpecification = swaggerJsdoc(options)
