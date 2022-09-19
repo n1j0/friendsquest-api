@@ -4,7 +4,7 @@
   "description": "API for FriendsQuest-APP",
   "main": "./.out/index.js",
   "scripts": {
-    "dev": "nodemon --ext ts --loader ts-node/esm --experimental-specifier-resolution node ./src --require dotenv/config dotenv_config_path=../.env",
+    "dev": "nodemon --ext ts --loader ts-node/esm --experimental-specifier-resolution node ./src",
     "prod": "tsc && node ./.out/index.js",
     "lint": "eslint --ext .js,.ts --color --cache --cache-location tmp/.eslintcache --ignore-path ../.gitignore .",
     "lintfix": "npm run lint -- --fix",
@@ -19,7 +19,7 @@
     "swagger-ui-express": "^4.5.0"
   },
   "engines": {
-    "node": "16.x.x",
+    "node": "^16.17.x",
     "npm": "^8.x.x"
   },
   "type": "module",
