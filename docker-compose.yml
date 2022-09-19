@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 volumes:
   pg_data:
@@ -19,10 +19,12 @@ services:
       PORT: ${PORT}
     ports:
       - ${PORT}:${PORT}
-    command: npm run dev
     volumes:
-      - ./backend:/backend/
-      - /backend/node_modules
+      - ./src:/src/
+      - /src/node_modules
+    working_dir: /src
+    command: bash -c "npm i && npm run dev"
+    env_file: .env
   db:
     container_name: postgres
     image: postgres:10.21
