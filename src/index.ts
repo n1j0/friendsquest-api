@@ -6,14 +6,14 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app: Application = express()
-const port: number = parseInt(process.env.PORT as string, 10) || 3000
+const port: number = Number.parseInt(process.env.PORT as string, 10) || 3000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get(
     '/',
-    (_req: Request, res: Response) => res.status(200).json('Hello World'),
+    (_request: Request, response: Response) => response.status(200).json('Hello World'),
 )
 
 try {
