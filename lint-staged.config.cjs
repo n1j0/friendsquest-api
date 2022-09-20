@@ -1,7 +1,5 @@
-const path = require('path')
-
 module.exports = {
-    '*.{(c|m)?js,ts}': filenames => [
+    '*.{(c|m)?js,ts}': () => [
         'npm run lintfix',
     ],
 }

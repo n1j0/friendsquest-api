@@ -26,12 +26,12 @@ module.exports = {
         'unicorn',
     ],
     rules: {
-        'array-bracket-spacing': [ 'error', 'always', { singleValue: false, objectsInArrays: false } ],
-        'arrow-parens': [ 'error', 'as-needed', { requireForBlockBody: true } ],
+        'array-bracket-spacing': [ 'error', 'always', { singleValue: false, objectsInArrays: false }],
+        'arrow-parens': [ 'error', 'as-needed', { requireForBlockBody: true }],
         indent: [ 'error', 4 ],
-        'no-use-before-define': [ 'error' ],
-        'no-unused-vars': [ 'error' ],
-        'no-shadow': [ 'error' ],
+        'no-use-before-define': ['error'],
+        'no-unused-vars': ['error'],
+        'no-shadow': ['error'],
         'linebreak-style': [ 'error', 'unix' ],
         'max-len': [ 'error', 120 ],
         'object-curly-newline': [
@@ -46,7 +46,15 @@ module.exports = {
         'no-console': 0,
         semi: [ 'error', 'never' ],
         'import/extensions': 1,
-        'import/no-unresolved': [ 2, { ignore: [ '^(.)?./' ] } ],
+        'import/no-unresolved': [ 2, { ignore: ['^(.)?./'] }],
         'import/prefer-default-export': 0,
     },
+    overrides: [
+        {
+            files: ['src/entities/**/*.*'],
+            rules: {
+                indent: 'warn',
+            },
+        },
+    ],
 }
