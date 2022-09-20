@@ -26,7 +26,7 @@ export default class Application {
         this.app.use(express.json())
         this.app.use(express.urlencoded({ extended: true }))
 
-        new Router(this.app).initRoutes()
+        new Router(this.app, this.orm as MikroORM<PostgreSqlDriver>).initRoutes()
 
         try {
             const port: number = Number.parseInt(process.env.PORT as string, 10) || 3000
