@@ -56,5 +56,11 @@ module.exports = {
                 indent: 'warn',
             },
         },
+        {
+            files: ['src/migrations/*.*'],
+            rules: {
+                'unicorn/filename-case': 0,
+            },
+        },
     ],
 }

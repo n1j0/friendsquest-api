@@ -8,11 +8,13 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default {
+    debug: process.env.NODE_ENV !== 'production',
     tsNode: process.env.NODE_ENV !== 'production',
     entities: ['./.out/entities'],
     entitiesTs: ['./src/entities'],
     migrations: {
-        path: './src/migrations',
+        path: './.out/migrations',
+        pathTs: './src/migrations',
         tableName: 'migrations',
         transactional: true,
     },
