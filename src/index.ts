@@ -7,4 +7,4 @@ if (process.env.NODE_ENV !== 'production') {
 
 const application = new Application()
 await application.connect()
-await application.init()
+application.init()

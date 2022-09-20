@@ -1,10 +1,8 @@
 import { MikroORM } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import express from 'express'
-import swaggerUi from 'swagger-ui-express'
 import mikroOrmConfig from './config/mikro-orm.config.js'
-import { openapiSpecification } from './docs/swagger.js'
-import index from './routes/index.js'
+import Router from './router.js'
 
 export default class Application {
     public orm: MikroORM<PostgreSqlDriver> | undefined
@@ -24,11 +22,11 @@ export default class Application {
         }
     }
 
-    public init = async (): Promise<void> => {
+    public init = (): void => {
         this.app.use(express.json())
         this.app.use(express.urlencoded({ extended: true }))
 
-        this.routes()
+        new Router(this.app).initRoutes()
 
         try {
             const port: number = Number.parseInt(process.env.PORT as string, 10) || 3000
@@ -38,13 +36,5 @@ export default class Application {
         } catch (error: any) {
             console.error('Could not start server', error)
         }
-    }
-
-    private routes = () => {
-        if (process.env.NODE_ENV !== 'production') {
-            this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-        }
-
-        this.app.get('/', index)
     }
 }
