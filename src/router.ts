@@ -3,27 +3,31 @@ import swaggerUi from 'swagger-ui-express'
 import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { openapiSpecification } from './docs/swagger.js'
-import index from './routes/index.js'
+import { indexRoutes } from './routes/index.js'
+import { booksRoutes } from './routes/books.js'
+import { $app } from './application.js'
 
 export default class Router {
-    private app: express.Application
+    private server: express.Application
 
     private readonly em: EntityManager<PostgreSqlDriver>
 
-    constructor(app: express.Application, orm: MikroORM<PostgreSqlDriver>) {
-        this.app = app
+    constructor(server: express.Application, orm: MikroORM<PostgreSqlDriver>) {
+        this.server = server
         this.em = orm.em
     }
 
     public initRoutes = () => {
         if (process.env.NODE_ENV !== 'production') {
-            this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
+            this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
+            console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
         }
 
-        this.app.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
+        this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
             RequestContext.create(this.em, next)
         })
 
-        this.app.use('/', index)
+        this.server.use('/', indexRoutes)
+        this.server.use('/books', booksRoutes)
     }
 }

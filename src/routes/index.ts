@@ -13,4 +13,4 @@ const router = express.Router()
  */
 router.get('/', (_request: Request, response: Response) => response.status(200).json('Hello World'))
 
-export default router
+export const indexRoutes = router

@@ -8,8 +8,14 @@ const options = {
             title: 'FriendsQuest',
             version: '0.0.1',
         },
+        servers: [
+            {
+                url: 'http://localhost:1234',
+                description: 'Development server',
+            },
+        ],
     },
-    apis: ['./src/routes/*.ts'],
+    apis: ['./src/routes/**/*.ts'],
 }
 
 export const openapiSpecification = swaggerJsdoc(options)
