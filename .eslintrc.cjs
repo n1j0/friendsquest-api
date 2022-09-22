@@ -62,5 +62,12 @@ module.exports = {
                 'unicorn/filename-case': 0,
             },
         },
+        {
+            files: ['src/seeders/*.*'],
+            rules: {
+                'unicorn/filename-case': 0,
+                'class-methods-use-this': 0,
+            },
+        },
     ],
 }
