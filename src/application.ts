@@ -1,6 +1,7 @@
 import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import express from 'express'
+import helmet from 'helmet'
 import mikroOrmConfig from './config/mikro-orm.config.js'
 import Router from './router.js'
 import { Book } from './entities/book.js'
@@ -37,6 +38,7 @@ export default class Application {
 
         this.server.use(express.json())
         this.server.use(express.urlencoded({ extended: true }))
+        this.server.use(helmet())
 
         new Router(this.server, $app.orm).initRoutes()
 
