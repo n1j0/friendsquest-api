@@ -40,6 +40,8 @@ export default class Application {
         this.server.use(express.urlencoded({ extended: true }))
         this.server.use(helmet())
 
+        this.server.disable('x-powered-by')
+
         new Router(this.server, $app.orm).initRoutes()
 
         try {
