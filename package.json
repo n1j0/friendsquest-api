@@ -5,7 +5,7 @@
   "main": "./.out/index.js",
   "scripts": {
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" nodemon --ext ts --experimental-specifier-resolution node ./src",
-    "prod": "tsc && NODE_OPTIONS=\"--loader ts-node/esm\" node ./.out/index.js",
+    "start": "tsc && NODE_OPTIONS=\"--loader ts-node/esm\" node ./.out/index.js",
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location tmp/.eslintcache --ignore-path ../.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
