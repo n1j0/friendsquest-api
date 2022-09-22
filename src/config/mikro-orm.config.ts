@@ -1,11 +1,7 @@
-import { config } from 'dotenv'
+import 'dotenv/config'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { Options } from '@mikro-orm/core'
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
-
-if (process.env.NODE_ENV !== 'production') {
-    config()
-}
 
 export default {
     debug: process.env.NODE_ENV !== 'production',
