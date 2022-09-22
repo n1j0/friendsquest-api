@@ -23,6 +23,13 @@ export default class Router {
             console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
         }
 
+        this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
+            RequestContext.create(this.em, next)
+        })
+
+        this.server.use('/', indexRoutes)
+        this.server.use('/books', booksRoutes)
+
         // custom 404
         this.server.use((_request: express.Request, response: express.Response) => {
             response.status(404).send("Sorry can't find that!")
@@ -32,12 +39,5 @@ export default class Router {
             console.error(error)
             response.status(500).send('Something broke!')
         })
-
-        this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
-            RequestContext.create(this.em, next)
-        })
-
-        this.server.use('/', indexRoutes)
-        this.server.use('/books', booksRoutes)
     }
 }
