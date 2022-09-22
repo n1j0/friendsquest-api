@@ -23,6 +23,16 @@ export default class Router {
             console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
         }
 
+        // custom 404
+        this.server.use((_request: express.Request, response: express.Response) => {
+            response.status(404).send("Sorry can't find that!")
+        })
+        // custom 500
+        this.server.use((error: express.ErrorRequestHandler, _request: express.Request, response: express.Response) => {
+            console.error(error)
+            response.status(500).send('Something broke!')
+        })
+
         this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
             RequestContext.create(this.em, next)
         })
