@@ -1,9 +1,11 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { BookSeeder } from './BookSeeder.js'
+import { UserSeeder } from './UserSeeder.js'
 
 export class DatabaseSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
-        await new BookSeeder().run(em)
+        return this.call(em, [
+            UserSeeder,
+        ])
     }
 }

@@ -25,11 +25,11 @@
           "mappedType": "string"
         }
       },
-      "name": "book",
+      "name": "user",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "book_pkey",
+          "keyName": "user_pkey",
           "columnNames": [
             "id"
           ],

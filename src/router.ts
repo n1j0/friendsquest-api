@@ -4,7 +4,7 @@ import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { openapiSpecification } from './docs/swagger.js'
 import { indexRoutes } from './routes/index.js'
-import { booksRoutes } from './routes/books.js'
+import { usersRoutes } from './routes/user.js'
 import { $app } from './application.js'
 
 export default class Router {
@@ -28,7 +28,7 @@ export default class Router {
         })
 
         this.server.use('/', indexRoutes)
-        this.server.use('/books', booksRoutes)
+        this.server.use('/users', usersRoutes)
 
         // custom 404
         this.server.use((_request: express.Request, response: express.Response) => {

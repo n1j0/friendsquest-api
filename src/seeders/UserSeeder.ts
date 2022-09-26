@@ -1,11 +1,11 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { Book } from '../entities/book.js'
+import { User } from '../entities/user.js'
 
-export class BookSeeder extends Seeder {
+export class UserSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {
-        em.create(Book, {
-            name: 'The book',
+        em.create(User, {
+            name: 'Peter Pan',
         })
     }
 }

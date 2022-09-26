@@ -5,16 +5,16 @@ const router = express.Router()
 
 /**
  * @openapi
- * /books:
+ * /users:
  *   get:
- *     description: Returns some books
+ *     description: Returns all users
  *     responses:
  *       200:
  *         description: Returns books
  */
 router.get(
     '/',
-    async (_request: Request, response: Response) => response.status(200).json(await $app.bookRepository.findAll()),
+    async (_request: Request, response: Response) => response.status(200).json(await $app.userRepository.findAll()),
 )
 
-export const booksRoutes = router
+export const usersRoutes = router
