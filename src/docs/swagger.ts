@@ -13,6 +13,10 @@ const options = {
                 url: 'http://localhost:1234',
                 description: 'Development server',
             },
+            {
+                url: 'https://friendsquest.projects.multimediatechnology.at',
+                description: 'FH server',
+            },
         ],
     },
     apis: ['./src/routes/**/*.ts'],
