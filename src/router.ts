@@ -18,10 +18,9 @@ export default class Router {
     }
 
     public initRoutes = () => {
-        if (process.env.NODE_ENV !== 'production') {
-            this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-            console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
-        }
+        // remove this when ready for production
+        this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
+        console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
 
         this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
             RequestContext.create(this.em, next)
