@@ -6,5 +6,6 @@ COPY . .
 
 FROM base as build
 
+ENV NODE_ENV=development
 RUN npm i --prefer-offline --no-audit --ignore-scripts
 CMD npm run start
