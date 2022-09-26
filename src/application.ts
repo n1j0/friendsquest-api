@@ -2,6 +2,7 @@ import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import express from 'express'
 import helmet from 'helmet'
+import cors from 'cors'
 import mikroOrmConfig from './config/mikro-orm.config.js'
 import Router from './router.js'
 import { User } from './entities/user.js'
@@ -39,6 +40,7 @@ export default class Application {
         this.server.use(express.json())
         this.server.use(express.urlencoded({ extended: true }))
         this.server.use(helmet())
+        this.server.use(cors())
 
         this.server.disable('x-powered-by')
 

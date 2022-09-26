@@ -15,7 +15,8 @@
       "node",
       "express",
       "swagger-ui-express",
-      "swagger-jsdoc"
+      "swagger-jsdoc",
+      "cors"
     ]
   },
   "include": [
