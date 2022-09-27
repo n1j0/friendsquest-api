@@ -1,30 +1,130 @@
-# node-js-sample
+# FriendsQuest API
  
-A barebones Node.js app using [Express 4](http://expressjs.com/).
+A Node.js express application written in Typescript for the backend of the App "FriendsQuest".
 
-## Running Locally
+## Requirements
+* docker
+* node ^16.17
+* npm ^8
 
-Make sure you have [Node.js](http://nodejs.org/) and dokku-cli installed (gem install dokku-cli)
+optional:
+* nvm
 
-Your app should be able to run on [localhost:5000](http://localhost:5000/).
+## Getting started
 
-## Deploying to Dokku
+You have two options: using the backend within or outside a docker container.
 
+Hot reloading of the Node.js app is always turned on for `npm run start`.
+
+### Running with node in docker
+
+```bash
+# copy env file
+$ cp .env.dist .env
+
+# installing pre-commit hooks
+$ npm install
+
+# if running for the first time
+$ docker-compose up --build
+
+# afterwards
+$ docker-compose up
 ```
-git remote add dokku ssh://dokku@projects.multimediatechnology.at:5412/<PROJECTNAME>
-git push dokku master
-# open https://<PROJECTNAME>.projects.multimediatechnology.at
+
+### Running without node in docker
+```bash
+# copy env file
+$ cp .env.dist .env
+
+# if running for the first time
+$ docker-compose up --build api
+
+# afterwards
+$ docker-compose up api
+
+# second terminal
+$ npm install
+$ npm run dev
 ```
 
-## Important Configuration
+## Pre-commit hook with [Husky](https://github.com/typicode/husky) and [lint-staged](https://github.com/okonet/lint-staged)
+Read carefully: it's pre-commit and not pre-push. See the difference in the official [git book](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
+Because only well-formatted and standards-compliant code should be included in the repo,
+we decided to format all edited files and check them using the linters.
+If one linter finds any issue and isn't able to fix it by itself, you aren't able to commit your changes.
+Take a look at the output of the linter(s) and fix the issue(s), so you can commit your changes.
+If you want to check if your code is well-formatted and standards-compliant, you can manually run the scripts mentioned in the chapters below.
 
-1) Read Environment Variables in your node app:
+## Linter
 
-* $PORT  (process.env.PORT in node.js) = port number you should bind to
-* $DATABASE_URL  (process.env.DATABASE_URL) = information on connecting to database
+### ESLint
 
-2) Set Node and npm version in package.json
+ESLint is a tool for identifying and reporting on patterns found in ECMAScript/JavaScript code.
+Check out the [ESLint repo](https://github.com/eslint/eslint) for detailed explanations.
 
-3) Make sure the buildpack is set:
+We take advantage of different packages to define our rules. Further information can be found in the `.eslintrc.cjs`.
 
-    dokku config:set BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-nodejs
+### Usage
+
+#### Identify wrong patterns
+
+``` bash
+# run ESLint
+$ npm run lint
+```
+
+#### Let the linter(s) fix your problems
+
+``` bash
+# automatically fix all ESLint issues
+$ npm run lint:fix
+```
+
+## Mikro-ORM
+
+We access our PostgreSQL-Database through the ORM-Tool [Mikro ORM](https://mikro-orm.io/). Keep in mind your api docker container needs to run in order to access the local database.
+
+### Migrations and Entities
+
+Migrations are shipped by Mikro ORM. They are created automatically. Mikro ORM looks into the `entities` directory to create the migrations.
+
+#### Creating a Migration
+
+```bash
+$ npm run migrate:create
+```
+
+#### Applying Migrations
+
+```bash
+# Migrate up to the latest version
+$ npm run migrate:up
+```
+
+#### Reverse Migrations
+
+```bash
+# Migrate one step down
+$ npm run migrate:down
+```
+
+#### Start new
+```bash
+# Drop the database and migrate up to the latest version
+$ npm run migrate:fresh
+```
+
+### Seeders
+
+You can create dummy data with Seeders. To create a new Seeder use `npm run seeder:create -- <EntityName>`. To run it: `npm run seeder:run`.
+
+#### Fresh seeding
+```bash
+# Drop the database, migrate up to the latest version and afterwards seed the database
+$ npm run orm:restart
+```
+
+## Conventional Commits
+
+We use Conventional Commits. Have a look at the [summary](https://www.conventionalcommits.org/en/v1.0.0/#summary) in order to make great commits.
