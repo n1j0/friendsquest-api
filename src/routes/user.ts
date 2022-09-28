@@ -9,8 +9,6 @@ const router = express.Router()
 // TODO test with swagger
 // TODO create tests
 
-// TODO create UserNotFoundError
-
 const userNotFoundError = (response: Response) => {
     response.status(404).send({
         message: 'User not found',
@@ -39,6 +37,8 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: id
+ *         schema:
+ *           type: integer
  *         required: true
  *         description: Numeric ID of the user to get
  *     responses:
@@ -64,17 +64,56 @@ router.get(
  *   post:
  *     description: Create a new user
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
- *         schema:
- *         type: object
- *         properties:
- *           email:
- *           type: string
- *           example:
- *             email: 'maxmuster@muster.com'
- *             required: true
- *             description: The email of the user
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: The first name of the user
+ *                 required: false
+ *               lastName:
+ *                 type: string
+ *                 description: The first name of the user
+ *                 required: false
+ *               email:
+ *                 type: string
+ *                 description: The email of the user
+ *                 required: true
+ *               username:
+ *                 type: string
+ *                 description: The username of the user
+ *                 required: false
+ *               birthday:
+ *                 type: date
+ *                 description: The birthday of the user
+ *                 required: false
+ *               homeland:
+ *                 type: string
+ *                 description: The homeland of the user
+ *                 required: false
+ *           examples:
+ *             minimum:
+ *               summary: Minimum example for valid creation of user
+ *               value:
+ *                 firstName: Jon
+ *                 email: Jon@Doe.abc
+ *             normal:
+ *               summary: Example for valid creation of user
+ *               value:
+ *                 firstName: Jon
+ *                 lastName: Doe
+ *                 email: Jon@Doe.abc
+ *                 username: JonDoe
+ *                 birthday: 1990-01-01
+ *                 homeland: England
+ *             error:
+ *               summary: Example for invalid creation of user
+ *               value:
+ *                 firstName: Jon
+ *                 lastName: Doe
  *     responses:
  *       201:
  *         description: Returns the created user
@@ -97,6 +136,7 @@ router.post(
         }
     },
 )
+// TODO extend patch docs
 
 /**
  * @openapi
@@ -138,10 +178,12 @@ router.patch(
  *     parameters:
  *       - in: path
  *         name: id
+ *         schema:
+ *           type: integer
  *         required: true
  *         description: Numeric ID of the user to delete
  *     responses:
- *       200:
+ *       204:
  *         description: Returns the deleted user
  *       404:
  *         description: User not found
