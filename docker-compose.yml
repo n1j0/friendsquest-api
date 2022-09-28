@@ -6,7 +6,9 @@ volumes:
 services:
   api:
     container_name: api
-    build: ./Dockerfile.dev
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
     depends_on:
       - db
     environment:
