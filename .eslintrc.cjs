@@ -54,12 +54,14 @@ module.exports = {
             files: ['src/entities/**/*.*'],
             rules: {
                 indent: 'warn',
+                'unicorn/filename-case': 0,
             },
         },
         {
             files: ['src/migrations/*.*'],
             rules: {
                 'unicorn/filename-case': 0,
+                'max-len': 0,
             },
         },
         {
