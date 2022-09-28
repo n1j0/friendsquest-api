@@ -16,6 +16,8 @@ You have two options: using the backend within or outside a docker container.
 
 Hot reloading of the Node.js app is always turned on for `npm run start`.
 
+Keep in mind to use ".js" for file extension. If you omit the extension, the application won't work because Typescript is used.
+
 ### Running with node in docker
 
 ```bash
@@ -66,6 +68,10 @@ Check out the [ESLint repo](https://github.com/eslint/eslint) for detailed expla
 We take advantage of different packages to define our rules. Further information can be found in the `.eslintrc.cjs`.
 
 ### Usage
+
+#### IDE / Code Editor
+
+Be sure to enable ESLint in your preferences to get realtime feedback.
 
 #### Identify wrong patterns
 
