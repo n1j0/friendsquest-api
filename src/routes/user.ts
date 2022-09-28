@@ -11,8 +11,8 @@ const router = express.Router()
 
 // TODO create UserNotFoundError
 
-const userNotFoundError = (res: Response) => {
-    res.status(404).send({
+const userNotFoundError = (response: Response) => {
+    response.status(404).send({
         message: 'User not found',
     })
 }
@@ -47,9 +47,9 @@ router.get(
  */
 router.get(
     '/:id',
-    async (_request: Request, response: Response) => {
+    async (request: Request, response: Response) => {
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/40584
-        const user = await $app.userRepository.findOne({ id: _request.params.id } as any)
+        const user = await $app.userRepository.findOne({ id: request.params.id } as any)
         if (user) {
             console.log(user)
             return response.status(200).json(user)
@@ -83,12 +83,12 @@ router.get(
  */
 router.post(
     '/',
-    async (_request: Request, response: Response) => {
-        if (!_request.body.email) {
+    async (request: Request, response: Response) => {
+        if (!request.body.email) {
             return response.status(400).json({ message: 'Email is missing' })
         }
         try {
-            const user = new User(_request.body.email)
+            const user = new User(request.body.email)
             // TODO change to persist
             await $app.userRepository.persistAndFlush(user)
             return response.status(201).json(user)
@@ -116,10 +116,10 @@ router.post(
  */
 router.patch(
     '/:id',
-    async (_request: Request, response: Response) => {
+    async (request: Request, response: Response) => {
         try {
-            const user = await $app.userRepository.findOneOrFail(_request.params.id as any)
-            wrap(user).assign(_request.body)
+            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
+            wrap(user).assign(request.body)
             // TODO check documentation flush/persist
             await $app.userRepository.flush()
 
@@ -148,9 +148,9 @@ router.patch(
  */
 router.delete(
     '/:id',
-    async (_request: Request, response: Response) => {
+    async (request: Request, response: Response) => {
         // TODO check error for undefined
-        const user = await $app.userRepository.findOne({ id: _request.params.id } as any)
+        const user = await $app.userRepository.findOne({ id: request.params.id } as any)
         if (user) {
             await $app.userRepository.removeAndFlush(user)
             return response.status(204).json()
