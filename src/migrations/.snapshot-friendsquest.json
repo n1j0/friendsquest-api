@@ -17,23 +17,21 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamptz(0)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
+          "mappedType": "string"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamptz(0)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
+          "mappedType": "string"
         },
         "first_name": {
           "name": "first_name",
@@ -156,23 +154,21 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamptz(0)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
+          "mappedType": "string"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamptz(0)",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
+          "mappedType": "string"
         },
         "title": {
           "name": "title",

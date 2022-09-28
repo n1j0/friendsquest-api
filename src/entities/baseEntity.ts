@@ -5,8 +5,8 @@ export abstract class BaseEntity {
     public id!: number
 
     @Property()
-    public createdAt = new Date()
+    public createdAt = new Date().toISOString()
 
-    @Property({ onUpdate: () => new Date() })
-    public updatedAt = new Date()
+    @Property({ onUpdate: () => new Date().toISOString() })
+    public updatedAt = new Date().toISOString()
 }
