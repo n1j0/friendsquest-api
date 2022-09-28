@@ -8,7 +8,7 @@ export class UserSeeder extends Seeder {
             email: 'peterpan@123.at',
             firstName: 'Peter',
             lastName: 'Pan',
-            userName: 'peterP',
+            username: 'peterP',
             emailVerified: true,
             termsAccepted: true,
             accountActivated: true,
