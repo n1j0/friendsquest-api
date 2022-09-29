@@ -26,7 +26,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T13:36:54.466567Z',
             emailVerified: true,
             updatedAt: '2022-05-06T13:36:54.466567Z',
-            username: 'kevin',
+            username: 'thomas',
         } as RequiredEntityData<User>)
         em.create(User, {
             email: 'lena.heiglauer@gmx.at',
