@@ -1,18 +1,11 @@
 import express, { Request, Response } from 'express'
-import { wrap } from '@mikro-orm/core'
-import { $app } from '../application.js'
-import { User } from '../entities/user.js'
+import UserController from '../controller/userController.js'
 
 const router = express.Router()
+const userController = new UserController()
 
 // TODO better openapi documentation
 // TODO create tests
-
-const userNotFoundError = (response: Response) => {
-    response.status(404).send({
-        message: 'User not found',
-    })
-}
 
 /**
  * @openapi
@@ -25,7 +18,7 @@ const userNotFoundError = (response: Response) => {
  */
 router.get(
     '/',
-    async (_request: Request, response: Response) => response.status(200).json(await $app.userRepository.findAll()),
+    (_request: Request, response: Response) => userController.getAllUsers(response),
 )
 
 /**
@@ -45,19 +38,8 @@ router.get(
  *         description: Returns a user by uid
  */
 router.get(
-    '/{id}',
-    async (request: Request, response: Response) => {
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/40584
-        const { id } = request.params
-        if (!id) {
-            return response.status(500).json({ message: 'Missing id' })
-        }
-        const user = await $app.userRepository.findOne({ id } as any)
-        if (user) {
-            return response.status(200).json(user)
-        }
-        return userNotFoundError(response)
-    },
+    '/:id',
+    (request: Request, response: Response) => userController.getUserById(request, response),
 )
 
 /**
@@ -124,23 +106,7 @@ router.get(
  */
 router.post(
     '/',
-    async (request: Request, response: Response) => {
-        if (!request.body.email) {
-            return response.status(400).json({ message: 'Email is missing' })
-        }
-
-        const user = new User(request.body.email)
-        const [ username, email ] = await Promise.all([
-            $app.userRepository.count({ username: request.body.username }),
-            $app.userRepository.count({ email: request.body.email }),
-        ])
-        if (email !== 0 || username !== 0) {
-            return response.status(400).json({ message: 'Email or Username already taken' })
-        }
-
-        await $app.userRepository.persist(user)
-        return response.status(201).json(user)
-    },
+    (request: Request, response: Response) => userController.createUser(request, response),
 )
 
 /**
@@ -209,25 +175,8 @@ router.post(
  *         description: User not found
  */
 router.patch(
-    '/{id}',
-    async (request: Request, response: Response) => {
-        try {
-            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
-            wrap(user).assign(request.body)
-            const [ username, email ] = await Promise.all([
-                $app.userRepository.count({ username: request.body.username }),
-                $app.userRepository.count({ email: request.body.email }),
-            ])
-            if (email !== 0 || username !== 0) {
-                return response.status(400).json({ message: 'Email or Username already taken' })
-            }
-            await $app.userRepository.persist(user)
-
-            return response.status(200).json(user)
-        } catch {
-            return userNotFoundError(response)
-        }
-    },
+    '/:id',
+    (request: Request, response: Response) => userController.updateUser(request, response),
 )
 
 /**
@@ -249,16 +198,8 @@ router.patch(
  *         description: User not found
  */
 router.delete(
-    '/{id}',
-    async (request: Request, response: Response) => {
-        // TODO check error for undefined
-        const user = await $app.userRepository.findOne({ id: request.params.id } as any)
-        if (user) {
-            await $app.userRepository.removeAndFlush(user)
-            return response.status(204).json()
-        }
-        return userNotFoundError(response)
-    },
+    '/:id',
+    (request: Request, response: Response) => userController.deleteUser(request, response),
 )
 
 export const usersRoutes = router

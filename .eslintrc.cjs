@@ -48,6 +48,17 @@ module.exports = {
         'import/extensions': 1,
         'import/no-unresolved': [ 2, { ignore: ['^(.)?./'] }],
         'import/prefer-default-export': 0,
+        'unicorn/filename-case': [
+            'error',
+            {
+                cases: {
+                    camelCase: true,
+                    pascalCase: true,
+                    kebabCase: true,
+                },
+            },
+        ],
+        'class-methods-use-this': 0,
     },
     overrides: [
         {
