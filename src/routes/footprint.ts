@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express'
-import { $app } from '../application.js'
+import FootprintController from '../controller/footprintController.js'
 
 const router = express.Router()
+const footprintController = new FootprintController()
 
 /**
  * @openapi
@@ -14,14 +15,10 @@ const router = express.Router()
  *       500:
  *         description: Error
  */
-router.get('/', async (_request: Request, response: Response) => {
-    try {
-        const footprints = await $app.footprintRepository.findAll()
-        return response.status(200).json(footprints)
-    } catch (error: any) {
-        return response.status(500).json({ message: error.message })
-    }
-})
+router.get(
+    '/',
+    (_request: Request, response: Response) => footprintController.getAllFootprints(response),
+)
 
 /**
  * @openapi
@@ -39,17 +36,10 @@ router.get('/', async (_request: Request, response: Response) => {
  *       200:
  *         description: Returns a footprint by ID
  */
-router.get('/:id', async (request: Request, response: Response) => {
-    try {
-        const footprint = await $app.footprintRepository.findOne({ id: request.params.id } as any)
-        if (footprint) {
-            return response.status(200).json(footprint)
-        }
-        return response.status(404).json({ message: 'Footprint not found' })
-    } catch (error: any) {
-        return response.status(500).json({ message: error.message })
-    }
-})
+router.get(
+    '/:id',
+    (request: Request, response: Response) => footprintController.getFootprintById(request, response),
+)
 
 /**
  * @openapi
@@ -69,17 +59,9 @@ router.get('/:id', async (request: Request, response: Response) => {
  *       500:
  *         description: Error
  */
-router.get('/:id/reactions', async (request: Request, response: Response) => {
-    const footprintId = request.params.id
-    if (!footprintId) {
-        return response.status(500).json({ message: 'ID is missing' })
-    }
-    try {
-        const footprints = await $app.footprintReactionRepository.findOneOrFail({ footprint: footprintId } as any)
-        return response.status(200).json(footprints)
-    } catch (error: any) {
-        return response.status(500).json({ message: error.message })
-    }
-})
+router.get(
+    '/:id/reactions',
+    (request: Request, response: Response) => footprintController.getFootprintReactions(request, response),
+)
 
 export const footprintRoutes = router
