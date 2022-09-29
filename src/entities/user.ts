@@ -9,10 +9,10 @@ export class User extends BaseEntity {
     @Property()
     public lastName?: string
 
-    @Property()
+    @Property({ unique: true })
     public username?: string
 
-    @Property()
+    @Property({ unique: true })
     public email!: string
 
     @Property()
