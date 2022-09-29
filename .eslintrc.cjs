@@ -71,6 +71,7 @@ module.exports = {
                 'class-methods-use-this': 0,
                 'max-len': 0,
                 'dot-notation': 0,
+                'sonarjs/no-duplicate-string': 0,
             },
         },
     ],

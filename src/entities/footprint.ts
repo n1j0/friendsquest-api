@@ -24,10 +24,10 @@ export class Footprint extends BaseEntity {
     public viewCount: number = 0
 
     @Property()
-    public imageURL?: string
+    public imageURL!: string
 
     @Property()
-    public audioURL?: string
+    public audioURL!: string
 
     @OneToMany('FootprintReaction', 'footprint')
     public reactions: Collection<FootprintReaction> = new Collection<FootprintReaction>(this)
