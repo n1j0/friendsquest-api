@@ -23,4 +23,32 @@ router.get('/', async (_request: Request, response: Response) => {
     }
 })
 
+/**
+ * @openapi
+ * /footprints/{id}:
+ *   get:
+ *     description: Get a footprint by uid
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Numeric ID of the footprint to get
+ *     responses:
+ *       200:
+ *         description: Returns a footprint by ID
+ */
+router.get('/:id', async (request: Request, response: Response) => {
+    try {
+        const footprint = await $app.footprintRepository.findOne({ id: request.params.id } as any)
+        if (footprint) {
+            return response.status(200).json(footprint)
+        }
+        return response.status(404).json({ message: 'Footprint not found' })
+    } catch (error: any) {
+        return response.status(500).json({ message: error.message })
+    }
+})
+
 export const footprintRoutes = router
