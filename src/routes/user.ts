@@ -6,7 +6,6 @@ import { User } from '../entities/user.js'
 const router = express.Router()
 
 // TODO better openapi documentation
-// TODO test with swagger
 // TODO create tests
 
 const userNotFoundError = (response: Response) => {
@@ -54,7 +53,7 @@ router.get(
             console.log(user)
             return response.status(200).json(user)
         }
-        return response.status(404).json({ message: 'User not found' })
+        return userNotFoundError(response)
     },
 )
 
@@ -136,7 +135,6 @@ router.post(
         }
     },
 )
-// TODO extend patch docs
 
 /**
  * @openapi
@@ -146,8 +144,51 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: id
+ *         schema:
+ *           type: integer
  *         required: true
  *         description: Numeric ID of the user to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: The first name of the user
+ *                 required: false
+ *               lastName:
+ *                 type: string
+ *                 description: The first name of the user
+ *                 required: false
+ *               email:
+ *                 type: string
+ *                 description: The email of the user
+ *                 required: true
+ *               username:
+ *                 type: string
+ *                 description: The username of the user
+ *                 required: false
+ *               birthday:
+ *                 type: date
+ *                 description: The birthday of the user
+ *                 required: false
+ *               homeland:
+ *                 type: string
+ *                 description: The homeland of the user
+ *                 required: false
+ *           examples:
+ *             normal:
+ *               summary: Example for valid change of one user
+ *               value:
+ *                 firstName: Jon
+ *                 lastName: Doe
+ *                 email: Jon@Doe.abc
+ *                 username: JonDoe
+ *                 birthday: 1990-01-01
+ *                 homeland: England
  *     responses:
  *       200:
  *         description: Returns the updated user
