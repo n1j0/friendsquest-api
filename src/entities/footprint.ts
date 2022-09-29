@@ -11,7 +11,7 @@ export class Footprint extends BaseEntity {
     public description?: string
 
     @ManyToOne()
-    public user!: User
+    public createdBy!: User
 
     @Property()
     public latitude!: number
@@ -33,10 +33,10 @@ export class Footprint extends BaseEntity {
 
     // TODO reactions
 
-    constructor(title: string, user: User, latitude: number, longitude: number) {
+    constructor(title: string, createdBy: User, latitude: number, longitude: number) {
         super()
         this.title = title
-        this.user = user
+        this.createdBy = createdBy
         this.latitude = latitude
         this.longitude = longitude
     }

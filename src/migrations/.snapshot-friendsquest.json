@@ -206,8 +206,8 @@
           "nullable": true,
           "mappedType": "string"
         },
-        "user_id": {
-          "name": "user_id",
+        "created_by_id": {
+          "name": "created_by_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -285,10 +285,10 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "footprint_user_id_foreign": {
-          "constraintName": "footprint_user_id_foreign",
+        "footprint_created_by_id_foreign": {
+          "constraintName": "footprint_created_by_id_foreign",
           "columnNames": [
-            "user_id"
+            "created_by_id"
           ],
           "localTableName": "public.footprint",
           "referencedColumnNames": [
