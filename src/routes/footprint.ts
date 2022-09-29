@@ -4,6 +4,8 @@ import FootprintController from '../controller/footprintController.js'
 const router = express.Router()
 const footprintController = new FootprintController()
 
+// TODO better openapi documentation
+
 /**
  * @openapi
  * /footprints:
@@ -18,6 +20,42 @@ const footprintController = new FootprintController()
 router.get(
     '/',
     (_request: Request, response: Response) => footprintController.getAllFootprints(response),
+)
+
+// TODO user information needs to be added
+
+/**
+ * @openapi
+ * /footprints/{id}:
+ *   post:
+ *     description: Create a new reaction
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Numeric ID of the footprint the reaction is for
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: The message of the reaction
+ *                 required: true
+ *     responses:
+ *       204:
+ *         description: OK
+ *       500:
+ *         description: Error
+ */
+router.post(
+    '/:id',
+    (request: Request, response: Response) => footprintController.createFootprintReaction(request, response),
 )
 
 /**

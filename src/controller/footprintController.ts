@@ -35,4 +35,23 @@ export default class FootprintController {
             return response.status(500).json({ message: error.message })
         }
     }
+
+    public createFootprintReaction = async (request: Request, response: Response) => {
+        const message = request.body.message.trim()
+        if (!message) {
+            return response.status(500).json({ message: 'Message is missing' })
+        }
+        const { id } = request.params
+        if (!id) {
+            return response.status(500).json({ message: 'ID is missing' })
+        }
+
+        // TODO user information needs to be added
+        /*
+        const footprint = await $app.footprintRepository.findOne({ id } as any)
+        const reaction = new FootprintReaction(user, message, footprint)
+        await $app.userRepository.persist(user)
+         */
+        return response.sendStatus(204)
+    }
 }
