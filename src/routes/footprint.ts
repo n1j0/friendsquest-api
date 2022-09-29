@@ -25,7 +25,7 @@ router.get('/', async (_request: Request, response: Response) => {
 
 /**
  * @openapi
- * /footprints/:id:
+ * /footprints/{id}:
  *   get:
  *     description: Get a footprint by uid
  *     parameters:
@@ -53,7 +53,7 @@ router.get('/:id', async (request: Request, response: Response) => {
 
 /**
  * @openapi
- * /footprints/:id/reactions:
+ * /footprints/{id}/reactions:
  *   get:
  *     description: Returns all reactions to the specified footprint
  *     parameters:

@@ -30,14 +30,14 @@ router.get(
 
 /**
  * @openapi
- * /users/:id:
+ * /users/{id}:
  *   get:
  *     description: Get a user by uid
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
- *           type: integer
+ *           type: string
  *         required: true
  *         description: Numeric ID of the user to get
  *     responses:
@@ -45,10 +45,14 @@ router.get(
  *         description: Returns a user by uid
  */
 router.get(
-    '/:id',
+    '/{id}',
     async (request: Request, response: Response) => {
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/40584
-        const user = await $app.userRepository.findOne({ id: request.params.id } as any)
+        const { id } = request.params
+        if (!id) {
+            return response.status(500).json({ message: 'Missing id' })
+        }
+        const user = await $app.userRepository.findOne({ id } as any)
         if (user) {
             return response.status(200).json(user)
         }
@@ -205,7 +209,7 @@ router.post(
  *         description: User not found
  */
 router.patch(
-    '/:id',
+    '/{id}',
     async (request: Request, response: Response) => {
         try {
             const user = await $app.userRepository.findOneOrFail(request.params.id as any)
@@ -228,7 +232,7 @@ router.patch(
 
 /**
  * @openapi
- * /users/:id:
+ * /users/{id}:
  *   delete:
  *     description: Delete a user by uid
  *     parameters:
@@ -245,7 +249,7 @@ router.patch(
  *         description: User not found
  */
 router.delete(
-    '/:id',
+    '/{id}',
     async (request: Request, response: Response) => {
         // TODO check error for undefined
         const user = await $app.userRepository.findOne({ id: request.params.id } as any)
