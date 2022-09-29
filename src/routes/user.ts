@@ -117,7 +117,7 @@ router.get(
  *       201:
  *         description: Returns the created user
  *       400:
- *         description: Returns an error if the user could not be created
+ *         description: Username or email already exists
  */
 router.post(
     '/',
@@ -125,14 +125,18 @@ router.post(
         if (!request.body.email) {
             return response.status(400).json({ message: 'Email is missing' })
         }
-        try {
-            const user = new User(request.body.email)
-            // TODO change to persist
-            await $app.userRepository.persistAndFlush(user)
-            return response.status(201).json(user)
-        } catch (error: any) {
-            return response.status(400).json({ message: error.message })
+
+        const user = new User(request.body.email)
+        const [ username, email ] = await Promise.all([
+            $app.userRepository.count({ username: request.body.username }),
+            $app.userRepository.count({ email: request.body.email }),
+        ])
+        if (email !== 0 || username !== 0) {
+            return response.status(400).json({ message: 'Email or Username already taken' })
         }
+
+        await $app.userRepository.persist(user)
+        return response.status(201).json(user)
     },
 )
 
@@ -189,9 +193,15 @@ router.post(
  *                 username: JonDoe
  *                 birthday: 1990-01-01
  *                 homeland: England
+ *             error:
+ *               summary: Example for invalid change of one user
+ *               value:
+ *                 username: kevin
  *     responses:
  *       200:
  *         description: Returns the updated user
+ *       400:
+ *         description: Email or Username already taken
  *       404:
  *         description: User not found
  */
@@ -201,8 +211,14 @@ router.patch(
         try {
             const user = await $app.userRepository.findOneOrFail(request.params.id as any)
             wrap(user).assign(request.body)
-            // TODO check documentation flush/persist
-            await $app.userRepository.flush()
+            const [ username, email ] = await Promise.all([
+                $app.userRepository.count({ username: request.body.username }),
+                $app.userRepository.count({ email: request.body.email }),
+            ])
+            if (email !== 0 || username !== 0) {
+                return response.status(400).json({ message: 'Email or Username already taken' })
+            }
+            await $app.userRepository.persist(user)
 
             return response.status(200).json(user)
         } catch {
