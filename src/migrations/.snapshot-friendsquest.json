@@ -217,33 +217,24 @@
         },
         "latitude": {
           "name": "latitude",
-          "type": "int",
+          "type": "double precision",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "double"
         },
         "longitude": {
           "name": "longitude",
-          "type": "int",
+          "type": "double precision",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "double"
         },
         "view_count": {
           "name": "view_count",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "reactions_count": {
-          "name": "reactions_count",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,

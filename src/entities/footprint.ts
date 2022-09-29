@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core'
+import { Entity, ManyToOne, Property, types } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'
 
@@ -13,17 +13,14 @@ export class Footprint extends BaseEntity {
     @ManyToOne()
     public createdBy!: User
 
-    @Property()
-    public latitude!: number
+    @Property({ type: types.double })
+    public latitude!: string
 
-    @Property()
-    public longitude!: number
+    @Property({ type: types.double })
+    public longitude!: string
 
     @Property()
     public viewCount: number = 0
-
-    @Property()
-    public reactionsCount: number = 0
 
     @Property()
     public imageURL?: string
@@ -33,7 +30,7 @@ export class Footprint extends BaseEntity {
 
     // TODO reactions
 
-    constructor(title: string, createdBy: User, latitude: number, longitude: number) {
+    constructor(title: string, createdBy: User, latitude: string, longitude: string) {
         super()
         this.title = title
         this.createdBy = createdBy

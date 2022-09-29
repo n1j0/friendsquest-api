@@ -5,6 +5,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { openapiSpecification } from './docs/swagger.js'
 import { indexRoutes } from './routes/index.js'
 import { usersRoutes } from './routes/user.js'
+import { footprintRoutes } from './routes/footprint.js'
 import { $app } from './application.js'
 
 export default class Router {
@@ -28,6 +29,7 @@ export default class Router {
 
         this.server.use('/', indexRoutes)
         this.server.use('/users', usersRoutes)
+        this.server.use('/footprints', footprintRoutes)
 
         // custom 404
         this.server.use((_request: express.Request, response: express.Response) => {
