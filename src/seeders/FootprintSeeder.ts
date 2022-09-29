@@ -4,7 +4,7 @@ import { Footprint } from '../entities/footprint.js'
 
 export class FootprintSeeder extends Seeder {
     async run(em: EntityManager, context: Dictionary): Promise<void> {
-        em.create(Footprint, {
+        context['0yfBXY8QLnrDC3xUIgkh'] = em.create(Footprint, {
             createdAt: '2022-05-08T18:51:36.164593Z',
             updatedAt: '2022-05-08T18:51:36.164593Z',
             createdBy: context.eliburgi,
@@ -14,7 +14,7 @@ export class FootprintSeeder extends Seeder {
             viewCount: 0,
             title: '',
         })
-        em.create(Footprint, {
+        context['1pKAZ9BauX7vLFthQywP'] = em.create(Footprint, {
             createdAt: '2022-05-06T11:06:35.627905Z',
             updatedAt: '2022-05-06T11:06:35.627905Z',
             createdBy: context.julrei,
@@ -24,7 +24,7 @@ export class FootprintSeeder extends Seeder {
             viewCount: 0,
             title: 'Testing',
         })
-        em.create(Footprint, {
+        context['32sd07rsRb95Yh6miCig'] = em.create(Footprint, {
             createdAt: '2022-05-06T15:04:15.796002Z',
             updatedAt: '2022-05-06T15:04:15.796002Z',
             createdBy: context.julrei,
@@ -35,7 +35,7 @@ export class FootprintSeeder extends Seeder {
             title: 'Studiowoche überlebt',
             description: '💪💯',
         })
-        em.create(Footprint, {
+        context['7TtrhxgKdFjfPA65uLz4'] = em.create(Footprint, {
             createdAt: '2022-05-09T08:46:49.579798Z',
             updatedAt: '2022-05-09T08:46:49.579798Z',
             createdBy: context.julrei,
@@ -46,7 +46,7 @@ export class FootprintSeeder extends Seeder {
             title: 'Feichtenstoa wandern',
             description: 'in Hintersee mit da Dani 💪',
         })
-        em.create(Footprint, {
+        context['7sEKb0oAbTtZTJnc2UTe'] = em.create(Footprint, {
             createdAt: '2022-05-06T12:03:56.109464Z',
             updatedAt: '2022-05-06T12:03:56.109464Z',
             createdBy: context.marcel98,
@@ -56,7 +56,7 @@ export class FootprintSeeder extends Seeder {
             viewCount: 0,
             title: 'Tischtennis',
         })
-        em.create(Footprint, {
+        context['B2uJ3EX3NPvIFNJwcWyl'] = em.create(Footprint, {
             createdAt: '2022-05-06T16:38:29.996530Z',
             updatedAt: '2022-05-06T16:38:29.996530Z',
             createdBy: context.julrei,
@@ -67,7 +67,7 @@ export class FootprintSeeder extends Seeder {
             title: 'Geburtstagsfeier',
             description: 'Familien Zeit',
         })
-        em.create(Footprint, {
+        context['CBBPoUjwpeKNAk6JcbhE'] = em.create(Footprint, {
             createdAt: '2022-05-06T13:28:25.343291Z',
             updatedAt: '2022-05-06T13:28:25.343291Z',
             createdBy: context.thdhjw,
@@ -78,7 +78,7 @@ export class FootprintSeeder extends Seeder {
             title: 'Teat',
             description: 'user testing',
         })
-        em.create(Footprint, {
+        context['EI9WpbWCBDSBM1vEImpk'] = em.create(Footprint, {
             createdAt: '2022-05-06T12:29:58.781709Z',
             updatedAt: '2022-05-06T12:29:58.781709Z',
             createdBy: context.kevin,
@@ -89,7 +89,7 @@ export class FootprintSeeder extends Seeder {
             title: 'die station',
             description: 'kaffee',
         })
-        em.create(Footprint, {
+        context['EevJrtmzs9silkqpYhS1'] = em.create(Footprint, {
             createdAt: '2022-05-06T12:23:28.679722Z',
             updatedAt: '2022-05-06T12:23:28.679722Z',
             createdBy: context.aaaa,
@@ -100,7 +100,7 @@ export class FootprintSeeder extends Seeder {
             title: 'schicker fuß',
             description: '😀😀😀😀😀',
         })
-        em.create(Footprint, {
+        context['NtwtvVKEPwW2Rwh9UTdS'] = em.create(Footprint, {
             createdAt: '2022-05-06T12:27:32.298252Z',
             updatedAt: '2022-05-06T12:27:32.298252Z',
             createdBy: context.eliburgi,
@@ -111,7 +111,7 @@ export class FootprintSeeder extends Seeder {
             title: 'u10',
             description: 'User testing',
         })
-        em.create(Footprint, {
+        context['WRzAbi88Z6V7G6VsMsjG'] = em.create(Footprint, {
             createdAt: '2022-06-14T10:23:12.496139Z',
             updatedAt: '2022-06-14T10:23:12.496139Z',
             createdBy: context.julrei,
@@ -122,7 +122,7 @@ export class FootprintSeeder extends Seeder {
             title: 'WeAreDevelopers',
             description: 'Berlin yea',
         })
-        em.create(Footprint, {
+        context['keI1TC8XWLT3eiIEMaof'] = em.create(Footprint, {
             createdAt: '2022-05-06T16:30:46.425551Z',
             updatedAt: '2022-05-06T16:30:46.425551Z',
             createdBy: context.julrei,

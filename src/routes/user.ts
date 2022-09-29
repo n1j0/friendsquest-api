@@ -30,7 +30,7 @@ router.get(
 
 /**
  * @openapi
- * /users/{id}:
+ * /users/:id:
  *   get:
  *     description: Get a user by uid
  *     parameters:
@@ -50,7 +50,6 @@ router.get(
         // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/40584
         const user = await $app.userRepository.findOne({ id: request.params.id } as any)
         if (user) {
-            console.log(user)
             return response.status(200).json(user)
         }
         return userNotFoundError(response)
@@ -142,7 +141,7 @@ router.post(
 
 /**
  * @openapi
- * /users/{id}:
+ * /users/:id:
  *   patch:
  *     description: Update a user by uid
  *     parameters:
@@ -229,7 +228,7 @@ router.patch(
 
 /**
  * @openapi
- * /users/{id}:
+ * /users/:id:
  *   delete:
  *     description: Delete a user by uid
  *     parameters:

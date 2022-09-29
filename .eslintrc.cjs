@@ -70,6 +70,7 @@ module.exports = {
                 'unicorn/filename-case': 0,
                 'class-methods-use-this': 0,
                 'max-len': 0,
+                'dot-notation': 0,
             },
         },
     ],

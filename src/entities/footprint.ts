@@ -1,6 +1,7 @@
-import { Entity, ManyToOne, Property, types } from '@mikro-orm/core'
+import { Collection, Entity, ManyToOne, OneToMany, Property, types } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'
+import { FootprintReaction } from './footprintReaction.js'
 
 @Entity()
 export class Footprint extends BaseEntity {
@@ -28,7 +29,8 @@ export class Footprint extends BaseEntity {
     @Property()
     public audioURL?: string
 
-    // TODO reactions
+    @OneToMany('FootprintReaction', 'footprint')
+    public reactions: Collection<FootprintReaction> = new Collection<FootprintReaction>(this)
 
     constructor(title: string, createdBy: User, latitude: string, longitude: string) {
         super()

@@ -7,6 +7,7 @@ import mikroOrmConfig from './config/mikro-orm.config.js'
 import Router from './router.js'
 import { User } from './entities/user.js'
 import { Footprint } from './entities/footprint.js'
+import { FootprintReaction } from './entities/footprintReaction.js'
 
 export const $app = {
     port: Number.parseInt(process.env.PORT as string, 10) || 3000,
@@ -16,6 +17,7 @@ export const $app = {
     orm: MikroORM<PostgreSqlDriver>,
     em: EntityManager,
     footprintRepository: EntityRepository<Footprint>,
+    footprintReactionRepository: EntityRepository<FootprintReaction>,
     userRepository: EntityRepository<User>,
 }
 
@@ -39,6 +41,7 @@ export default class Application {
         $app.em = $app.orm.em
         $app.userRepository = $app.em.getRepository(User)
         $app.footprintRepository = $app.em.getRepository(Footprint)
+        $app.footprintReactionRepository = $app.em.getRepository(FootprintReaction)
 
         this.server.use(express.json())
         this.server.use(express.urlencoded({ extended: true }))
