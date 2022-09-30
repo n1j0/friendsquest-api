@@ -24,14 +24,18 @@ router.get(
     (_request: Request, response: Response) => footprintController.getAllFootprints(response),
 )
 
-// TODO user information needs to be added
-
 /**
  * @openapi
  * /footprints/{id}/reactions:
  *   post:
  *     description: Create a new reaction
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:
