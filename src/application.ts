@@ -10,7 +10,7 @@ import { User } from './entities/user.js'
 import { Footprint } from './entities/footprint.js'
 import { FootprintReaction } from './entities/footprintReaction.js'
 
-interface ServiceAccount{
+interface ServiceAccount {
     type: string,
     project_id: string
     private_key_id: string,
@@ -48,7 +48,7 @@ export const $app = {
     footprintRepository: EntityRepository<Footprint>,
     footprintReactionRepository: EntityRepository<FootprintReaction>,
     userRepository: EntityRepository<User>,
-    firebase: any
+    firebase: any,
   }
 
 export default class Application {

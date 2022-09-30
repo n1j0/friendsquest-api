@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../application.js'
-import { FootprintReaction } from '../entities/footprintReaction'
-import { verifyAuthToken } from '../helper/firebaseAuth'
+import { FootprintReaction } from '../entities/footprintReaction.js'
+import { AUTH_HEADER_UID } from '../constants/index.js'
 
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
@@ -49,13 +49,11 @@ export default class FootprintController {
             return response.status(500).json({ message: 'ID is missing' })
         }
 
-        if (!request.headers['x-auth']) {
-            return response.status(403).send({ message: 'No authorization header' })
-        }
         try {
-            const uid = await verifyAuthToken(request.headers['x-auth'])
             const footprint = await $app.footprintRepository.findOneOrFail({ id } as any)
-            const user = await $app.userRepository.findOneOrFail({ uid } as any)
+            const user = await $app.userRepository.findOneOrFail({
+                uid: request.headers[AUTH_HEADER_UID] as string,
+            } as any)
             const reaction = new FootprintReaction(user, message, footprint)
             await $app.userRepository.persist(reaction)
         } catch (error: any) {

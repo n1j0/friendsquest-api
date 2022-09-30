@@ -2,12 +2,14 @@ import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
+import { getAuth } from 'firebase-admin/auth'
 import { openapiSpecification } from './docs/swagger.js'
 import { indexRoutes } from './routes/index.js'
 import { usersRoutes } from './routes/user.js'
 import { footprintRoutes } from './routes/footprint.js'
 import { $app } from './application.js'
 import { firebaseRoutes } from './routes/_firebaseAuth.js'
+import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
 
 export default class Router {
     private server: express.Application
@@ -29,8 +31,8 @@ export default class Router {
         })
 
         this.server.use('/', indexRoutes)
-        this.server.use('/users', usersRoutes)
-        this.server.use('/footprints', footprintRoutes)
+        this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
+        this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
         this.server.use('/firebase', firebaseRoutes)
 
         // custom 404

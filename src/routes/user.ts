@@ -12,6 +12,13 @@ const userController = new UserController()
  * /users:
  *   get:
  *     description: Returns all users
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *     responses:
  *       200:
  *         description: Returns persons
@@ -27,6 +34,12 @@ router.get(
  *   get:
  *     description: Get a user by uid
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:
@@ -122,6 +135,12 @@ router.post(
  *   patch:
  *     description: Update a user by uid
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:
@@ -192,6 +211,12 @@ router.patch(
  *   delete:
  *     description: Delete a user by uid
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:

@@ -13,6 +13,13 @@ const footprintController = new FootprintController()
  * /footprints:
  *   get:
  *     description: Returns all footprints
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *     responses:
  *       200:
  *         description: Returns footprints
@@ -70,6 +77,12 @@ router.post(
  *   get:
  *     description: Get a footprint by uid
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:
@@ -91,6 +104,12 @@ router.get(
  *   get:
  *     description: Returns all reactions to the specified footprint
  *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *       - in: path
  *         name: id
  *         schema:
@@ -117,6 +136,13 @@ router.get(
  * /footprints:
  *   post:
  *     description: Create a footprint
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *     requestBody:
  *         content:
  *           multipart/form-data:

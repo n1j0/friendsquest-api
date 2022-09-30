@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { wrap } from '@mikro-orm/core'
 import { $app } from '../application.js'
 import { User } from '../entities/user.js'
-import { verifyAuthToken } from '../helper/firebaseAuth'
+import { AUTH_HEADER_UID } from '../constants/index.js'
 
 export default class UserController {
     private userNotFoundError = (response: Response) => {
@@ -41,13 +41,8 @@ export default class UserController {
             return response.status(400).json({ message: 'Email is missing' })
         }
 
-        if (!request.headers['x-auth']) {
-            return response.status(403).send({ message: 'No authorization header' })
-        }
-
         try {
-            const uid = await verifyAuthToken(request.headers['x-auth'])
-            const user = new User(request.body.email, uid)
+            const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {
                 return response.status(400).json({ message: 'Email or Username already taken' })
