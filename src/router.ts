@@ -7,6 +7,7 @@ import { indexRoutes } from './routes/index.js'
 import { usersRoutes } from './routes/user.js'
 import { footprintRoutes } from './routes/footprint.js'
 import { $app } from './application.js'
+import { firebaseRoutes } from './routes/_firebaseAuth.js'
 
 export default class Router {
     private server: express.Application
@@ -30,6 +31,7 @@ export default class Router {
         this.server.use('/', indexRoutes)
         this.server.use('/users', usersRoutes)
         this.server.use('/footprints', footprintRoutes)
+        this.server.use('/firebase', firebaseRoutes)
 
         // custom 404
         this.server.use((_request: express.Request, response: express.Response) => {
