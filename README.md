@@ -32,6 +32,8 @@ $ docker-compose up --build
 $ docker-compose up
 ```
 
+Keep in mind that you have to rebuild the container when installing new dependencies.
+
 ### Running without node in docker
 ```bash
 # copy env file
@@ -124,6 +126,16 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 # Drop the database, migrate up to the latest version and afterwards seed the database
 $ npm run orm:restart
 ```
+
+## Health checks
+In order to check if the API is running, you can use the health check endpoint `/health`. It returns `status: up` if the API is running.
+
+### All endpoints
+| ID        | Description                                            |
+|-----------|--------------------------------------------------------|
+| `info`    | Displays application information.                      |
+| `metrics` | Shows metrics information for the current application. |
+| `health`  | Shows application health information.                  |
 
 ## Conventional Commits
 

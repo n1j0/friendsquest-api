@@ -3,6 +3,7 @@ import swaggerUi from 'swagger-ui-express'
 import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { getAuth } from 'firebase-admin/auth'
+import actuator from 'express-actuator'
 import { openapiSpecification } from './docs/swagger.js'
 import { indexRoutes } from './routes/index.js'
 import { usersRoutes } from './routes/user.js'
@@ -29,6 +30,8 @@ export default class Router {
         this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
             RequestContext.create(this.em, next)
         })
+
+        this.server.use(actuator())
 
         this.server.use('/', indexRoutes)
         this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)

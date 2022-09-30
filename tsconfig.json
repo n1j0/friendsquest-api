@@ -18,7 +18,8 @@
       "swagger-jsdoc",
       "cors",
       "multer",
-      "firebase"
+      "firebase",
+      "express-actuator"
     ]
   },
   "include": [
