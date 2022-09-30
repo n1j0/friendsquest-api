@@ -16,7 +16,9 @@
       "express",
       "swagger-ui-express",
       "swagger-jsdoc",
-      "cors"
+      "cors",
+      "multer",
+      "firebase"
     ]
   },
   "include": [
