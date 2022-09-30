@@ -15,7 +15,7 @@
  */
 import { NextFunction, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants/index.js'
 
 export const firebaseAuthMiddleware = (
     firebaseAuth: Auth,
@@ -43,8 +43,8 @@ export const firebaseAuthMiddleware = (
 
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
-            if (request.headers['x-auth']) {
-                let authHeader = request.headers['x-auth']
+            if (request.headers[AUTH_HEADER_KEY]) {
+                let authHeader = request.headers[AUTH_HEADER_KEY]
                 if (typeof authHeader !== 'string') {
                     [authHeader] = authHeader
                 }

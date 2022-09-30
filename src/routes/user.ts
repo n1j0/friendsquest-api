@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express'
 import UserController from '../controller/userController.js'
+import { userPermissionMiddleware } from '../middlewares/userPermission'
 
 const router = express.Router()
 const userController = new UserController()
@@ -202,6 +203,7 @@ router.post(
  */
 router.patch(
     '/:id',
+    userPermissionMiddleware((uid, request) => userController.isAllowedToEditUser(uid, request)),
     (request: Request, response: Response) => userController.updateUser(request, response),
 )
 

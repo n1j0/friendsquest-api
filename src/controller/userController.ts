@@ -22,6 +22,15 @@ export default class UserController {
         }
     }
 
+    public isAllowedToEditUser = async (uid: string, request: Request) => {
+        try {
+            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
+            return user.uid === uid
+        } catch {
+            return false
+        }
+    }
+
     public getAllUsers = async (response: Response) => response.status(200).json(await $app.userRepository.findAll())
 
     public getUserById = async (request: Request, response: Response) => {
