@@ -233,6 +233,7 @@ router.patch(
  */
 router.delete(
     '/:id',
+    userPermissionMiddleware((uid, request) => userController.isAllowedToEditUser(uid, request)),
     (request: Request, response: Response) => userController.deleteUser(request, response),
 )
 
