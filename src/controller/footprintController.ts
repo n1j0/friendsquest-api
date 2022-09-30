@@ -54,4 +54,8 @@ export default class FootprintController {
          */
         return response.sendStatus(204)
     }
+
+    /* public createFootprint = async (request: Request, response: Response) => {
+
+    } */
 }

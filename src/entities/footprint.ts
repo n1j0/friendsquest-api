@@ -32,11 +32,12 @@ export class Footprint extends BaseEntity {
     @OneToMany('FootprintReaction', 'footprint')
     public reactions: Collection<FootprintReaction> = new Collection<FootprintReaction>(this)
 
-    constructor(title: string, createdBy: User, latitude: string, longitude: string) {
+    constructor(title: string, createdBy: User, latitude: string, longitude: string, imageURL: string) {
         super()
         this.title = title
         this.createdBy = createdBy
         this.latitude = latitude
         this.longitude = longitude
+        this.imageURL = imageURL
     }
 }

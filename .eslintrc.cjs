@@ -46,7 +46,7 @@ module.exports = {
         'no-console': 0,
         semi: [ 'error', 'never' ],
         'import/extensions': 1,
-        'import/no-unresolved': [ 2, { ignore: ['^(.)?./'] }],
+        'import/no-unresolved': [ 2, { ignore: [ '^firebase-admin/.+', '^(.)?./' ] }],
         'import/prefer-default-export': 0,
         'unicorn/filename-case': [
             'error',
