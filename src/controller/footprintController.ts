@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../application.js'
 
 export default class FootprintController {
@@ -55,7 +56,36 @@ export default class FootprintController {
         return response.sendStatus(204)
     }
 
-    /* public createFootprint = async (request: Request, response: Response) => {
+    public createFootprint = async (request: Request, response: Response) => {
+        if (!request.body.title && !request.body.latitude && !request.body.longitude && !request.body.createdBy) {
+            return response.status(400).json({ message: 'Missing required fields' })
+        }
 
-    } */
+        // TODO maybe reduce the size of the image ( or in the frontend )
+        // TODO upload the image to firebase storage
+        // get maybe compressed blob file --> upload to firebase storage --> get url --> save to db
+
+        if (request.file) {
+            const image = request.body.files.image[0]
+
+            const storage = await $app.firebase.storage().ref('gs://friends-quest.appspot.com').upload(image, {
+                public: true,
+                destination: `/images/${uuidv4()}`,
+                metadata: {
+                    firebaseStorageDownloadTokens: uuidv4(),
+                },
+            })
+
+            // Link to file
+            console.log(storage[0].metadata.mediaLink)
+            return response.status(201).json(storage[0].metadata.mediaLink)
+        }
+
+        try {
+            const footprint = await $app.footprintRepository.create(request.body)
+            return response.status(201).json(footprint)
+        } catch (error: any) {
+            return response.status(500).json({ message: error.message })
+        }
+    }
 }
