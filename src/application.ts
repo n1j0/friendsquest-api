@@ -25,7 +25,7 @@ interface ServiceAccount{
 
 const serviceAccount = {
     type: 'service_account',
-    project_id: 'your-project-id',
+    project_id: process.env.FIREBASE_PROJECT_ID,
     private_key_id: process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
     // See: https://stackoverflow.com/a/50376092/3403247.
     private_key: (process.env.FIREBASE_ADMIN_PRIVATE_KEY as string).replace(/\\n/g, '\n'),

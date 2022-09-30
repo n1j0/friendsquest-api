@@ -47,6 +47,13 @@ router.get(
  * /users:
  *   post:
  *     description: Create a new user
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
  *     requestBody:
  *       required: true
  *       content:
@@ -111,7 +118,7 @@ router.post(
 
 /**
  * @openapi
- * /users/:id:
+ * /users/{id}:
  *   patch:
  *     description: Update a user by uid
  *     parameters:

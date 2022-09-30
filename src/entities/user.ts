@@ -15,6 +15,9 @@ export class User extends BaseEntity {
     @Property({ unique: true })
     public email!: string
 
+    @Property({ unique: true })
+    public uid!: string
+
     @Property()
     public emailVerified: boolean = false
 
@@ -33,8 +36,9 @@ export class User extends BaseEntity {
     @Property()
     public imageURL?: string
 
-    constructor(email: string) {
+    constructor(email: string, uid: string) {
         super()
         this.email = email
+        this.uid = uid
     }
 }

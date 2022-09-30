@@ -69,6 +69,15 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "uid": {
+          "name": "uid",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
         "email_verified": {
           "name": "email_verified",
           "type": "boolean",
@@ -143,6 +152,15 @@
           ],
           "composite": false,
           "keyName": "user_email_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "uid"
+          ],
+          "composite": false,
+          "keyName": "user_uid_unique",
           "primary": false,
           "unique": true
         },
