@@ -15,7 +15,7 @@
  */
 import { NextFunction, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
-import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants'
+import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants/index'
 
 export const firebaseAuthMiddleware = (
     firebaseAuth: Auth,

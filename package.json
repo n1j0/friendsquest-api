@@ -5,7 +5,7 @@
   "main": "./.out/index.js",
   "scripts": {
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" nodemon --ext ts --experimental-specifier-resolution node ./src",
-    "start": "tsc && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/index.js",
+    "start": "rm -rf .out && tsc && node addJsExtensionToImports.js && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/index.js",
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location temp/.eslintcache --ignore-path ../.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
@@ -65,6 +65,7 @@
     "eslint-plugin-security": "^1.5.0",
     "eslint-plugin-sonarjs": "^0.15.0",
     "eslint-plugin-unicorn": "^43.0.2",
+    "glob": "^8.0.3",
     "husky": "^8.0.1",
     "jest": "^29.1.2",
     "lint-staged": "^13.0.3",

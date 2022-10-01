@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app'
 import { FootprintReaction } from '../entities/footprintReaction'
-import { AUTH_HEADER_UID } from '../constants'
+import { AUTH_HEADER_UID } from '../constants/index'
 
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
