@@ -1,0 +1,27 @@
+image: node
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - setup
+  - lint
+
+node:
+  stage: setup
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules/
+
+eslint:
+  stage: lint
+  script:
+    - npm run lint
+
+typecheck:
+  stage: lint
+  script:
+    - npm run typecheck
