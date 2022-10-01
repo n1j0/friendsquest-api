@@ -1,4 +1,16 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/**
+ * Goes through every js file in the .out directory and adds the .js extension to every import statement.
+ * This is necessary because the TypeScript compiler does not add the extension to imports.
+ * Only imports that are relative are affected. So imports from node_modules are not affected.
+ * @example
+ * "import { foo } from './foo'"
+ * => "import { foo } from './foo.js'"
+ * "import { zab } from '../x/zab'"
+ * => "import { zab } from '../x/zab.js'"
+ * "import { bar } from 'bar'"
+ * => "import { bar } from 'bar'"
+ */
+
 import * as fs from 'node:fs'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import glob from 'glob'
