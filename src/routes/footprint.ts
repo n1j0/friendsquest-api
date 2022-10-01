@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import multer from 'multer'
-import FootprintController from '../controller/footprintController.js'
+import FootprintController from '../controller/footprintController'
 
 const upload = multer()
 const router = express.Router()

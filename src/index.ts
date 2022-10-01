@@ -1,5 +1,5 @@
 import { config } from 'dotenv'
-import Application from './application.js'
+import Application from './application'
 
 if (process.env.NODE_ENV !== 'production') {
     config()

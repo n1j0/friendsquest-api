@@ -15,7 +15,7 @@
  */
 import { NextFunction, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
-import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants/index.js'
+import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants'
 
 export const firebaseAuthMiddleware = (
     firebaseAuth: Auth,
@@ -43,12 +43,15 @@ export const firebaseAuthMiddleware = (
 
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
+            // eslint-disable-next-line security/detect-object-injection
             if (request.headers[AUTH_HEADER_KEY]) {
+                // eslint-disable-next-line security/detect-object-injection
                 let authHeader = request.headers[AUTH_HEADER_KEY]
                 if (typeof authHeader !== 'string') {
                     [authHeader] = authHeader
                 }
                 const decodedToken = await firebaseAuth.verifyIdToken(authHeader, checkRevoked)
+                // eslint-disable-next-line security/detect-object-injection
                 request.headers[attachUserTo] = decodedToken.uid
                 return next()
             }

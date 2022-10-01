@@ -45,7 +45,14 @@ module.exports = {
         ],
         'no-console': 0,
         semi: [ 'error', 'never' ],
-        'import/extensions': 1,
+        'import/extensions': [
+            'error',
+            'ignorePackages',
+            {
+                js: 'never',
+                ts: 'never',
+            },
+        ],
         'import/no-unresolved': [ 2, { ignore: [ '^firebase-admin/.+', '^(.)?./' ] }],
         'import/prefer-default-export': 0,
         'unicorn/filename-case': [
@@ -61,6 +68,11 @@ module.exports = {
         'class-methods-use-this': 0,
     },
     overrides: [
+        {
+            files: ['tests/**'],
+            plugins: ['jest'],
+            extends: ['plugin:jest/recommended'],
+        },
         {
             files: ['src/entities/**/*.*'],
             rules: {

@@ -1,8 +1,8 @@
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { UserSeeder } from './UserSeeder.js'
-import { FootprintSeeder } from './FootprintSeeder.js'
-import { FootprintReactionSeeder } from './FootprintReactionSeeder.js'
+import { UserSeeder } from './UserSeeder'
+import { FootprintSeeder } from './FootprintSeeder'
+import { FootprintReactionSeeder } from './FootprintReactionSeeder'
 
 export class DatabaseSeeder extends Seeder {
     async run(em: EntityManager): Promise<void> {

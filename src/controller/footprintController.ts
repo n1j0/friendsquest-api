@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { $app } from '../application.js'
-import { FootprintReaction } from '../entities/footprintReaction.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { $app } from '../$app'
+import { FootprintReaction } from '../entities/footprintReaction'
+import { AUTH_HEADER_UID } from '../constants'
 
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
@@ -52,6 +52,7 @@ export default class FootprintController {
         try {
             const footprint = await $app.footprintRepository.findOneOrFail({ id } as any)
             const user = await $app.userRepository.findOneOrFail({
+                // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)

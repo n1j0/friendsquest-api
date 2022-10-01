@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { wrap } from '@mikro-orm/core'
-import { $app } from '../application.js'
-import { User } from '../entities/user.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { $app } from '../$app'
+import { User } from '../entities/user'
+import { AUTH_HEADER_UID } from '../constants'
 
 export default class UserController {
     private userNotFoundError = (response: Response) => {
@@ -51,6 +51,7 @@ export default class UserController {
         }
 
         try {
+            // eslint-disable-next-line security/detect-object-injection
             const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {

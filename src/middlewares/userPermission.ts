@@ -2,7 +2,7 @@
  * Authorization middleware using Firebase Auth
  */
 import { NextFunction, Request, Response } from 'express'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { AUTH_HEADER_UID } from '../constants'
 
 export const userPermissionMiddleware = (
     /* eslint-disable no-unused-vars */
@@ -35,7 +35,9 @@ export const userPermissionMiddleware = (
      */
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
+            // eslint-disable-next-line security/detect-object-injection
             if (request.headers[attachUserTo]) {
+                // eslint-disable-next-line security/detect-object-injection
                 let uid = request.headers[attachUserTo]
                 if (uid && typeof uid !== 'string') {
                     [uid] = uid
