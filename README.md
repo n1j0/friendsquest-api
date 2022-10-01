@@ -10,6 +10,10 @@ A Node.js express application written in Typescript for the backend of the App "
 optional:
 * nvm
 
+## Important notes
+
+* Always write `/index` at the end of the import path if you reference an index.ts file. This is necessary for the typescript compiler and `addJsExtensionToImports` script to work correctly.
+
 ## Getting started
 
 You have two options: using the backend within or outside a docker container.
