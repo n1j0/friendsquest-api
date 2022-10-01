@@ -9,7 +9,7 @@
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location temp/.eslintcache --ignore-path ../.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test": "jest",
     "test:watch": "jest --watchAll",
     "test:ci": "node --expose-gc node_modules/.bin/jest --ci --reporters=default --coverage --logHeapUsage --maxWorkers=50%",
     "migrate:create": "NODE_OPTIONS=\"--loader ts-node/esm\" mikro-orm migration:create",
