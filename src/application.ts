@@ -1,6 +1,7 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import compression from 'compression'
 import Router from './router.js'
 import { User } from './entities/user.js'
 import { Footprint } from './entities/footprint.js'
@@ -33,6 +34,7 @@ export default class Application {
         this.server.use(express.urlencoded({ extended: true }))
         this.server.use(helmet())
         this.server.use(cors())
+        this.server.use(compression())
 
         this.server.disable('x-powered-by')
 

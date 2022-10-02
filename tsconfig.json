@@ -19,7 +19,8 @@
       "cors",
       "multer",
       "express-actuator",
-      "jest"
+      "jest",
+      "compression"
     ]
   },
   "include": [
