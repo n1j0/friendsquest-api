@@ -6,25 +6,36 @@ import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController'
 
 // eslint-disable-next-line no-undef
-async function uploadFileToFirestorage(data: Express.Multer.File, directory: string) {
-    const fileName = uuidv4()
-    const fullPath = `${directory}/${fileName}.${data.mimetype.split('/')[1]}`
+async function uploadFileToFirestorage(data: Express.Multer.File[]) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
 
-    const bucketFile = bucket.file(fullPath)
+    const promises = data.map((file) => {
+        const fileName = uuidv4()
 
-    console.log(data.buffer)
-    await bucketFile.save(data.buffer, {
-        metadata: {
-            contentType: data.mimetype,
-        },
-    })
-    const [url] = await bucketFile.getSignedUrl({
-        action: 'read',
-        expires: '01-01-2050',
-    })
+        const fullPath = () => {
+            if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+                return `images/${fileName}.${file.mimetype.split('/')[1]}`
+            }
+            if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3') {
+                return `audios/${fileName}.${file.mimetype.split('/')[1]}`
+            }
+            return `videos/${fileName}.${file.mimetype.split('/')[1]}`
+        }
 
-    return url
+        const bucketFile = bucket.file(fullPath())
+        console.log(file.mimetype)
+        bucketFile.save(file.buffer, {
+            metadata: {
+                contentType: file.mimetype,
+            },
+        })
+
+        return bucketFile.getSignedUrl({
+            action: 'read',
+            expires: '01-01-2050',
+        })
+    })
+    return Promise.all(promises)
 }
 
 export default class FootprintController {
@@ -100,8 +111,10 @@ export default class FootprintController {
             /* const footprint = await $app.footprintRepository.create()
             await $app.footprintRepository.persist(footprint) */
             // eslint-disable-next-line no-undef
-            const photoURL = await uploadFileToFirestorage(request.file as Express.Multer.File, 'images')
-            return response.status(201).json({ message: photoURL })
+            const [ videoURL, audioURL ] = await uploadFileToFirestorage(request.files as Express.Multer.File[])
+
+            // TODO store to db
+            return response.status(201).json({ videoURL, audioURL })
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }

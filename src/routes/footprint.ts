@@ -149,9 +149,11 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 file:
- *                   type: string
- *                   format: binary
+ *                 files:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     format: binary
  *     responses:
  *       200:
  *         description: Returns reactions
@@ -162,7 +164,7 @@ router.get(
  */
 router.post(
     '/',
-    upload.single('file'),
+    upload.array('files'),
     (request: Request, response: Response) => footprintController.createFootprint(request, response),
 )
 
