@@ -23,4 +23,4 @@ check:
     - npm ci --prefer-offline --no-audit --ignore-scripts
     - npm run lint
     - npm run typecheck
-    - npm run jest:ci
+    - npm run test:ci
