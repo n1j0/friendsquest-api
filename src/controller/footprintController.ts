@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app.js'
 import { FootprintReaction } from '../entities/footprintReaction.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
+import ErrorController from './errorController'
 
 // eslint-disable-next-line no-undef
 async function uploadFileToFirestorage(data: Express.Multer.File, directory: string) {
@@ -32,7 +33,7 @@ export default class FootprintController {
             const footprints = await $app.footprintRepository.findAll()
             return response.status(200).json(footprints)
         } catch (error: any) {
-            return response.status(500).json({ message: error.message })
+            return ErrorController.sendError(response, 500, error)
         }
     }
 
@@ -42,33 +43,33 @@ export default class FootprintController {
             if (footprint) {
                 return response.status(200).json(footprint)
             }
-            return response.status(404).json({ message: 'Footprint not found' })
+            return ErrorController.sendError(response, 404, 'Footprint not found')
         } catch (error: any) {
-            return response.status(500).json({ message: error.message })
+            return ErrorController.sendError(response, 500, error)
         }
     }
 
     public getFootprintReactions = async (request: Request, response: Response) => {
         const footprintId = request.params.id
         if (!footprintId) {
-            return response.status(500).json({ message: 'ID is missing' })
+            return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
             const footprints = await $app.footprintReactionRepository.findOneOrFail({ footprint: footprintId } as any)
             return response.status(200).json(footprints)
         } catch (error: any) {
-            return response.status(500).json({ message: error.message })
+            return ErrorController.sendError(response, 500, error)
         }
     }
 
     public createFootprintReaction = async (request: Request, response: Response) => {
         const message = request.body.message.trim()
         if (!message) {
-            return response.status(500).json({ message: 'Message is missing' })
+            return ErrorController.sendError(response, 500, 'Message is missing')
         }
         const { id } = request.params
         if (!id) {
-            return response.status(500).json({ message: 'ID is missing' })
+            return ErrorController.sendError(response, 500, 'ID is missing')
         }
 
         try {
@@ -80,7 +81,7 @@ export default class FootprintController {
             const reaction = new FootprintReaction(user, message, footprint)
             await $app.userRepository.persist(reaction)
         } catch (error: any) {
-            return response.status(403).send({ message: error.message })
+            return ErrorController.sendError(response, 403, error)
         }
 
         return response.sendStatus(204)
@@ -92,7 +93,7 @@ export default class FootprintController {
             return response.status(400).json({ message: 'Missing required fields' })
         } */
         if (!request.file) {
-            return response.status(400).json({ message: 'Missing required fields' })
+            return ErrorController.sendError(response, 400, 'Missing required fields')
         }
 
         try {
@@ -102,7 +103,7 @@ export default class FootprintController {
             const photoURL = await uploadFileToFirestorage(request.file as Express.Multer.File, 'images')
             return response.status(201).json({ message: photoURL })
         } catch (error: any) {
-            return response.status(500).json({ message: error.message })
+            return ErrorController.sendError(response, 500, error)
         }
     }
 }

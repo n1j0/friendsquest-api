@@ -3,13 +3,10 @@ import { wrap } from '@mikro-orm/core'
 import { $app } from '../$app.js'
 import { User } from '../entities/user.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
+import ErrorController from './errorController'
 
 export default class UserController {
-    private userNotFoundError = (response: Response) => {
-        response.status(404).send({
-            message: 'User not found',
-        })
-    }
+    private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
     private checkUsernameAndMail = async (request: Request) => {
         const [ username, email ] = await Promise.all([
@@ -47,7 +44,7 @@ export default class UserController {
 
     public createUser = async (request: Request, response: Response) => {
         if (!request.body.email) {
-            return response.status(400).json({ message: 'Email is missing' })
+            return ErrorController.sendError(response, 403, 'Email is missing')
         }
 
         try {
@@ -61,7 +58,7 @@ export default class UserController {
             await $app.userRepository.persist(user)
             return response.status(201).json(user)
         } catch (error: any) {
-            return response.status(403).send({ message: error.message })
+            return ErrorController.sendError(response, 403, error)
         }
     }
 
@@ -71,7 +68,7 @@ export default class UserController {
             wrap(user).assign(request.body)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {
-                return response.status(400).json({ message: 'Email or Username already taken' })
+                return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
             await $app.userRepository.persist(user)
 
@@ -84,7 +81,7 @@ export default class UserController {
     public deleteUser = async (request: Request, response: Response) => {
         const { id } = request.params
         if (!id) {
-            return response.status(500).json({ message: 'Missing id' })
+            return ErrorController.sendError(response, 500, 'ID is missing')
         }
         const user = await $app.userRepository.findOne({ id } as any)
         if (user) {
@@ -92,7 +89,7 @@ export default class UserController {
                 await $app.userRepository.removeAndFlush(user)
                 return response.status(204).json()
             } catch (error: any) {
-                return response.status(500).json({ message: error.message })
+                return ErrorController.sendError(response, 500, error)
             }
         }
         return this.userNotFoundError(response)

@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express'
 import fetch from 'node-fetch'
+import ErrorController from '../controller/errorController'
 
 const router = express.Router()
 
@@ -33,7 +34,7 @@ router.get('/token', async (_request: Request, response: Response) => {
         )
         return response.status(200).json((await token.json() as any).idToken)
     } catch (error: any) {
-        return response.status(500).json({ message: error.message })
+        return ErrorController.sendError(response, 500, error)
     }
 })
 
