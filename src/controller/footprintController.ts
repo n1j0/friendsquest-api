@@ -1,25 +1,29 @@
 import { Request, Response } from 'express'
-// import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app.js'
 import { FootprintReaction } from '../entities/footprintReaction.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 
-async function uploadFileToFirestorage(request: Request) {
-    const image = request.body.file
-    const bucket = $app.firebase.storage().bucket()
-    const imageBuffer = Buffer.from(image.buffer, 'base64')
-    const imageByteArray = new Uint8Array(imageBuffer)
-    const options = {
-        resumable: false,
-        metadata: { contentType: image.mimetype },
-        predefinedAcl: 'publicRead',
-        public: true,
-    }
-    const files = bucket.file(`images/${image.originalname}`)
-    await files.save(imageByteArray, options)
-    const field = await files.getMetadata()
+// eslint-disable-next-line no-undef
+async function uploadFileToFirestorage(data: Express.Multer.File, directory: string) {
+    const fileName = uuidv4()
+    const fullPath = `${directory}/${fileName}.${data.mimetype.split('/')[1]}`
+    const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
 
-    return field[0].mediaLink
+    const bucketFile = bucket.file(fullPath)
+
+    console.log(data.buffer)
+    await bucketFile.save(data.buffer, {
+        metadata: {
+            contentType: data.mimetype,
+        },
+    })
+    const [url] = await bucketFile.getSignedUrl({
+        action: 'read',
+        expires: '01-01-2050',
+    })
+
+    return url
 }
 
 export default class FootprintController {
@@ -83,18 +87,19 @@ export default class FootprintController {
     }
 
     public createFootprint = async (request: Request, response: Response) => {
-        console.log(request.file)
-        if (!request.body.title && !request.body.latitude
+        /* if (!request.body.title && !request.body.latitude
             && !request.body.longitude && !request.body.createdBy && !request.body.file) {
             return response.status(400).json({ message: 'Missing required fields' })
+        } */
+        if (!request.file) {
+            return response.status(400).json({ message: 'Missing required fields' })
         }
-        const photoURL = await uploadFileToFirestorage(request)
-        // TODO upload the image to firebase storage
-        // get maybe compressed blob file --> upload to firebase storage --> get url --> save to db
 
         try {
             /* const footprint = await $app.footprintRepository.create()
             await $app.footprintRepository.persist(footprint) */
+            // eslint-disable-next-line no-undef
+            const photoURL = await uploadFileToFirestorage(request.file as Express.Multer.File, 'images')
             return response.status(201).json({ message: photoURL })
         } catch (error: any) {
             return response.status(500).json({ message: error.message })

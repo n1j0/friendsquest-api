@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express'
-import multer from 'multer'
+import Multer from 'multer'
 import FootprintController from '../controller/footprintController.js'
 
-const upload = multer()
+const upload = Multer()
 const router = express.Router()
 const footprintController = new FootprintController()
 
@@ -149,18 +149,20 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 image:
+ *                 file:
  *                   type: string
  *                   format: binary
  *     responses:
  *       200:
  *         description: Returns reactions
+ *       400:
+ *         description: Missing required fields
  *       500:
  *         description: Error
  */
 router.post(
     '/',
-    upload.single('image'),
+    upload.single('file'),
     (request: Request, response: Response) => footprintController.createFootprint(request, response),
 )
 

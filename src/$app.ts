@@ -1,5 +1,6 @@
 import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
 import { cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
+import { getStorage, Storage } from 'firebase-admin/storage'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import mikroOrmConfig from './config/mikro-orm.config.js'
 import { Footprint } from './entities/footprint.js'
@@ -24,6 +25,7 @@ export const $app = {
     port: Number.parseInt(process.env.PORT as string, 10) || 3000,
     orm: await MikroORM.init(mikroOrmConfig),
     firebase: initializeApp({ credential: cert(serviceAccount) }),
+    storage: getStorage(),
 } as {
     port: number,
     orm: MikroORM<PostgreSqlDriver>,
@@ -32,4 +34,5 @@ export const $app = {
     footprintReactionRepository: EntityRepository<FootprintReaction>,
     userRepository: EntityRepository<User>,
     firebase: any,
+    storage: Storage
 }
