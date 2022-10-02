@@ -11,23 +11,30 @@ const router = express.Router()
  *     responses:
  *       200:
  *         description: Returns the idToken
+ *       500:
+ *         description: Internal server error
  */
 router.get('/token', async (_request: Request, response: Response) => {
-    const token = await fetch(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+    try {
+        const token = await fetch(
+            // eslint-disable-next-line max-len
+            `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: process.env.FIREBASE_TEST_USER,
+                    password: process.env.FIREBASE_TEST_PASSWORD,
+                    returnSecureToken: true,
+                }),
             },
-            body: JSON.stringify({
-                email: process.env.FIREBASE_TEST_USER,
-                password: process.env.FIREBASE_TEST_PASSWORD,
-                returnSecureToken: true,
-            }),
-        },
-    )
-    return response.status(200).json((await token.json() as any).idToken)
+        )
+        return response.status(200).json((await token.json() as any).idToken)
+    } catch (error: any) {
+        return response.status(500).json({ message: error.message })
+    }
 })
 
 export const firebaseRoutes = router
