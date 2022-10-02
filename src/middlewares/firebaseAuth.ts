@@ -48,10 +48,9 @@ export const firebaseAuthMiddleware = (
                 // eslint-disable-next-line security/detect-object-injection
                 let authHeader = request.headers[AUTH_HEADER_KEY]
                 if (typeof authHeader !== 'string') {
-                    // @ts-ignore
                     [authHeader] = authHeader
                 }
-                const decodedToken = await firebaseAuth.verifyIdToken(authHeader as string, checkRevoked)
+                const decodedToken = await firebaseAuth.verifyIdToken(authHeader, checkRevoked)
                 // eslint-disable-next-line security/detect-object-injection
                 request.headers[attachUserTo] = decodedToken.uid
                 return next()
