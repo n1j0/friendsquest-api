@@ -1,6 +1,6 @@
 import type { Dictionary, EntityManager, RequiredEntityData } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { User } from '../entities/user'
+import { User } from '../entities/user.js'
 
 export class UserSeeder extends Seeder {
     async run(em: EntityManager, context: Dictionary): Promise<void> {

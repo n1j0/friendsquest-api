@@ -1,8 +1,8 @@
 import { Collection, Entity, ManyToOne, OneToMany, Property, types } from '@mikro-orm/core'
-import { BaseEntity } from './baseEntity'
-import { User } from './user'
+import { BaseEntity } from './baseEntity.js'
+import { User } from './user.js'
 // eslint-disable-next-line import/no-cycle
-import { FootprintReaction } from './footprintReaction'
+import { FootprintReaction } from './footprintReaction.js'
 
 @Entity()
 export class Footprint extends BaseEntity {

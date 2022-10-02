@@ -1,6 +1,6 @@
 import type { Dictionary, EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
-import { FootprintReaction } from '../entities/footprintReaction'
+import { FootprintReaction } from '../entities/footprintReaction.js'
 
 export class FootprintReactionSeeder extends Seeder {
     async run(em: EntityManager, context: Dictionary): Promise<void> {

@@ -1,10 +1,10 @@
 import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
 import { cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
-import mikroOrmConfig from './config/mikro-orm.config'
-import { Footprint } from './entities/footprint'
-import { FootprintReaction } from './entities/footprintReaction'
-import { User } from './entities/user'
+import mikroOrmConfig from './config/mikro-orm.config.js'
+import { Footprint } from './entities/footprint.js'
+import { FootprintReaction } from './entities/footprintReaction.js'
+import { User } from './entities/user.js'
 
 const serviceAccount = {
     type: 'service_account',

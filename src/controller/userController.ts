@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { wrap } from '@mikro-orm/core'
-import { $app } from '../$app'
-import { User } from '../entities/user'
-import { AUTH_HEADER_UID } from '../constants/index'
+import { $app } from '../$app.js'
+import { User } from '../entities/user.js'
+import { AUTH_HEADER_UID } from '../constants/index.js'
 
 export default class UserController {
     private userNotFoundError = (response: Response) => {

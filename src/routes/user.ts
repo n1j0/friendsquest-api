@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
-import UserController from '../controller/userController'
-import { userPermissionMiddleware } from '../middlewares/userPermission'
+import UserController from '../controller/userController.js'
+import { userPermissionMiddleware } from '../middlewares/userPermission.js'
 
 const router = express.Router()
 const userController = new UserController()
@@ -203,7 +203,7 @@ router.post(
  */
 router.patch(
     '/:id',
-    userPermissionMiddleware((uid, request) => userController.isAllowedToEditUser(uid, request)),
+    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(uid, request)),
     (request: Request, response: Response) => userController.updateUser(request, response),
 )
 
@@ -233,7 +233,7 @@ router.patch(
  */
 router.delete(
     '/:id',
-    userPermissionMiddleware((uid, request) => userController.isAllowedToEditUser(uid, request)),
+    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(uid, request)),
     (request: Request, response: Response) => userController.deleteUser(request, response),
 )
 

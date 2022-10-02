@@ -1,8 +1,26 @@
 import { Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
-import { $app } from '../$app'
-import { FootprintReaction } from '../entities/footprintReaction'
-import { AUTH_HEADER_UID } from '../constants/index'
+// import { v4 as uuidv4 } from 'uuid'
+import { $app } from '../$app.js'
+import { FootprintReaction } from '../entities/footprintReaction.js'
+import { AUTH_HEADER_UID } from '../constants/index.js'
+
+async function uploadFileToFirestorage(request: Request) {
+    const image = request.body.file
+    const bucket = $app.firebase.storage().bucket()
+    const imageBuffer = Buffer.from(image.buffer, 'base64')
+    const imageByteArray = new Uint8Array(imageBuffer)
+    const options = {
+        resumable: false,
+        metadata: { contentType: image.mimetype },
+        predefinedAcl: 'publicRead',
+        public: true,
+    }
+    const files = bucket.file(`images/${image.originalname}`)
+    await files.save(imageByteArray, options)
+    const field = await files.getMetadata()
+
+    return field[0].mediaLink
+}
 
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
@@ -65,33 +83,19 @@ export default class FootprintController {
     }
 
     public createFootprint = async (request: Request, response: Response) => {
-        if (!request.body.title && !request.body.latitude && !request.body.longitude && !request.body.createdBy) {
+        console.log(request.file)
+        if (!request.body.title && !request.body.latitude
+            && !request.body.longitude && !request.body.createdBy && !request.body.file) {
             return response.status(400).json({ message: 'Missing required fields' })
         }
-
-        // TODO maybe reduce the size of the image ( or in the frontend )
+        const photoURL = await uploadFileToFirestorage(request)
         // TODO upload the image to firebase storage
         // get maybe compressed blob file --> upload to firebase storage --> get url --> save to db
 
-        if (request.file) {
-            const image = request.body.files.image[0]
-
-            const storage = await $app.firebase.storage().ref('gs://friends-quest.appspot.com').upload(image, {
-                public: true,
-                destination: `/images/${uuidv4()}`,
-                metadata: {
-                    firebaseStorageDownloadTokens: uuidv4(),
-                },
-            })
-
-            // Link to file
-            console.log(storage[0].metadata.mediaLink)
-            return response.status(201).json(storage[0].metadata.mediaLink)
-        }
-
         try {
-            const footprint = await $app.footprintRepository.create(request.body)
-            return response.status(201).json(footprint)
+            /* const footprint = await $app.footprintRepository.create()
+            await $app.footprintRepository.persist(footprint) */
+            return response.status(201).json({ message: photoURL })
         } catch (error: any) {
             return response.status(500).json({ message: error.message })
         }

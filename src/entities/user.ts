@@ -1,5 +1,5 @@
 import { Entity, Property } from '@mikro-orm/core'
-import { BaseEntity } from './baseEntity'
+import { BaseEntity } from './baseEntity.js'
 
 @Entity()
 export class User extends BaseEntity {

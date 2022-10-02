@@ -1,11 +1,11 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
-import Router from './router'
-import { User } from './entities/user'
-import { Footprint } from './entities/footprint'
-import { FootprintReaction } from './entities/footprintReaction'
-import { $app } from './$app'
+import Router from './router.js'
+import { User } from './entities/user.js'
+import { Footprint } from './entities/footprint.js'
+import { FootprintReaction } from './entities/footprintReaction.js'
+import { $app } from './$app.js'
 
 export default class Application {
     public server: express.Application = express()
