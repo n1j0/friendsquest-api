@@ -11,7 +11,8 @@ import { $app } from './$app.js'
 export default class Application {
     public server: express.Application = express()
 
-    // eslint-disable-next-line class-methods-use-this
+    public router: Router | undefined
+
     public connect = async (): Promise<void> => {
         try {
             const migrator = $app.orm.getMigrator()
@@ -38,7 +39,8 @@ export default class Application {
 
         this.server.disable('x-powered-by')
 
-        new Router(this.server, $app.orm).initRoutes()
+        this.router = new Router(this.server, $app.orm)
+        this.router.initRoutes()
 
         try {
             this.server.listen($app.port, () => {
