@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app.js'
 import { FootprintReaction } from '../entities/footprintReaction.js'
+import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController'
 
@@ -23,7 +24,7 @@ async function uploadFileToFirestorage(data: Express.Multer.File[]) {
         }
 
         const bucketFile = bucket.file(fullPath())
-        console.log(file.mimetype)
+
         bucketFile.save(file.buffer, {
             metadata: {
                 contentType: file.mimetype,
@@ -33,6 +34,8 @@ async function uploadFileToFirestorage(data: Express.Multer.File[]) {
         return bucketFile.getSignedUrl({
             action: 'read',
             expires: '01-01-2050',
+        }).then(signedUrls => signedUrls[0]).catch((error) => {
+            throw error
         })
     })
     return Promise.all(promises)
@@ -103,18 +106,28 @@ export default class FootprintController {
             && !request.body.longitude && !request.body.createdBy && !request.body.file) {
             return response.status(400).json({ message: 'Missing required fields' })
         } */
-        if (!request.file) {
+        if (!request.files) {
             return ErrorController.sendError(response, 400, 'Missing required fields')
         }
 
         try {
-            /* const footprint = await $app.footprintRepository.create()
-            await $app.footprintRepository.persist(footprint) */
+            const em = $app.em.fork()
+            const user = await em.findOneOrFail('User', {
+                // eslint-disable-next-line security/detect-object-injection
+                uid: request.headers[AUTH_HEADER_UID] as string,
+            } as any)
             // eslint-disable-next-line no-undef
-            const [ videoURL, audioURL ] = await uploadFileToFirestorage(request.files as Express.Multer.File[])
-
-            // TODO store to db
-            return response.status(201).json({ videoURL, audioURL })
+            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files as Express.Multer.File[])
+            const footprint = new Footprint(
+                request.body.title,
+                request.body.latitude,
+                request.body.longitude,
+                user,
+                photoURL,
+                audioURL,
+            )
+            em.persist(footprint)
+            return response.status(201).json(footprint)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
