@@ -137,6 +137,12 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 $ npm run orm:restart
 ```
 
+## Pushing to FH system
+```bash
+$ git remote add dokku ssh://projects.multimediatechnology.at:5412/friendsquest
+$ git push dokku main:main
+```
+
 ## Health checks
 In order to check if the API is running, you can use the health check endpoint `/health`. It returns `status: up` if the API is running.
 
