@@ -1,0 +1,94 @@
+components:
+  schemas:
+    Footprint:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The id of the footprint
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          description: The date of creation of the footprint
+          example: 2020-12-01T12:00:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date of the last update of the footprint
+          example: 2020-12-01T12:00:00.000Z
+        title:
+          type: string
+          description: The title of the footprint
+          example: My first footprint
+          required: true
+        description:
+          type: string
+          description: The description of the footprint
+          example: This is my first footprint
+          required: false
+        createdBy:
+          type: number
+          description: The id of the user who created the footprint
+          example: 1
+          required: true
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the footprint
+          example: 48.2081743
+          required: true
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the footprint
+          example: 16.3738189
+          required: true
+        viewCount:
+          type: number
+          description: The view count of the footprint
+          example: 50
+          required: false
+          default: 0
+        imageURL:
+          type: string
+          description: The image URL of the footprint
+          example: 'https://example.com/image.png'
+          format: uri
+          required: true
+        audioURL:
+          type: string
+          description: The audio URL of the footprint
+          example: 'https://example.com/audio.mp3'
+          format: uri
+          required: true
+    NewFootprint:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the footprint
+          example: My first footprint
+          required: true
+        description:
+          type: string
+          description: The description of the footprint
+          example: This is my first footprint
+          required: false
+        createdBy:
+          type: number
+          description: The id of the user who created the footprint
+          example: 1
+          required: true
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the footprint
+          example: 48.2081743
+          required: true
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the footprint
+          example: 16.3738189
+          required: true

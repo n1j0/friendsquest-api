@@ -19,13 +19,13 @@ const upload = Multer({ fileFilter(request: Request, file: Express.Multer.File, 
 const router = express.Router()
 const footprintController = new FootprintController()
 
-// TODO better openapi documentation
-
 /**
  * @openapi
  * /footprints:
  *   get:
- *     description: Returns all footprints
+ *     summary: Returns all footprints
+ *     tags:
+ *       - Footprint
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -36,6 +36,14 @@ const footprintController = new FootprintController()
  *     responses:
  *       200:
  *         description: Returns footprints
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Footprint'
+ *       403:
+ *         description: Forbidden access or invalid token
  *       500:
  *         description: Error
  */
@@ -48,7 +56,9 @@ router.get(
  * @openapi
  * /footprints/{id}/reactions:
  *   post:
- *     description: Create a new reaction
+ *     summary: Create a new reaction
+ *     tags:
+ *       - Footprint
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -67,15 +77,16 @@ router.get(
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               message:
- *                 type: string
- *                 description: The message of the reaction
- *                 required: true
+ *             $ref: '#/components/schemas/NewFootprintReaction'
  *     responses:
  *       204:
- *         description: OK
+ *         description: Returns the created reaction
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/FootprintReaction'
+ *       403:
+ *         description: Forbidden access or invalid token
  *       500:
  *         description: Error
  */
@@ -88,7 +99,9 @@ router.post(
  * @openapi
  * /footprints/{id}:
  *   get:
- *     description: Get a footprint by uid
+ *     summary: Get a footprint by uid
+ *     tags:
+ *       - Footprint
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -105,6 +118,12 @@ router.post(
  *     responses:
  *       200:
  *         description: Returns a footprint by ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Footprint'
+ *       403:
+ *         description: Forbidden access or invalid token
  */
 router.get(
     '/:id',
@@ -115,7 +134,9 @@ router.get(
  * @openapi
  * /footprints/{id}/reactions:
  *   get:
- *     description: Returns all reactions to the specified footprint
+ *     summary: Returns all reactions to the specified footprint
+ *     tags:
+ *       - Footprint
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -131,7 +152,15 @@ router.get(
  *         description: Numeric ID of the footprint reactions to get
  *     responses:
  *       200:
- *         description: Returns reactions
+ *         description: Returns all reactions to the specified footprint
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/FootprintReaction'
+ *       403:
+ *         description: Forbidden access or invalid token
  *       500:
  *         description: Error
  */
@@ -140,15 +169,13 @@ router.get(
     (request: Request, response: Response) => footprintController.getFootprintReactions(request, response),
 )
 
-// TODO documentation for post
-// TODO picture compression
-// TODO audio compression
-
 /**
  * @openapi
  * /footprints:
  *   post:
- *     description: Create a footprint
+ *     summary: Create a footprint
+ *     tags:
+ *       - Footprint
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -157,21 +184,38 @@ router.get(
  *         required: true
  *         description: Authorization header
  *     requestBody:
- *         content:
- *           multipart/form-data:
- *             schema:
- *               type: object
- *               properties:
- *                 files:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: binary
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               files:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *               photo:
+ *                 type: string
+ *                 format: binary
+ *                 description: The photo of the footprint
+ *                 required: false
+ *               audio:
+ *                 type: string
+ *                 format: binary
+ *                 description: The audio of the footprint
+ *                 required: false
  *     responses:
  *       200:
- *         description: Returns reactions
+ *         description: Returns the created footprint
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Footprint'
  *       400:
  *         description: Missing required fields
+ *       403:
+ *         description: Forbidden access or invalid token
  *       500:
  *         description: Error
  */

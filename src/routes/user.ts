@@ -5,14 +5,13 @@ import { userPermissionMiddleware } from '../middlewares/userPermission.js'
 const router = express.Router()
 const userController = new UserController()
 
-// TODO better openapi documentation
-// TODO create tests
-
 /**
  * @openapi
  * /users:
  *   get:
- *     description: Returns all users
+ *     summary: Returns all users
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -23,6 +22,14 @@ const userController = new UserController()
  *     responses:
  *       200:
  *         description: Returns persons
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Forbidden access or invalid token
  */
 router.get(
     '/',
@@ -33,7 +40,9 @@ router.get(
  * @openapi
  * /users/{id}:
  *   get:
- *     description: Get a user by uid
+ *     summary: Get a user by uid
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -50,6 +59,12 @@ router.get(
  *     responses:
  *       200:
  *         description: Returns a user by uid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Forbidden access or invalid token
  */
 router.get(
     '/:id',
@@ -60,7 +75,9 @@ router.get(
  * @openapi
  * /users:
  *   post:
- *     description: Create a new user
+ *     summary: Create a new user
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -124,6 +141,8 @@ router.get(
  *         description: Returns the created user
  *       400:
  *         description: Username or email already exists
+ *       403:
+ *         description: Forbidden access or invalid token
  */
 router.post(
     '/',
@@ -134,7 +153,9 @@ router.post(
  * @openapi
  * /users/{id}:
  *   patch:
- *     description: Update a user by uid
+ *     summary: Update a user by uid
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -196,6 +217,11 @@ router.post(
  *     responses:
  *       200:
  *         description: Returns the updated user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               ref: '#/components/schemas/User'
  *       400:
  *         description: Email or Username already taken
  *       404:
@@ -211,7 +237,9 @@ router.patch(
  * @openapi
  * /users/{id}:
  *   delete:
- *     description: Delete a user by uid
+ *     summary: Delete a user by uid
+ *     tags:
+ *       - User
  *     parameters:
  *       - in: header
  *         name: X-Auth
@@ -228,6 +256,11 @@ router.patch(
  *     responses:
  *       204:
  *         description: Returns the deleted user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
  */

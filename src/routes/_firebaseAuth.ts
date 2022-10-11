@@ -8,7 +8,7 @@ const router = express.Router()
  * @openapi
  * /firebase/token:
  *   get:
- *     description: Receive a firebase token for test user
+ *     summary: Receive a firebase token for test user
  *     responses:
  *       200:
  *         description: Returns the idToken
