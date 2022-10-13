@@ -55,7 +55,8 @@ export default class UserController {
                 return response.status(400).json({ message: 'Email or Username already taken' })
             }
 
-            await $app.userRepository.persist(user)
+            $app.userRepository.persist(user)
+            await $app.userRepository.flush()
             return response.status(201).json(user)
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
@@ -70,8 +71,8 @@ export default class UserController {
             if (email !== 0 || username !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
-            await $app.userRepository.persist(user)
-
+            $app.userRepository.persist(user)
+            await $app.userRepository.flush()
             return response.status(200).json(user)
         } catch {
             return this.userNotFoundError(response)

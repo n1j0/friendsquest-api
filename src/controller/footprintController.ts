@@ -6,38 +6,54 @@ import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController'
 
+// eslint-disable-next-line max-len
+const createPersistentDownloadUrl = (bucket: any, pathToFile: string, downloadToken: string) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
+    pathToFile,
+)}?alt=media&token=${downloadToken}`
+
 // eslint-disable-next-line no-undef
-async function uploadFileToFirestorage(data: Express.Multer.File[]) {
+async function uploadFileToFirestorage(files: Express.Multer.File []) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
+    const fileName = uuidv4()
 
-    const promises = data.map((file) => {
-        const fileName = uuidv4()
+    // [Object: null prototype] Problem
+    // @ts-ignore
+    const images: [] = files.image
+    // @ts-ignore
+    const audios: [] = files.audio
 
+    const concatFiles = [ ...images, ...audios ]
+
+    // eslint-disable-next-line no-undef
+    const promises = concatFiles.map((value: Express.Multer.File) => {
         const fullPath = () => {
-            if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
-                return `images/${fileName}.${file.mimetype.split('/')[1]}`
+            if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
+                && value.fieldname === 'image') {
+                return `images/${fileName}.${value.mimetype.split('/')[1]}`
             }
-            if (file.mimetype === 'audio/mpeg' || file.mimetype === 'audio/mp3') {
-                return `audios/${fileName}.${file.mimetype.split('/')[1]}`
+            if ((value.mimetype === 'audio/mpeg' || value.mimetype === 'audio/mp3') && value.fieldname === 'audio') {
+                return `audios/${fileName}.${value.mimetype.split('/')[1]}`
             }
-            return `videos/${fileName}.${file.mimetype.split('/')[1]}`
+            if (value.mimetype === 'video/mp4' && value.fieldname === 'video') {
+                return `videos/${fileName}.${value.mimetype.split('/')[1]}`
+            }
+            return ''
         }
 
         const bucketFile = bucket.file(fullPath())
 
-        bucketFile.save(file.buffer, {
+        const downloadToken = uuidv4()
+
+        bucketFile.save(value.buffer, {
             metadata: {
-                contentType: file.mimetype,
+                contentType: value.mimetype,
+                downloadTokens: downloadToken,
             },
         })
 
-        return bucketFile.getSignedUrl({
-            action: 'read',
-            expires: '01-01-2050',
-        }).then(signedUrls => signedUrls[0]).catch((error) => {
-            throw error
-        })
+        return createPersistentDownloadUrl(bucket.name, fullPath(), downloadToken)
     })
+
     return Promise.all(promises)
 }
 
@@ -93,7 +109,8 @@ export default class FootprintController {
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)
-            await $app.userRepository.persist(reaction)
+            $app.userRepository.persist(reaction)
+            await $app.userRepository.flush()
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
@@ -102,13 +119,13 @@ export default class FootprintController {
     }
 
     public createFootprint = async (request: Request, response: Response) => {
-        /* if (!request.body.title && !request.body.latitude
-            && !request.body.longitude && !request.body.createdBy && !request.body.file) {
-            return response.status(400).json({ message: 'Missing required fields' })
-        } */
-        if (!request.files) {
+        if (!request.body.title && !request.body.latitude
+            && !request.body.longitude && !request.body.createdBy && !request.body.files) {
             return ErrorController.sendError(response, 400, 'Missing required fields')
         }
+        /* if (!request.files) {
+            return ErrorController.sendError(response, 400, 'Missing required fields')
+        } */
 
         try {
             const em = $app.em.fork()
@@ -117,16 +134,17 @@ export default class FootprintController {
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             // eslint-disable-next-line no-undef
-            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files as Express.Multer.File[])
+            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files! as Express.Multer.File[])
             const footprint = new Footprint(
                 request.body.title,
+                user,
                 request.body.latitude,
                 request.body.longitude,
-                user,
                 photoURL,
                 audioURL,
             )
             em.persist(footprint)
+            await em.flush()
             return response.status(201).json(footprint)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)

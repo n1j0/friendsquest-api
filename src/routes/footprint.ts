@@ -190,12 +190,7 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               files:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
- *               photo:
+ *               image:
  *                 type: string
  *                 format: binary
  *                 description: The photo of the footprint
@@ -205,6 +200,9 @@ router.get(
  *                 format: binary
  *                 description: The audio of the footprint
  *                 required: false
+ *         multipart/json:
+ *           schema:
+ *             $ref: '#/components/schemas/NewFootprint'
  *     responses:
  *       200:
  *         description: Returns the created footprint
@@ -221,7 +219,7 @@ router.get(
  */
 router.post(
     '/',
-    upload.array('files'),
+    upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
     (request: Request, response: Response) => footprintController.createFootprint(request, response),
 )
 
