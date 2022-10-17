@@ -1,0 +1,80 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The id of the user
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          description: The date of creation of the user
+          example: 2022-12-01T12:00:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date of the last update of the user
+          example: 2022-12-01T12:00:00.000Z
+        firstName:
+          type: string
+          description: The first name of the user
+          example: John
+          required: false
+        lastName:
+          type: string
+          description: The last name of the user
+          example: Doe
+          required: false
+        email:
+          type: string
+          format: email
+          description: The email of the user
+          example: john@doe.com
+          required: true
+        username:
+          type: string
+          description: The username of the user
+          example: JohnDoe
+          required: false
+        birthday:
+          type: string
+          format: date
+          description: The birthday of the user
+          example: 2000-01-01
+          required: false
+        uid:
+          type: string
+          format: uuid
+          description: The uid of the user
+          example: 39FDDRsAsZNPmocG4ZIgcnwO5BF2
+          required: true
+        emailVerified:
+          type: boolean
+          description: The emailVerified of the user
+          example: true
+          required: false
+          default: false
+        termsAccepted:
+          type: boolean
+          description: The termsAccepted of the user
+          example: true
+          required: false
+          default: false
+        accountActivated:
+          type: boolean
+          description: The accountActivated of the user
+          example: true
+          required: false
+          default: false
+        homeland:
+          type: string
+          description: The homeland of the user
+          example: Austria
+          required: false
+        imageURL:
+          type: string
+          description: The imageURL of the avatar of the user
+          example: https://example.com/image.png
+          required: false

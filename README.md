@@ -10,6 +10,10 @@ A Node.js express application written in Typescript for the backend of the App "
 optional:
 * nvm
 
+## Important notes
+
+* Always write `/index` at the end of the import path if you reference an index.ts file. This is necessary for the typescript compiler and `addJsExtensionToImports` script to work correctly.
+
 ## Getting started
 
 You have two options: using the backend within or outside a docker container.
@@ -33,6 +37,8 @@ $ docker-compose up --build
 # afterwards
 $ docker-compose up
 ```
+
+Keep in mind that you have to rebuild the container when installing new dependencies.
 
 ### Running without node in docker
 ```bash
@@ -130,6 +136,22 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 # Drop the database, migrate up to the latest version and afterwards seed the database
 $ npm run orm:restart
 ```
+
+## Pushing to FH system
+```bash
+$ git remote add dokku ssh://projects.multimediatechnology.at:5412/friendsquest
+$ git push dokku main:main
+```
+
+## Health checks
+In order to check if the API is running, you can use the health check endpoint `/health`. It returns `status: up` if the API is running.
+
+### All endpoints
+| ID        | Description                                            |
+|-----------|--------------------------------------------------------|
+| `info`    | Displays application information.                      |
+| `metrics` | Shows metrics information for the current application. |
+| `health`  | Shows application health information.                  |
 
 ## Conventional Commits
 

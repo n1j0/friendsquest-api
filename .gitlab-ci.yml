@@ -5,23 +5,22 @@ cache:
     - node_modules/
 
 stages:
-  - setup
-  - lint
+  # - setup
+  - qa
 
-node:
-  stage: setup
-  script:
-    - npm install
-  artifacts:
-    paths:
-      - node_modules/
+# right now there is an error with uploading artifacts
+# node:
+#   stage: setup
+#   script:
+#     - npm install
+#   artifacts:
+#     paths:
+#       - node_modules/
 
-eslint:
-  stage: lint
+check:
+  stage: qa
   script:
+    - npm ci --prefer-offline --no-audit --ignore-scripts
     - npm run lint
-
-typecheck:
-  stage: lint
-  script:
     - npm run typecheck
+    - npm run test:ci

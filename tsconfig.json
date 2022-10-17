@@ -16,11 +16,16 @@
       "express",
       "swagger-ui-express",
       "swagger-jsdoc",
-      "cors"
+      "cors",
+      "multer",
+      "express-actuator",
+      "jest",
+      "compression"
     ]
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules"

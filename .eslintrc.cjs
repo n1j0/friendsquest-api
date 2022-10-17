@@ -45,21 +45,47 @@ module.exports = {
         ],
         'no-console': 0,
         semi: [ 'error', 'never' ],
-        'import/extensions': 1,
-        'import/no-unresolved': [ 2, { ignore: ['^(.)?./'] }],
+        'import/extensions': [
+            'error',
+            'ignorePackages',
+            {
+                js: 'never',
+                ts: 'never',
+            },
+        ],
+        'import/no-unresolved': [ 2, { ignore: [ '^firebase-admin/.+', '^(.)?./' ] }],
         'import/prefer-default-export': 0,
+        'unicorn/filename-case': [
+            'error',
+            {
+                cases: {
+                    camelCase: true,
+                    pascalCase: true,
+                    kebabCase: true,
+                },
+            },
+        ],
+        'unicorn/no-array-for-each': 0,
+        'class-methods-use-this': 0,
     },
     overrides: [
+        {
+            files: ['tests/**'],
+            plugins: ['jest'],
+            extends: ['plugin:jest/recommended'],
+        },
         {
             files: ['src/entities/**/*.*'],
             rules: {
                 indent: 'warn',
+                'unicorn/filename-case': 0,
             },
         },
         {
             files: ['src/migrations/*.*'],
             rules: {
                 'unicorn/filename-case': 0,
+                'max-len': 0,
             },
         },
         {
@@ -67,6 +93,9 @@ module.exports = {
             rules: {
                 'unicorn/filename-case': 0,
                 'class-methods-use-this': 0,
+                'max-len': 0,
+                'dot-notation': 0,
+                'sonarjs/no-duplicate-string': 0,
             },
         },
     ],
