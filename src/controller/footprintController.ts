@@ -123,9 +123,6 @@ export default class FootprintController {
             && !request.body.longitude && !request.body.createdBy && !request.body.files) {
             return ErrorController.sendError(response, 400, 'Missing required fields')
         }
-        /* if (!request.files) {
-            return ErrorController.sendError(response, 400, 'Missing required fields')
-        } */
 
         try {
             const em = $app.em.fork()
