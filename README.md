@@ -125,6 +125,13 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 $ npm run orm:restart
 ```
 
+## Test Strategy
+The backend includes an ORM system (Mikro-ORM). This consists of so-called entities and controllers. The controllers contain the business logic. 
+
+### Controllers
+The controllers (routes) are tested using unit tests and integration tests with jest. The methods of the Entity Manager are mocked in the process. The tests can be found in the app's `tests/routes` folder. In addition, path tests are created for migrations and seeders.
+
+
 ## Conventional Commits
 
 We use Conventional Commits. Have a look at the [summary](https://www.conventionalcommits.org/en/v1.0.0/#summary) in order to make great commits.
