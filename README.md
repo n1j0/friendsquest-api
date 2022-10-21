@@ -139,7 +139,7 @@ $ npm run orm:restart
 
 ## Pushing to FH system
 ```bash
-$ git remote add dokku ssh://projects.multimediatechnology.at:5412/friendsquest
+$ git remote add dokku ssh://dokku@projects.multimediatechnology.at:5412/friendsquest
 $ git push dokku main:main
 ```
 
