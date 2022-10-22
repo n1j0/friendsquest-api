@@ -1,5 +1,5 @@
 import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
-import { cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
+import { App, cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
 import { getStorage, Storage } from 'firebase-admin/storage'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import mikroOrmConfig from './config/mikro-orm.config.js'
@@ -33,6 +33,6 @@ export const $app = {
     footprintRepository: EntityRepository<Footprint>,
     footprintReactionRepository: EntityRepository<FootprintReaction>,
     userRepository: EntityRepository<User>,
-    firebase: any,
+    firebase: App,
     storage: Storage
 }
