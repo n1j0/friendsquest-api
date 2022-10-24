@@ -34,7 +34,7 @@ const footprintController = new FootprintController()
  *         required: true
  *         description: Authorization header
  *     responses:
- *       201:
+ *       200:
  *         description: Returns footprints
  *         content:
  *           application/json:

@@ -65,6 +65,8 @@ router.get(
  *               $ref: '#/components/schemas/User'
  *       403:
  *         description: Forbidden access or invalid token
+ *       404:
+ *         description: User not found
  */
 router.get(
     '/:id',
