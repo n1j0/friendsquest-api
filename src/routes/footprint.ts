@@ -1,21 +1,7 @@
 import express, { Request, Response } from 'express'
-import Multer from 'multer'
 import FootprintController from '../controller/footprintController.js'
+import upload from '../services/footprintService.js'
 
-// eslint-disable-next-line no-undef
-const upload = Multer({ fileFilter(request: Request, file: Express.Multer.File, callback: Multer.FileFilterCallback) {
-    if (file.mimetype === 'image/jpeg'
-            || file.mimetype === 'image/png'
-            || file.mimetype === 'image/jpg'
-            || file.mimetype === 'audio/mpeg'
-            || file.mimetype === 'audio/mp3'
-            || file.mimetype === 'video/mp4') {
-        // eslint-disable-next-line unicorn/no-null
-        callback(null, true)
-    } else {
-        callback(new Error('Type of file is not supported'))
-    }
-} })
 const router = express.Router()
 const footprintController = new FootprintController()
 
