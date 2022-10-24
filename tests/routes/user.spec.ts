@@ -22,6 +22,11 @@ describe('UsersRoutes', () => {
         expect(usersRoutes.get).toHaveBeenNthCalledWith(2, '/:id', expect.any(Function))
     })
 
+    it('has route to get a specific user by uid', () => {
+        expect(usersRoutes.get).toEqual(expect.any(Function))
+        expect(usersRoutes.get).toHaveBeenNthCalledWith(3, '/uid/:uid', expect.any(Function))
+    })
+
     it('has route to create a new user', () => {
         expect(usersRoutes.post).toEqual(expect.any(Function))
         expect(usersRoutes.post).toHaveBeenNthCalledWith(1, '/', expect.any(Function))

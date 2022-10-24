@@ -60,7 +60,9 @@ async function uploadFileToFirestorage(files: Express.Multer.File []) {
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
         try {
-            const footprints = await $app.footprintRepository.findAll()
+            // @ts-ignore
+            // eslint-disable-next-line max-len
+            const footprints = await $app.footprintRepository.findAll({ populate: ['createdBy'] })
             return response.status(200).json(footprints)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)

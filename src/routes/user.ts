@@ -40,7 +40,7 @@ router.get(
  * @openapi
  * /users/{id}:
  *   get:
- *     summary: Get a user by uid
+ *     summary: Get a user by id
  *     tags:
  *       - User
  *     parameters:
@@ -65,10 +65,49 @@ router.get(
  *               $ref: '#/components/schemas/User'
  *       403:
  *         description: Forbidden access or invalid token
+ *       404:
+ *         description: User not found
  */
 router.get(
     '/:id',
     (request: Request, response: Response) => userController.getUserById(request, response),
+)
+
+/**
+ * @openapi
+ * /users/uid/{uid}:
+ *   get:
+ *     summary: Get a user by uid
+ *     tags:
+ *       - User
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Authorization header
+ *       - in: path
+ *         name: uid
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Numeric UID of the user to get
+ *     responses:
+ *       200:
+ *         description: Returns a user by uid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Forbidden access or invalid token
+ *       404:
+ *         description: User not found
+ */
+router.get(
+    '/uid/:uid',
+    (request: Request, response: Response) => userController.getUserByUid(request, response),
 )
 
 /**
@@ -92,14 +131,6 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
- *                 type: string
- *                 description: The first name of the user
- *                 required: false
- *               lastName:
- *                 type: string
- *                 description: The first name of the user
- *                 required: false
  *               email:
  *                 type: string
  *                 description: The email of the user
@@ -107,30 +138,13 @@ router.get(
  *               username:
  *                 type: string
  *                 description: The username of the user
- *                 required: false
- *               birthday:
- *                 type: date
- *                 description: The birthday of the user
- *                 required: false
- *               homeland:
- *                 type: string
- *                 description: The homeland of the user
- *                 required: false
+ *                 required: true
  *           examples:
- *             minimum:
- *               summary: Minimum example for valid creation of user
- *               value:
- *                 firstName: Jon
- *                 email: Jon@Doe.abc
  *             normal:
  *               summary: Example for valid creation of user
  *               value:
- *                 firstName: Jon
- *                 lastName: Doe
  *                 email: Jon@Doe.abc
  *                 username: JonDoe
- *                 birthday: 1990-01-01
- *                 homeland: England
  *             error:
  *               summary: Example for invalid creation of user
  *               value:
@@ -176,14 +190,6 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
- *                 type: string
- *                 description: The first name of the user
- *                 required: false
- *               lastName:
- *                 type: string
- *                 description: The first name of the user
- *                 required: false
  *               email:
  *                 type: string
  *                 description: The email of the user
@@ -192,24 +198,12 @@ router.post(
  *                 type: string
  *                 description: The username of the user
  *                 required: false
- *               birthday:
- *                 type: date
- *                 description: The birthday of the user
- *                 required: false
- *               homeland:
- *                 type: string
- *                 description: The homeland of the user
- *                 required: false
  *           examples:
  *             normal:
  *               summary: Example for valid change of one user
  *               value:
- *                 firstName: Jon
- *                 lastName: Doe
  *                 email: Jon@Doe.abc
  *                 username: JonDoe
- *                 birthday: 1990-01-01
- *                 homeland: England
  *             error:
  *               summary: Example for invalid change of one user
  *               value:
@@ -220,8 +214,7 @@ router.post(
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               ref: '#/components/schemas/User'
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Email or Username already taken
  *       404:

@@ -42,6 +42,19 @@ export default class UserController {
         return this.userNotFoundError(response)
     }
 
+    public getUserByUid = async (request: Request, response: Response) => {
+        const { uid } = request.params
+        if (!uid) {
+            return response.status(500).json({ message: 'Missing uid' })
+        }
+        console.log(uid)
+        const user = await $app.userRepository.findOne({ uid } as any)
+        if (user) {
+            return response.status(200).json(user)
+        }
+        return this.userNotFoundError(response)
+    }
+
     public createUser = async (request: Request, response: Response) => {
         if (!request.body.email) {
             return ErrorController.sendError(response, 403, 'Email is missing')
@@ -49,7 +62,7 @@ export default class UserController {
 
         try {
             // eslint-disable-next-line security/detect-object-injection
-            const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string)
+            const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {
                 return response.status(400).json({ message: 'Email or Username already taken' })
