@@ -1,0 +1,26 @@
+image: node
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  # - setup
+  - qa
+
+# right now there is an error with uploading artifacts
+# node:
+#   stage: setup
+#   script:
+#     - npm install
+#   artifacts:
+#     paths:
+#       - node_modules/
+
+check:
+  stage: qa
+  script:
+    - npm ci --prefer-offline --no-audit --ignore-scripts
+    - npm run lint
+    - npm run typecheck
+    - npm run test:ci

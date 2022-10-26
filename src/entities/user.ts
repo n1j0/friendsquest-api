@@ -3,38 +3,22 @@ import { BaseEntity } from './baseEntity.js'
 
 @Entity()
 export class User extends BaseEntity {
-    @Property()
-    public firstName?: string
+    @Property({ unique: true })
+    public username!: string
 
-    @Property()
-    public lastName?: string
-
-    @Property()
-    public username?: string
-
-    @Property()
+    @Property({ unique: true })
     public email!: string
 
-    @Property()
-    public emailVerified: boolean = false
-
-    @Property()
-    public birthday?: Date
-
-    @Property()
-    public termsAccepted: boolean = false
-
-    @Property()
-    public accountActivated: boolean = false
-
-    @Property()
-    public homeland?: string
+    @Property({ unique: true })
+    public uid!: string
 
     @Property()
     public imageURL?: string
 
-    constructor(email: string) {
+    constructor(email: string, uid: string, username: string) {
         super()
         this.email = email
+        this.uid = uid
+        this.username = username
     }
 }

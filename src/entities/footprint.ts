@@ -1,6 +1,8 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core'
+import { Collection, Entity, ManyToOne, OneToMany, Property, types } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'
+// eslint-disable-next-line import/no-cycle
+import { FootprintReaction } from './footprintReaction.js'
 
 @Entity()
 export class Footprint extends BaseEntity {
@@ -11,33 +13,40 @@ export class Footprint extends BaseEntity {
     public description?: string
 
     @ManyToOne()
-    public user!: User
+    public createdBy!: User
 
-    @Property()
-    public latitude!: number
+    @Property({ type: types.double })
+    public latitude!: string
 
-    @Property()
-    public longitude!: number
+    @Property({ type: types.double })
+    public longitude!: string
 
     @Property()
     public viewCount: number = 0
 
     @Property()
-    public reactionsCount: number = 0
+    public imageURL!: string
 
     @Property()
-    public imageURL?: string
+    public audioURL!: string
 
-    @Property()
-    public audioURL?: string
+    @OneToMany('FootprintReaction', 'footprint')
+    public reactions: Collection<FootprintReaction> = new Collection<FootprintReaction>(this)
 
-    // TODO reactions
-
-    constructor(title: string, user: User, latitude: number, longitude: number) {
+    constructor(
+        title: string,
+        createdBy: User,
+        latitude: string,
+        longitude: string,
+        imageURL: string,
+        audioURL: string,
+    ) {
         super()
         this.title = title
-        this.user = user
+        this.createdBy = createdBy
         this.latitude = latitude
         this.longitude = longitude
+        this.imageURL = imageURL
+        this.audioURL = audioURL
     }
 }

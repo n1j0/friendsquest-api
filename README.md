@@ -10,11 +10,17 @@ A Node.js express application written in Typescript for the backend of the App "
 optional:
 * nvm
 
+## Important notes
+
+* Always write `/index` at the end of the import path if you reference an index.ts file. This is necessary for the typescript compiler and `addJsExtensionToImports` script to work correctly.
+
 ## Getting started
 
 You have two options: using the backend within or outside a docker container.
 
 Hot reloading of the Node.js app is always turned on for `npm run start`.
+
+Keep in mind to use ".js" for file extension. If you omit the extension, the application won't work because Typescript is used.
 
 ### Running with node in docker
 
@@ -31,6 +37,8 @@ $ docker-compose up --build
 # afterwards
 $ docker-compose up
 ```
+
+Keep in mind that you have to rebuild the container when installing new dependencies.
 
 ### Running without node in docker
 ```bash
@@ -66,6 +74,10 @@ Check out the [ESLint repo](https://github.com/eslint/eslint) for detailed expla
 We take advantage of different packages to define our rules. Further information can be found in the `.eslintrc.cjs`.
 
 ### Usage
+
+#### IDE / Code Editor
+
+Be sure to enable ESLint in your preferences to get realtime feedback.
 
 #### Identify wrong patterns
 
@@ -131,6 +143,22 @@ The backend includes an ORM system (Mikro-ORM). This consists of so-called entit
 ### Controllers
 The controllers (routes) are tested using unit tests and integration tests with jest. The methods of the Entity Manager are mocked in the process. The tests can be found in the app's `tests/routes` folder. In addition, path tests are created for migrations and seeders.
 
+
+## Pushing to FH system
+```bash
+$ git remote add dokku ssh://dokku@projects.multimediatechnology.at:5412/friendsquest
+$ git push dokku main:main
+```
+
+## Health checks
+In order to check if the API is running, you can use the health check endpoint `/health`. It returns `status: up` if the API is running.
+
+### All endpoints
+| ID        | Description                                            |
+|-----------|--------------------------------------------------------|
+| `info`    | Displays application information.                      |
+| `metrics` | Shows metrics information for the current application. |
+| `health`  | Shows application health information.                  |
 
 ## Conventional Commits
 

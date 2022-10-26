@@ -1,26 +1,18 @@
-import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
-import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
-import mikroOrmConfig from './config/mikro-orm.config.js'
+import compression from 'compression'
 import Router from './router.js'
 import { User } from './entities/user.js'
-
-export const $app = {
-    port: Number.parseInt(process.env.PORT as string, 10) || 3000,
-    orm: await MikroORM.init(mikroOrmConfig),
-} as {
-    port: number,
-    orm: MikroORM<PostgreSqlDriver>,
-    em: EntityManager,
-    userRepository: EntityRepository<User>,
-}
+import { Footprint } from './entities/footprint.js'
+import { FootprintReaction } from './entities/footprintReaction.js'
+import { $app } from './$app.js'
 
 export default class Application {
     public server: express.Application = express()
 
-    // eslint-disable-next-line class-methods-use-this
+    public router: Router | undefined
+
     public connect = async (): Promise<void> => {
         try {
             const migrator = $app.orm.getMigrator()
@@ -36,15 +28,19 @@ export default class Application {
     public init = (): void => {
         $app.em = $app.orm.em
         $app.userRepository = $app.em.getRepository(User)
+        $app.footprintRepository = $app.em.getRepository(Footprint)
+        $app.footprintReactionRepository = $app.em.getRepository(FootprintReaction)
 
         this.server.use(express.json())
         this.server.use(express.urlencoded({ extended: true }))
         this.server.use(helmet())
         this.server.use(cors())
+        this.server.use(compression())
 
         this.server.disable('x-powered-by')
 
-        new Router(this.server, $app.orm).initRoutes()
+        this.router = new Router(this.server, $app.orm)
+        this.router.initRoutes()
 
         try {
             this.server.listen($app.port, () => {

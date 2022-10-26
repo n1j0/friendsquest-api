@@ -1,0 +1,52 @@
+components:
+  schemas:
+    FootprintReaction:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The id of the footprint reaction
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          description: The date of creation of the footprint reaction
+          example: '2020-12-01T12:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: The date of the last update of the footprint reaction
+          example: '2020-12-01T12:00:00.000Z'
+        createdBy:
+          type: number
+          description: The id of the user who created the footprint reaction
+          example: 1
+          required: true
+        footprint:
+          type: number
+          description: The id of the footprint
+          example: 1
+          required: true
+        message:
+          type: string
+          description: The message of the footprint reaction
+          example: This is a great footprint
+          required: true
+    NewFootprintReaction:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message of the footprint
+          example: This is a great footprint
+          required: true
+        createdBy:
+          type: number
+          description: The id of the user who created the footprint
+          example: 1
+          required: true
+        footprint:
+          type: number
+          description: The id of the footprint
+          example: 1
+          required: true
