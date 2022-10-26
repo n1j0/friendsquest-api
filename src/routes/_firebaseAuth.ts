@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import fetch from 'node-fetch'
-import ErrorController from '../controller/errorController'
+import ErrorController from '../controller/errorController.js'
 
 const router = express.Router()
 

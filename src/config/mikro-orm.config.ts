@@ -6,16 +6,16 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection'
 export default {
     debug: process.env.NODE_ENV !== 'production',
     tsNode: process.env.NODE_ENV !== 'production',
-    entities: ['./.out/entities'],
+    entities: ['./.out/src/entities'],
     entitiesTs: ['./src/entities'],
     migrations: {
-        path: './.out/migrations',
+        path: './.out/src/migrations',
         pathTs: './src/migrations',
         tableName: 'migrations',
         transactional: true,
     },
     seeder: {
-        path: './.out/seeders',
+        path: './.out/src/seeders',
         pathTs: './src/seeders',
         defaultSeeder: 'DatabaseSeeder',
         glob: '!(*.d).{js,ts}',

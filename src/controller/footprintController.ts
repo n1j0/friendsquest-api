@@ -4,7 +4,7 @@ import { $app } from '../$app.js'
 import { FootprintReaction } from '../entities/footprintReaction.js'
 import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
-import ErrorController from './errorController'
+import ErrorController from './errorController.js'
 
 // eslint-disable-next-line max-len
 const createPersistentDownloadUrl = (bucket: any, pathToFile: string, downloadToken: string) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(

@@ -3,7 +3,7 @@ import { wrap } from '@mikro-orm/core'
 import { $app } from '../$app.js'
 import { User } from '../entities/user.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
-import ErrorController from './errorController'
+import ErrorController from './errorController.js'
 
 export default class UserController {
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')

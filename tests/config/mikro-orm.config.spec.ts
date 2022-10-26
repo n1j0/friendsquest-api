@@ -8,12 +8,12 @@ describe('MikroORM config', () => {
 
     it('sets the correct entity js path', () => {
         expect(mikroOrmConfig.entities).toHaveLength(1)
-        expect(mikroOrmConfig.entities![0]).toBe('./.out/entities')
+        expect(mikroOrmConfig.entities![0]).toBe('./.out/src/entities')
     })
 
     it('sets the correct migration information', () => {
         const migrations = {
-            path: './.out/migrations',
+            path: './.out/src/migrations',
             pathTs: './src/migrations',
             tableName: 'migrations',
             transactional: true,
@@ -23,7 +23,7 @@ describe('MikroORM config', () => {
 
     it('sets the correct seeder information', () => {
         const seeder = {
-            path: './.out/seeders',
+            path: './.out/src/seeders',
             pathTs: './src/seeders',
             defaultSeeder: 'DatabaseSeeder',
             glob: '!(*.d).{js,ts}',
