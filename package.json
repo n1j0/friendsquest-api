@@ -2,10 +2,10 @@
   "name": "friendsquest-api",
   "version": "0.0.1",
   "description": "API for FriendsQuest-APP",
-  "main": "./.out/index.js",
+  "main": "./.out/src/index.js",
   "scripts": {
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" nodemon --ext ts --experimental-specifier-resolution node ./src",
-    "start": "tsc && npm run orm:restart && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/index.js",
+    "start": "tsc && npm run orm:restart && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/src/index.js",
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location temp/.eslintcache --ignore-path ./.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
