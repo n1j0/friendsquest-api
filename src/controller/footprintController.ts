@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Express, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app.js'
 import { FootprintReaction } from '../entities/footprintReaction.js'
@@ -11,7 +11,6 @@ const createPersistentDownloadUrl = (bucket: any, pathToFile: string, downloadTo
     pathToFile,
 )}?alt=media&token=${downloadToken}`
 
-// eslint-disable-next-line no-undef
 async function uploadFileToFirestorage(files: Express.Multer.File []) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
     const fileName = uuidv4()
@@ -24,7 +23,6 @@ async function uploadFileToFirestorage(files: Express.Multer.File []) {
 
     const concatFiles = [ ...images, ...audios ]
 
-    // eslint-disable-next-line no-undef
     const promises = concatFiles.map((value: Express.Multer.File) => {
         const fullPath = () => {
             if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
@@ -132,7 +130,6 @@ export default class FootprintController {
                 // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
-            // eslint-disable-next-line no-undef
             const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files! as Express.Multer.File[])
             const footprint = new Footprint(
                 request.body.title,

@@ -1,7 +1,6 @@
 import Multer from 'multer'
-import { Request } from 'express'
+import { Express, Request } from 'express'
 
-// eslint-disable-next-line no-undef
 const upload = Multer({ fileFilter(request: Request, file: Express.Multer.File, callback: Multer.FileFilterCallback) {
     if (file.mimetype === 'image/jpeg'
             || file.mimetype === 'image/png'
