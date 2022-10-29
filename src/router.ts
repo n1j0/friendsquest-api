@@ -23,7 +23,7 @@ export default class Router {
     }
 
     public initRoutes = () => {
-        // remove this when ready for production
+        // TODO: remove this when ready for production
         this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
         console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
 
@@ -36,6 +36,7 @@ export default class Router {
         this.server.use('/', indexRoutes)
         this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
         this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
+        // TODO: remove this when ready for production
         this.server.use('/firebase', firebaseRoutes)
 
         // custom 404

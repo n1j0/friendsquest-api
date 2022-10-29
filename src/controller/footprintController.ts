@@ -58,6 +58,7 @@ async function uploadFileToFirestorage(files: MulterFiles['files']) {
         return createPersistentDownloadUrl(bucket.name, fullPath(), downloadToken)
     })
 
+    // TODO: promises is a string array?!
     return Promise.all(promises)
 }
 
