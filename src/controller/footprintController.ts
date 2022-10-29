@@ -6,20 +6,26 @@ import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
 
-// eslint-disable-next-line max-len
-const createPersistentDownloadUrl = (bucket: any, pathToFile: string, downloadToken: string) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(
-    pathToFile,
-)}?alt=media&token=${downloadToken}`
+interface MulterFiles extends Express.Request {
+    files: {
+        image: Express.Multer.File[]
+        audio: Express.Multer.File[]
+    }
+}
 
-async function uploadFileToFirestorage(files: Express.Multer.File []) {
+const createPersistentDownloadUrl = (
+    bucket: any,
+    pathToFile: string,
+    downloadToken: string,
+// eslint-disable-next-line max-len
+) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
+
+async function uploadFileToFirestorage(files: MulterFiles['files']) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
     const fileName = uuidv4()
 
-    // [Object: null prototype] Problem
-    // @ts-ignore
-    const images: [] = files.image
-    // @ts-ignore
-    const audios: [] = files.audio
+    const images: Express.Multer.File[] = files.image
+    const audios: Express.Multer.File[] = files.audio
 
     const concatFiles = [ ...images, ...audios ]
 
@@ -58,8 +64,6 @@ async function uploadFileToFirestorage(files: Express.Multer.File []) {
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
         try {
-            // @ts-ignore
-            // eslint-disable-next-line max-len
             const footprints = await $app.footprintRepository.findAll({ populate: ['createdBy'] })
             return response.status(200).json(footprints)
         } catch (error: any) {
@@ -130,7 +134,7 @@ export default class FootprintController {
                 // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
-            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files! as Express.Multer.File[])
+            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files as MulterFiles['files'])
             const footprint = new Footprint(
                 request.body.title,
                 user,
