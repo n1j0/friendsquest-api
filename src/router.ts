@@ -5,7 +5,6 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
 import { openapiSpecification } from './docs/swagger.js'
-import { indexRoutes } from './routes/index.js'
 import { usersRoutes } from './routes/user.js'
 import { footprintRoutes } from './routes/footprint.js'
 import { $app } from './$app.js'
@@ -33,7 +32,6 @@ export default class Router {
 
         this.server.use(actuator())
 
-        this.server.use('/', indexRoutes)
         this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
         this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
         // TODO: remove this when ready for production
