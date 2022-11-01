@@ -130,6 +130,7 @@ export default class FootprintController {
         }
 
         try {
+            // TODO: why fork?
             const em = $app.em.fork()
             const user = await em.findOneOrFail('User', {
                 // eslint-disable-next-line security/detect-object-injection

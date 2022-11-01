@@ -70,11 +70,6 @@ components:
           description: The title of the footprint
           example: My first footprint
           required: true
-        createdBy:
-          type: number
-          description: The id of the user who created the footprint
-          example: 1
-          required: true
         latitude:
           type: integer
           format: double
