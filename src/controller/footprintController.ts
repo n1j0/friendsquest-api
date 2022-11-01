@@ -14,7 +14,7 @@ interface MulterFiles extends Express.Request {
 }
 
 const createPersistentDownloadUrl = (
-    bucket: any,
+    bucket: string,
     pathToFile: string,
     downloadToken: string,
 // eslint-disable-next-line max-len
@@ -72,6 +72,8 @@ export default class FootprintController {
         }
     }
 
+    // TODO: should getFootprint include the reactions?
+    // TODO: every time this is called the viewCount needs to be increased
     public getFootprintById = async (request: Request, response: Response) => {
         try {
             const footprint = await $app.footprintRepository.findOne({ id: request.params.id } as any)
