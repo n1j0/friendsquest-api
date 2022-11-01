@@ -78,14 +78,14 @@ export default class UserController {
 
     public updateUser = async (request: Request, response: Response) => {
         try {
-            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
-            wrap(user).assign(request.body)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
-            $app.userRepository.persist(user)
-            await $app.userRepository.flush()
+
+            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
+            wrap(user).assign(request.body)
+            await $app.userRepository.persistAndFlush(user)
             return response.status(200).json(user)
         } catch {
             return this.userNotFoundError(response)
