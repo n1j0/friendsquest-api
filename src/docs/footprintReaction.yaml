@@ -40,13 +40,3 @@ components:
           description: The message of the footprint
           example: This is a great footprint
           required: true
-        createdBy:
-          type: number
-          description: The id of the user who created the footprint
-          example: 1
-          required: true
-        footprint:
-          type: number
-          description: The id of the footprint
-          example: 1
-          required: true

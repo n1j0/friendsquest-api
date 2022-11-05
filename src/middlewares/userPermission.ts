@@ -1,5 +1,11 @@
 /**
  * Authorization middleware using Firebase Auth
+ * @param predicate - The predicate function to check if the user is authorized
+ * @param options - Options for the middleware
+ * @param options.attachUserTo - The name of the header attribute to attach the user to
+ * @param options.errorJSON - The JSON to attach to the error response
+ * @param options.errorMessage - The error message to send to the client
+ * @returns The middleware function
  */
 import { NextFunction, Request, Response } from 'express'
 import { AUTH_HEADER_UID } from '../constants/index.js'
