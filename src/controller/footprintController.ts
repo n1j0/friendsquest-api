@@ -5,7 +5,7 @@ import { FootprintReaction } from '../entities/footprintReaction.js'
 import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
-import { fullPath } from '../services/footprintService'
+import { fullPath } from '../services/footprintService.js'
 
 interface MulterFiles extends Express.Request {
     files: {
