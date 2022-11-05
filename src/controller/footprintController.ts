@@ -65,7 +65,8 @@ async function uploadFileToFirestorage(files: MulterFiles['files']) {
 export default class FootprintController {
     public getAllFootprints = async (response: Response) => {
         try {
-            const footprints = await $app.footprintRepository.findAll({ populate: ['createdBy'] })
+            const em = $app.em.fork()
+            const footprints = await em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
             return response.status(200).json(footprints)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
@@ -76,7 +77,8 @@ export default class FootprintController {
     // TODO: every time this is called the viewCount needs to be increased
     public getFootprintById = async (request: Request, response: Response) => {
         try {
-            const footprint = await $app.footprintRepository.findOne({ id: request.params.id } as any)
+            const em = $app.em.fork()
+            const footprint = await em.findOne('Footprint', { id: request.params.id } as any)
             if (footprint) {
                 return response.status(200).json(footprint)
             }
@@ -92,7 +94,8 @@ export default class FootprintController {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
-            const footprints = await $app.footprintReactionRepository.findOneOrFail({ footprint: footprintId } as any)
+            const em = $app.em.fork()
+            const footprints = await em.findOneOrFail('FootprintReaction', { footprint: footprintId } as any)
             return response.status(200).json(footprints)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
@@ -110,14 +113,14 @@ export default class FootprintController {
         }
 
         try {
-            const footprint = await $app.footprintRepository.findOneOrFail({ id } as any)
-            const user = await $app.userRepository.findOneOrFail({
+            const em = $app.em.fork()
+            const footprint = await em.findOneOrFail('Footprint', { id } as any)
+            const user = await em.findOneOrFail('User', {
                 // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)
-            $app.userRepository.persist(reaction)
-            await $app.userRepository.flush()
+            await em.persistAndFlush(reaction)
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
@@ -132,7 +135,6 @@ export default class FootprintController {
         }
 
         try {
-            // TODO: why fork?
             const em = $app.em.fork()
             const user = await em.findOneOrFail('User', {
                 // eslint-disable-next-line security/detect-object-injection
@@ -147,8 +149,7 @@ export default class FootprintController {
                 photoURL,
                 audioURL,
             )
-            em.persist(footprint)
-            await em.flush()
+            await em.persistAndFlush(footprint)
             return response.status(201).json(footprint)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)

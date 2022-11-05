@@ -21,7 +21,8 @@ export default class UserController {
 
     public isAllowedToEditUser = async (uid: string, request: Request) => {
         try {
-            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
+            const em = $app.em.fork()
+            const user = await em.findOneOrFail('User', request.params.id as any)
             return user.uid === uid
         } catch {
             return false
@@ -35,7 +36,8 @@ export default class UserController {
         if (!id) {
             return response.status(500).json({ message: 'Missing id' })
         }
-        const user = await $app.userRepository.findOne({ id } as any)
+        const em = $app.em.fork()
+        const user = await em.findOne('User', { id } as any)
         if (user) {
             return response.status(200).json(user)
         }
@@ -47,8 +49,8 @@ export default class UserController {
         if (!uid) {
             return response.status(500).json({ message: 'Missing uid' })
         }
-        console.log(uid)
-        const user = await $app.userRepository.findOne({ uid } as any)
+        const em = $app.em.fork()
+        const user = await em.findOne('User', { uid } as any)
         if (user) {
             return response.status(200).json(user)
         }
@@ -68,8 +70,8 @@ export default class UserController {
                 return response.status(400).json({ message: 'Email or Username already taken' })
             }
 
-            $app.userRepository.persist(user)
-            await $app.userRepository.flush()
+            const em = $app.em.fork()
+            await em.persistAndFlush(user)
             return response.status(201).json(user)
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
@@ -83,9 +85,10 @@ export default class UserController {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
 
-            const user = await $app.userRepository.findOneOrFail(request.params.id as any)
+            const em = $app.em.fork()
+            const user = await em.findOneOrFail('User', request.params.id as any)
             wrap(user).assign(request.body)
-            await $app.userRepository.persistAndFlush(user)
+            await em.persistAndFlush(user)
             return response.status(200).json(user)
         } catch {
             return this.userNotFoundError(response)
@@ -97,10 +100,11 @@ export default class UserController {
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
-        const user = await $app.userRepository.findOne({ id } as any)
+        const em = $app.em.fork()
+        const user = await em.findOne('User', { id } as any)
         if (user) {
             try {
-                await $app.userRepository.removeAndFlush(user)
+                await em.removeAndFlush(user)
                 return response.status(204).json()
             } catch (error: any) {
                 return ErrorController.sendError(response, 500, error)
