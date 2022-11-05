@@ -85,7 +85,7 @@ router.post(
  * @openapi
  * /footprints/{id}:
  *   get:
- *     summary: Get a footprint by uid
+ *     summary: Get a footprint by id
  *     tags:
  *       - Footprint
  *     parameters:
