@@ -5,6 +5,7 @@ import { FootprintReaction } from '../entities/footprintReaction.js'
 import { Footprint } from '../entities/footprint.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
+import { fullPath } from '../services/footprintService'
 
 interface MulterFiles extends Express.Request {
     files: {
@@ -20,46 +21,31 @@ const createPersistentDownloadUrl = (
 // eslint-disable-next-line max-len
 ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
-async function uploadFileToFirestorage(files: MulterFiles['files']) {
+async function uploadFilesToFirestorage(files: MulterFiles['files']) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
-    const fileName = uuidv4()
-
     const images: Express.Multer.File[] = files.image
     const audios: Express.Multer.File[] = files.audio
-
     const concatFiles = [ ...images, ...audios ]
+    const promises: Promise<void>[] = []
 
-    const promises = concatFiles.map((value: Express.Multer.File) => {
-        const fullPath = () => {
-            if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
-                && value.fieldname === 'image') {
-                return `images/${fileName}.${value.mimetype.split('/')[1]}`
-            }
-            if ((value.mimetype === 'audio/mpeg' || value.mimetype === 'audio/mp3') && value.fieldname === 'audio') {
-                return `audios/${fileName}.${value.mimetype.split('/')[1]}`
-            }
-            if (value.mimetype === 'video/mp4' && value.fieldname === 'video') {
-                return `videos/${fileName}.${value.mimetype.split('/')[1]}`
-            }
-            return ''
-        }
-
-        const bucketFile = bucket.file(fullPath())
-
+    const downloadURLs = concatFiles.map((value: Express.Multer.File) => {
+        const fileName = uuidv4()
+        const bucketFile = bucket.file(fullPath(value, fileName))
         const downloadToken = uuidv4()
 
-        bucketFile.save(value.buffer, {
+        promises.push(bucketFile.save(value.buffer, {
             metadata: {
                 contentType: value.mimetype,
                 downloadTokens: downloadToken,
             },
-        })
+        }))
 
-        return createPersistentDownloadUrl(bucket.name, fullPath(), downloadToken)
+        return createPersistentDownloadUrl(bucket.name, fullPath(value, fileName), downloadToken)
     })
 
-    // TODO: promises is a string array?!
-    return Promise.all(promises)
+    await Promise.all(promises)
+
+    return downloadURLs
 }
 
 export default class FootprintController {
@@ -140,7 +126,7 @@ export default class FootprintController {
                 // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
-            const [ photoURL, audioURL ] = await uploadFileToFirestorage(request.files as MulterFiles['files'])
+            const [ photoURL, audioURL ] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])
             const footprint = new Footprint(
                 request.body.title,
                 user,
