@@ -13,21 +13,15 @@ export default class FriendshipController {
     }
 
     public getFriendships = async (request: Request, response: Response) => {
-        const id = request.query.userId
-        if (!id) {
+        const { userId } = request.query
+        if (!userId) {
             return this.idNotFoundError(response)
         }
         const em = $app.em.fork()
-        const user = await em.findOne('User', { id } as any, { populate:
-                [ 'friendships.invitor', 'friendships.invitee' ] })
-        if (user) {
-            return response.status(200).json(user.friendships)
-        }
-        return this.friendshipNotFoundError(response)
+        const friendships = await em.find('Friendship', { $or: [{ invitee: userId }, { invitor: userId }] })
+        return response.status(200).json(friendships)
     }
 
-    // TODO: Check if friendship already exists
-    // TODO: Check if status is already accepted
     public createFriendship = async (request: Request, response: Response) => {
         const { friendsCode } = request.body
         const uid = request.headers[AUTH_HEADER_UID] as string
