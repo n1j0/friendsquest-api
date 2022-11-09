@@ -81,7 +81,11 @@ export default class FootprintController {
         }
         try {
             const em = $app.em.fork()
-            const footprints = await em.findOneOrFail('FootprintReaction', { footprint: footprintId } as any)
+            const footprints = await em.findOneOrFail(
+                'FootprintReaction',
+                { footprint: footprintId } as any,
+                { populate: ['createdBy'] } as any,
+            )
             return response.status(200).json(footprints)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
@@ -136,7 +140,12 @@ export default class FootprintController {
                 audioURL,
             )
             await em.persistAndFlush(footprint)
-            return response.status(201).json(footprint)
+            const footprintForExport = {
+                ...footprint,
+                longitude: Number(footprint.longitude),
+                latitude: Number(footprint.latitude),
+            }
+            return response.status(201).json(footprintForExport)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }

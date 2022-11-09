@@ -190,7 +190,7 @@ router.get(
  *           schema:
  *             $ref: '#/components/schemas/NewFootprint'
  *     responses:
- *       200:
+ *       201:
  *         description: Returns the created footprint
  *         content:
  *           application/json:
