@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { wrap } from '@mikro-orm/core'
+import { nanoid } from 'nanoid'
 import { $app } from '../$app.js'
 import { User } from '../entities/user.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -69,8 +70,14 @@ export default class UserController {
             if (email !== 0 || username !== 0) {
                 return response.status(400).json({ message: 'Email or Username already taken' })
             }
-
             const em = $app.em.fork()
+            // TODO: Check if friendsCode already exists
+            let friendsCode = nanoid(5)
+            const codeInUse = await em.findOne('User', { friendsCode } as any)
+            if (codeInUse) {
+                friendsCode = nanoid(5)
+            }
+            user.friendsCode = friendsCode
             await em.persistAndFlush(user)
             return response.status(201).json(user)
         } catch (error: any) {
