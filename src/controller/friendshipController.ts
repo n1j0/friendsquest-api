@@ -8,10 +8,14 @@ export default class FriendshipController {
         ErrorController.sendError(response, 404, 'Friendship not found')
     }
 
+    private idNotFoundError = (response: Response) => {
+        ErrorController.sendError(response, 500, 'Missing id')
+    }
+
     public getFriendships = async (request: Request, response: Response) => {
         const id = request.query.userId
         if (!id) {
-            return ErrorController.sendError(response, 500, 'Missing id')
+            return this.idNotFoundError(response)
         }
         const em = $app.em.fork()
         const user = await em.findOne('User', { id } as any, { populate:
@@ -62,7 +66,7 @@ export default class FriendshipController {
         const uid = request.headers[AUTH_HEADER_UID] as string
         const { status } = request.body
         if (!id) {
-            return ErrorController.sendError(response, 500, 'Missing id')
+            return this.idNotFoundError(response)
         }
         const em = $app.em.fork()
         const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
@@ -80,5 +84,21 @@ export default class FriendshipController {
         return this.friendshipNotFoundError(response)
     }
 
-    // TODO deleteFriendship
+    public deleteFriendship = async (request: Request, response: Response) => {
+        const { id } = request.params
+        const uid = request.headers[AUTH_HEADER_UID] as string
+        if (!id) {
+            return this.idNotFoundError(response)
+        }
+        const em = $app.em.fork()
+        const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
+        if (friendship) {
+            if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
+                await em.removeAndFlush(friendship)
+                return response.status(200).json(friendship)
+            }
+            return ErrorController.sendError(response, 403, 'You are not allowed to delete this friendship')
+        }
+        return this.friendshipNotFoundError(response)
+    }
 }

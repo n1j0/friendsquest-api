@@ -123,4 +123,37 @@ router.patch(
     (request: Request, response: Response) => friendshipController.updateFriendship(request, response),
 )
 
+/**
+ * @openapi
+ * /friendships/{id}:
+ *   delete:
+ *     summary: Delete a friendship
+ *     tags:
+ *       - Friendship
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Authorization header
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *           required: true
+ *           description: Numeric ID of the friendship to delete
+ *     responses:
+ *       200:
+ *         description: Returns message that friendship was deleted
+ *       403:
+ *         description: Forbidden access or invalid token
+ *       404:
+ *         description: Friendship not found
+ */
+router.delete(
+    '/:id',
+    (request: Request, response: Response) => friendshipController.deleteFriendship(request, response),
+)
+
 export const friendshipRoutes = router
