@@ -81,8 +81,7 @@ export default class FootprintController {
         }
         try {
             const em = $app.em.fork()
-            const footprints = await em.findOneOrFail(
-                'FootprintReaction',
+            const footprints = await em.getRepository('FootprintReaction').find(
                 { footprint: footprintId } as any,
                 { populate: ['createdBy'] } as any,
             )
