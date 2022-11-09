@@ -11,7 +11,7 @@ export default class FriendshipController {
     public getFriendships = async (request: Request, response: Response) => {
         const id = request.query.userId
         if (!id) {
-            return response.status(500).json({ message: 'Missing id' })
+            return ErrorController.sendError(response, 500, 'Missing id')
         }
         const em = $app.em.fork()
         const user = await em.findOne('User', { id } as any, { populate:
@@ -57,7 +57,28 @@ export default class FriendshipController {
         return this.friendshipNotFoundError(response)
     }
 
-    // TODO patchFriendship
+    public updateFriendship = async (request: Request, response: Response) => {
+        const { id } = request.params
+        const uid = request.headers[AUTH_HEADER_UID] as string
+        const { status } = request.body
+        if (!id) {
+            return ErrorController.sendError(response, 500, 'Missing id')
+        }
+        const em = $app.em.fork()
+        const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
+        if (friendship) {
+            if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
+                if (friendship.status === 'accepted') {
+                    return ErrorController.sendError(response, 403, 'Friendship already accepted')
+                }
+                friendship.status = status
+                await em.persistAndFlush(friendship)
+                return response.status(200).json(friendship)
+            }
+            return ErrorController.sendError(response, 403, 'You are not allowed to update this friendship')
+        }
+        return this.friendshipNotFoundError(response)
+    }
 
     // TODO deleteFriendship
 }

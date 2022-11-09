@@ -75,7 +75,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "string"
         }
       },
@@ -108,6 +108,15 @@
           "keyName": "user_uid_unique",
           "primary": false,
           "unique": true
+        },
+        {
+          "columnNames": [
+            "friends_code"
+          ],
+          "composite": false,
+          "keyName": "user_friends_code_index",
+          "primary": false,
+          "unique": false
         },
         {
           "columnNames": [
@@ -180,11 +189,15 @@
         },
         "status": {
           "name": "status",
-          "type": "smallint",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "enumItems": [
+            "invited",
+            "accepted"
+          ],
           "mappedType": "enum"
         }
       },

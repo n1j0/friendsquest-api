@@ -63,7 +63,7 @@ router.get(
  *                 type: string
  *                 required: true
  *                 description: Friends code of the user to create a friendship with
- *                 example: 5x7xu
+ *                 example: 0rIxc
  *     responses:
  *       200:
  *         description: Returns the created friendship
@@ -75,6 +75,52 @@ router.get(
 router.post(
     '/',
     (request: Request, response: Response) => friendshipController.createFriendship(request, response),
+)
+
+/**
+ * @openapi
+ * /friendships/{id}:
+ *   patch:
+ *     summary: Update a friendship
+ *     tags:
+ *       - Friendship
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: Authorization header
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *           required: true
+ *           description: Numeric ID of the friendship to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 required: true
+ *                 enum: [invited, accepted]
+ *                 description: Status of the friendship
+ *                 example: accepted
+ *     responses:
+ *       200:
+ *         description: Returns the updated friendship
+ *       403:
+ *         description: Forbidden access or invalid token
+ *       404:
+ *         description: Friendship not found
+ */
+router.patch(
+    '/:id',
+    (request: Request, response: Response) => friendshipController.updateFriendship(request, response),
 )
 
 export const friendshipRoutes = router

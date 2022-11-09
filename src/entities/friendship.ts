@@ -5,9 +5,9 @@ import { User } from './user.js'
 // eslint-disable-next-line no-shadow
 export enum FriendshipStatus {
     // eslint-disable-next-line no-unused-vars
-    INVITED = 0,
+    INVITED = 'invited',
     // eslint-disable-next-line no-unused-vars
-    ACCEPTED = 1,
+    ACCEPTED = 'accepted',
 }
 
 @Entity()
