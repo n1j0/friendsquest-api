@@ -18,7 +18,12 @@ export default class FriendshipController {
             return this.idNotFoundError(response)
         }
         const em = $app.em.fork()
-        const friendships = await em.find('Friendship', { $or: [{ invitee: userId }, { invitor: userId }] })
+        const friendships = await em.find(
+            'Friendship',
+            { $or: [{ invitee: userId }, { invitor: userId }] },
+            { populate: [ 'invitee', 'invitor' ] },
+        )
+
         return response.status(200).json(friendships)
     }
 
