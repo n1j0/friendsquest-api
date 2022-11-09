@@ -68,6 +68,15 @@
           "primary": false,
           "nullable": true,
           "mappedType": "string"
+        },
+        "friends_code": {
+          "name": "friends_code",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
         }
       },
       "name": "user",
@@ -101,6 +110,15 @@
           "unique": true
         },
         {
+          "columnNames": [
+            "friends_code"
+          ],
+          "composite": false,
+          "keyName": "user_friends_code_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "user_pkey",
           "columnNames": [
             "id"
@@ -112,6 +130,104 @@
       ],
       "checks": [],
       "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "invitor_id": {
+          "name": "invitor_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "invitee_id": {
+          "name": "invitee_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "status": {
+          "name": "status",
+          "type": "smallint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "enum"
+        }
+      },
+      "name": "friendship",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "friendship_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "friendship_invitor_id_foreign": {
+          "constraintName": "friendship_invitor_id_foreign",
+          "columnNames": [
+            "invitor_id"
+          ],
+          "localTableName": "public.friendship",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "updateRule": "cascade"
+        },
+        "friendship_invitee_id_foreign": {
+          "constraintName": "friendship_invitee_id_foreign",
+          "columnNames": [
+            "invitee_id"
+          ],
+          "localTableName": "public.friendship",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.user",
+          "updateRule": "cascade"
+        }
+      }
     },
     {
       "columns": {
