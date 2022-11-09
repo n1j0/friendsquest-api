@@ -28,6 +28,12 @@ const friendshipController = new FriendshipController()
  *    responses:
  *      200:
  *        description: Returns all friendships of a user
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *               $ref: '#/components/schemas/Friendship'
  *      403:
  *        description: Forbidden access or invalid token
  *      404:
@@ -67,6 +73,10 @@ router.get(
  *     responses:
  *       200:
  *         description: Returns the created friendship
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Friendship'
  *       403:
  *         description: Forbidden access or invalid token
  *       404:
@@ -113,6 +123,10 @@ router.post(
  *     responses:
  *       200:
  *         description: Returns the updated friendship
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Friendship'
  *       403:
  *         description: Forbidden access or invalid token
  *       404:

@@ -38,8 +38,6 @@ export default class FriendshipController {
         const invitor = await em.findOne('User', { uid } as any)
         const invitee = await em.findOne('User', { friendsCode } as any)
 
-        console.log(invitor, invitee)
-
         if (invitor.friendsCode === invitee.friendsCode) {
             return ErrorController.sendError(response, 403, 'You can not add yourself')
         }
@@ -95,7 +93,7 @@ export default class FriendshipController {
         if (friendship) {
             if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
                 await em.removeAndFlush(friendship)
-                return response.status(200).json(friendship)
+                return response.status(200).json('Friendship deleted')
             }
             return ErrorController.sendError(response, 403, 'You are not allowed to delete this friendship')
         }

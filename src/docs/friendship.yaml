@@ -1,0 +1,20 @@
+components:
+  schemas:
+    Friendship:
+      type: object
+      properties:
+        invitor:
+          type: object
+          description: The user who sent the friendship request
+          example: { id: 1, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: john@doe.com, username: JohnDoe, uid: 39FDDRsAsZNPmocG4ZIgcnwO5BF2, imageURL: https://example.com/image.png }
+        invitee:
+          type: object
+          description: The user who received the friendship request
+          example: { id: 2, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: laura@doe.com, username: LauraDoe, uid: NFT7IF5F46eLuzKnjuLX4ZmWLTB3, imageURL: https://example.com/image.png }
+        status:
+          type: string
+          description: The status of the friendship
+          example: invited
+          enum:
+              - invited
+              - accepted
