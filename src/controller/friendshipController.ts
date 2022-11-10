@@ -18,14 +18,36 @@ export default class FriendshipController {
             return this.idNotFoundError(response)
         }
         const em = $app.em.fork()
-        const friendships = await em.find(
-            'Friendship',
-            { $or: [{ invitee: userId }, { invitor: userId }] },
-            { populate: [ 'invitee', 'invitor' ] },
-        )
-
-        return response.status(200).json(friendships)
+        const connection = em.getConnection()
+        // eslint-disable-next-line max-len
+        const results = await connection.execute(`SELECT f1.id as fs_id, f1.created_at as fs_created_at, f1.updated_at as fs_updated_at, f1.invitor_id as fs_invitor_id, f1.invitee_id as fs_invitee_id, f1.status as fs_status, f2.*  FROM (select "f0".* from "friendship" as "f0" where ("f0"."invitee_id" = ${userId} or "f0"."invitor_id" = ${userId})) f1 LEFT JOIN (SELECT *  FROM public.user WHERE id IN ( SELECT (CASE WHEN f.invitor_id != ${userId} THEN f.invitor_id ELSE f.invitee_id END) AS friend FROM (SELECT t.* FROM public.friendship t WHERE (t.invitor_id = ${userId} OR t.invitee_id = ${userId})) AS f)) as f2 ON (f1.invitee_id = f2.id OR f1.invitor_id = f2.id)`)
+        return response.status(200).json(this.mapFriendshipToObject(results))
     }
+
+    private mapFriendshipToObject = (friendship: any) => friendship.map((f: any) => {
+        const fs = {
+            id: f.fs_id,
+            created_at: f.fs_created_at,
+            updated_at: f.fs_updated_at,
+            invitor: f.fs_invitor_id,
+            invitee: f.fs_invitee_id,
+            status: f.fs_status,
+        }
+        const friend = {
+            id: f.id,
+            created_at: f.created_at,
+            updated_at: f.updated_at,
+            username: f.username,
+            email: f.email,
+            uid: f.uid,
+            image_url: f.image_url,
+            friendsCode: f.friends_code,
+        }
+        return {
+            ...fs,
+            friend,
+        }
+    })
 
     public createFriendship = async (request: Request, response: Response) => {
         const { friendsCode } = request.body
