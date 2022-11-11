@@ -33,7 +33,7 @@ const friendshipController = new FriendshipController()
  *            schema:
  *              type: array
  *              items:
- *               $ref: '#/components/schemas/GetFriendship'
+ *               $ref: '#/components/schemas/ExportFriendship'
  *      403:
  *        description: Forbidden access or invalid token
  *      404:
@@ -76,7 +76,7 @@ router.get(
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Friendship'
+ *               $ref: '#/components/schemas/ExportFriendship'
  *       403:
  *         description: Forbidden access or invalid token
  *       404:

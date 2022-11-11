@@ -18,17 +18,17 @@ components:
           enum:
               - invited
               - accepted
-    GetFriendship:
+    ExportFriendship:
       type: object
       properties:
         invitor:
-          type: object
-          description: The user who sent the friendship request
-          example: { id: 1, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: john@doe.com, username: JohnDoe, uid: 39FDDRsAsZNPmocG4ZIgcnwO5BF2, imageURL: https://example.com/image.png }
+          type: integer
+          description: The id of the user who sent the friendship request
+          example: 1
         invitee:
-          type: object
-          description: The user who received the friendship request
-          example: { id: 2, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: laura@doe.com, username: LauraDoe, uid: NFT7IF5F46eLuzKnjuLX4ZmWLTB3, imageURL: https://example.com/image.png }
+          type: integer
+          description: The id of the user who received the friendship request
+          example: 2
         status:
           type: string
           description: The status of the friendship
