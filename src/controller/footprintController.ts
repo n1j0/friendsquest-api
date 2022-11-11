@@ -25,7 +25,7 @@ async function uploadFilesToFirestorage(files: MulterFiles['files']) {
     const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
     const images: Express.Multer.File[] = files.image
     const audios: Express.Multer.File[] = files.audio
-    const concatFiles = [...images, ...audios]
+    const concatFiles = [ ...images, ...audios ]
     const promises: Promise<void>[] = []
 
     const downloadURLs = concatFiles.map((value: Express.Multer.File) => {
@@ -81,9 +81,10 @@ export default class FootprintController {
         }
         try {
             const em = $app.em.fork()
-            const footprints = await em.getRepository('FootprintReaction').find(
-                { footprint: footprintId } as any,
-                { populate: ['createdBy'] } as any
+            const footprints = await em.find(
+                'FootprintReaction',
+                { footprint: { id: footprintId } } as any,
+                { populate: ['createdBy'] } as any,
             )
             return response.status(200).json(footprints)
         } catch (error: any) {
@@ -110,10 +111,9 @@ export default class FootprintController {
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)
             await em.persistAndFlush(reaction)
-            console.log({ ... reaction, footprint: reaction.footprint.id })
-            const reactionForExport = { 
-                ... reaction, 
-                footprint: reaction.footprint.id 
+            const reactionForExport = {
+                ...reaction,
+                footprint: reaction.footprint.id,
             }
             return response.status(201).json(reactionForExport)
         } catch (error: any) {
@@ -133,7 +133,7 @@ export default class FootprintController {
                 // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
-            const [photoURL, audioURL] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])
+            const [ photoURL, audioURL ] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])
             const footprint = new Footprint(
                 request.body.title,
                 user,

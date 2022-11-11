@@ -20,7 +20,8 @@
       "multer",
       "express-actuator",
       "jest",
-      "compression"
+      "compression",
+      "nanoid"
     ]
   },
   "include": [

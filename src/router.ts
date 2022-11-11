@@ -7,6 +7,7 @@ import actuator from 'express-actuator'
 import { openapiSpecification } from './docs/swagger.js'
 import { usersRoutes } from './routes/user.js'
 import { footprintRoutes } from './routes/footprint.js'
+import { friendshipRoutes } from './routes/friendship.js'
 import { $app } from './$app.js'
 import { firebaseRoutes } from './routes/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
@@ -34,6 +35,7 @@ export default class Router {
 
         this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
         this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
+        this.server.use('/friendships', firebaseAuthMiddleware(getAuth()), friendshipRoutes)
         // TODO: remove this when ready for production
         this.server.use('/firebase', firebaseRoutes)
 

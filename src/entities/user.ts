@@ -15,6 +15,9 @@ export class User extends BaseEntity {
     @Property()
     public imageURL?: string
 
+    @Property({ unique: true, index: true })
+    public friendsCode?: string
+
     constructor(email: string, uid: string, username: string) {
         super()
         this.email = email

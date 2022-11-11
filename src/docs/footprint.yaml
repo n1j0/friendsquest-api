@@ -28,9 +28,9 @@ components:
           example: This is my first footprint
           required: false
         createdBy:
-          type: number
-          description: The id of the user who created the footprint
-          example: 1
+          type: object
+          description: The user who created the footprint
+          example: { id: 1, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: john@doe.com, username: JohnDoe, uid: 39FDDRsAsZNPmocG4ZIgcnwO5BF2, imageURL: https://example.com/image.png }
           required: true
         latitude:
           type: number
