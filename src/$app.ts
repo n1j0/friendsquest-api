@@ -6,6 +6,7 @@ import mikroOrmConfig from './config/mikro-orm.config.js'
 import { Footprint } from './entities/footprint.js'
 import { FootprintReaction } from './entities/footprintReaction.js'
 import { User } from './entities/user.js'
+import { Friendship } from './entities/friendship.js'
 
 const serviceAccount = {
     type: 'service_account',
@@ -32,6 +33,7 @@ export const $app = {
     em: EntityManager,
     footprintRepository: EntityRepository<Footprint>,
     footprintReactionRepository: EntityRepository<FootprintReaction>,
+    friendshipRepository: EntityRepository<Friendship>,
     userRepository: EntityRepository<User>,
     firebase: App,
     storage: Storage

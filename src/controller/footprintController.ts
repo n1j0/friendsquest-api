@@ -18,7 +18,7 @@ const createPersistentDownloadUrl = (
     bucket: string,
     pathToFile: string,
     downloadToken: string,
-// eslint-disable-next-line max-len
+    // eslint-disable-next-line max-len
 ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
 async function uploadFilesToFirestorage(files: MulterFiles['files']) {
@@ -81,7 +81,11 @@ export default class FootprintController {
         }
         try {
             const em = $app.em.fork()
-            const footprints = await em.findOneOrFail('FootprintReaction', { footprint: footprintId } as any)
+            const footprints = await em.find(
+                'FootprintReaction',
+                { footprint: { id: footprintId } } as any,
+                { populate: ['createdBy'] } as any,
+            )
             return response.status(200).json(footprints)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
@@ -107,11 +111,14 @@ export default class FootprintController {
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)
             await em.persistAndFlush(reaction)
+            const reactionForExport = {
+                ...reaction,
+                footprint: reaction.footprint.id,
+            }
+            return response.status(201).json(reactionForExport)
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
-
-        return response.sendStatus(204)
     }
 
     public createFootprint = async (request: Request, response: Response) => {
@@ -136,7 +143,12 @@ export default class FootprintController {
                 audioURL,
             )
             await em.persistAndFlush(footprint)
-            return response.status(201).json(footprint)
+            const footprintForExport = {
+                ...footprint,
+                longitude: Number(footprint.longitude),
+                latitude: Number(footprint.latitude),
+            }
+            return response.status(201).json(footprintForExport)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
