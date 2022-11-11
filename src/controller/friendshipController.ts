@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { $app } from '../$app.js'
 import ErrorController from './errorController.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
+import { Friendship } from '../entities/friendship.js'
 
 export default class FriendshipController {
     private friendshipNotFoundError = (response: Response) => {
@@ -70,12 +71,18 @@ export default class FriendshipController {
             if (checkInvitorFriendship.length > 0 || checkInviteeFriendship.length > 0) {
                 return ErrorController.sendError(response, 403, 'Friendship already exists')
             }
-            const friendship = em.create('Friendship', {
-                invitor,
-                invitee,
-            })
+            const friendship = new Friendship(invitor, invitee)
             await em.persistAndFlush(friendship)
-            return response.status(200).json(friendship)
+            const friendshipObjectToReturn = {
+                id: friendship.id,
+                createdAt: friendship.createdAt,
+                updatedAt: friendship.updatedAt,
+                invitor: friendship.invitor.id,
+                invitee: friendship.invitee.id,
+                status: friendship.status,
+                friend: { ...invitee },
+            }
+            return response.status(200).json(friendshipObjectToReturn)
         }
         return this.friendshipNotFoundError(response)
     }
