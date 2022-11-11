@@ -5,7 +5,7 @@
   "main": "./.out/src/index.js",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" nodemon --ext ts --experimental-specifier-resolution node ./src",
-    "start": "tsc && npm run orm:restart && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/src/index.js",
+    "start": "tsc && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/src/index.js",
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location temp/.eslintcache --ignore-path ./.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
