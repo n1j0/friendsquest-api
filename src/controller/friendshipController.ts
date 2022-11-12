@@ -97,6 +97,7 @@ export default class FriendshipController {
         const em = $app.em.fork()
         const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
         if (friendship) {
+            // TODO: remove invitor.uid
             if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
                 if (friendship.status === 'accepted') {
                     return ErrorController.sendError(response, 403, 'Friendship already accepted')
@@ -110,6 +111,7 @@ export default class FriendshipController {
         return this.friendshipNotFoundError(response)
     }
 
+    // TODO: rename to decline
     public deleteFriendship = async (request: Request, response: Response) => {
         const { id } = request.params
         const uid = request.headers[AUTH_HEADER_UID] as string
@@ -119,6 +121,7 @@ export default class FriendshipController {
         const em = $app.em.fork()
         const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
         if (friendship) {
+            // TODO: remove invitor.uid
             if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
                 await em.removeAndFlush(friendship)
                 return response.status(200).json('Friendship deleted')
