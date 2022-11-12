@@ -8,13 +8,13 @@ export class UserSeeder extends Seeder {
             email: 'test@test.at',
             uid: '39FDDRsAsZNPmocG4ZIgcnwO5BF2',
             username: 'peterPan',
-            friendsCode: '3rpxc',
+            friendsCode: '00000',
         } as RequiredEntityData<User>)
         context['NFT7IF5F46eLuzKnjuLX4ZmWLTB3'] = em.create(User, {
             email: 'test@test2.at',
             uid: 'NFT7IF5F46eLuzKnjuLX4ZmWLTB3',
             username: 'lauraPan',
-            friendsCode: '0rIxc',
+            friendsCode: '00001',
         } as RequiredEntityData<User>)
         context['86Tu5feimgMLOJ1JHpKAUmaG4wV2'] = em.create(User, {
             email: 'kevin.harizaj@gmail.com',
@@ -22,7 +22,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:23:56.843524Z',
             updatedAt: '2022-05-06T12:23:56.843524Z',
             username: 'kevin',
-            friendsCode: 'me5uo',
+            friendsCode: '00002',
         } as RequiredEntityData<User>)
         context['8eBoGksf7XQtn0gj11GaHrmc3dX2'] = em.create(User, {
             email: 'thomas@mayrhofer.at',
@@ -30,7 +30,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T13:36:54.466567Z',
             updatedAt: '2022-05-06T13:36:54.466567Z',
             username: 'thomas',
-            friendsCode: 'duwrn',
+            friendsCode: '00003',
         } as RequiredEntityData<User>)
         context['BluuGruwMfaAy99BLYyhyfNQktu2'] = em.create(User, {
             email: 'lena.heiglauer@gmx.at',
@@ -38,7 +38,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:34:01.447527Z',
             updatedAt: '2022-05-06T12:34:01.447527Z',
             username: 'lener',
-            friendsCode: 'cbxwn',
+            friendsCode: '00004',
         } as RequiredEntityData<User>)
         context['FhsDLCfvnRecYq0Z1LB7uNx6OzV2'] = em.create(User, {
             email: 'sags-per-mail@mein.gmx',
@@ -46,7 +46,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:08:10.231517Z',
             updatedAt: '2022-05-06T12:08:10.231517Z',
             username: 'jtpfa',
-            friendsCode: '5bfiu',
+            friendsCode: '00005',
         } as RequiredEntityData<User>)
         context['FjKDIEQvWscXjDMAmNfITK3HpN42'] = em.create(User, {
             email: 'elias.burgstaller@gmx.at',
@@ -54,7 +54,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T09:08:27.852798Z',
             updatedAt: '2022-05-06T09:08:27.852798Z',
             username: 'eliburgi',
-            friendsCode: 'y66ea',
+            friendsCode: '00006',
         } as RequiredEntityData<User>)
         context['FznIzkaDFLULTHPy5DCdFfA473w1'] = em.create(User, {
             email: 'marcelhans89@googlemail.com',
@@ -62,7 +62,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:02:27.500081Z',
             updatedAt: '2022-05-06T12:02:27.500081Z',
             username: 'marcel98',
-            friendsCode: 'awp7x',
+            friendsCode: '00007',
         } as RequiredEntityData<User>)
         context['M6JCFPQ3JPXsepF9LekbnabMvwc2'] = em.create(User, {
             email: 'tu1.app.friendsquest@gmail.com',
@@ -70,7 +70,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-06-06T19:59:53.677629Z',
             updatedAt: '2022-06-06T19:59:53.677629Z',
             username: 'test',
-            friendsCode: '9mugr',
+            friendsCode: '00008',
         } as RequiredEntityData<User>)
         context['PhADaouxlzPc6rHv2vKkGFryM7V2'] = em.create(User, {
             email: 'bjelli@gmail.com',
@@ -78,7 +78,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-07-04T10:05:09.555099Z',
             updatedAt: '2022-07-04T10:05:09.555099Z',
             username: 'bjelline',
-            friendsCode: 'mmeix',
+            friendsCode: '00009',
         } as RequiredEntityData<User>)
         context['UNJkNmUUDzUzDQI47nTZupFjYaf2'] = em.create(User, {
             email: 'reisingerjuli@gmail.com',
@@ -86,7 +86,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T07:20:24.790489Z',
             updatedAt: '2022-05-06T07:20:24.790489Z',
             username: 'julrei',
-            friendsCode: '5x7xu',
+            friendsCode: '0000A',
         } as RequiredEntityData<User>)
         context['WtISXJI9AXYGkJMuXW1th1BG9gU2'] = em.create(User, {
             email: 'julia@reisinger.pro',
@@ -94,7 +94,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T13:27:14.256713Z',
             updatedAt: '2022-05-06T13:27:14.256713Z',
             username: 'thdhjw',
-            friendsCode: '5u6cs',
+            friendsCode: '0000B',
         } as RequiredEntityData<User>)
         context['d4FR9aldNwX7vMzsgm35cXIiKWk1'] = em.create(User, {
             email: 'djdjdjdjk@gmail.at',
@@ -102,7 +102,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:18:18.504911Z',
             updatedAt: '2022-05-06T12:18:18.504911Z',
             username: 'aaaa',
-            friendsCode: 'mpoo9',
+            friendsCode: '0000C',
         } as RequiredEntityData<User>)
         context['h5KPMw0obScf8FJ2QbLUMtgvLJV2'] = em.create(User, {
             email: 'dominik.rakowski@outlook.de',
@@ -110,7 +110,7 @@ export class UserSeeder extends Seeder {
             createdAt: '2022-05-06T12:33:15.625885Z',
             updatedAt: '2022-05-06T12:33:15.625885Z',
             username: 'dominik',
-            friendsCode: 'i34d3',
+            friendsCode: '0000D',
         } as RequiredEntityData<User>)
     }
 }
