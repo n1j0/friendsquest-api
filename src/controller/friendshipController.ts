@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { $app } from '../$app.js'
 import ErrorController from './errorController.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { AUTH_HEADER_UID, FriendshipStatus } from '../constants/index.js'
 import { Friendship } from '../entities/friendship.js'
 
 export default class FriendshipController {
@@ -90,6 +90,7 @@ export default class FriendshipController {
     public updateFriendship = async (request: Request, response: Response) => {
         const { id } = request.params
         const uid = request.headers[AUTH_HEADER_UID] as string
+        // TODO: status shouldn't be passed in body
         const { status } = request.body
         if (!id) {
             return this.idNotFoundError(response)
@@ -97,9 +98,8 @@ export default class FriendshipController {
         const em = $app.em.fork()
         const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
         if (friendship) {
-            // TODO: remove invitor.uid
-            if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
-                if (friendship.status === 'accepted') {
+            if (friendship.invitee.uid === uid) {
+                if (friendship.status === FriendshipStatus.ACCEPTED) {
                     return ErrorController.sendError(response, 403, 'Friendship already accepted')
                 }
                 friendship.status = status
@@ -111,8 +111,7 @@ export default class FriendshipController {
         return this.friendshipNotFoundError(response)
     }
 
-    // TODO: rename to decline
-    public deleteFriendship = async (request: Request, response: Response) => {
+    public declineFriendship = async (request: Request, response: Response) => {
         const { id } = request.params
         const uid = request.headers[AUTH_HEADER_UID] as string
         if (!id) {
@@ -121,8 +120,7 @@ export default class FriendshipController {
         const em = $app.em.fork()
         const friendship = await em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
         if (friendship) {
-            // TODO: remove invitor.uid
-            if (friendship.invitor.uid === uid || friendship.invitee.uid === uid) {
+            if (friendship.invitee.uid === uid) {
                 await em.removeAndFlush(friendship)
                 return response.status(200).json('Friendship deleted')
             }

@@ -1,14 +1,7 @@
 import { Entity, Enum, ManyToOne } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'
-
-// eslint-disable-next-line no-shadow
-export enum FriendshipStatus {
-    // eslint-disable-next-line no-unused-vars
-    INVITED = 'invited',
-    // eslint-disable-next-line no-unused-vars
-    ACCEPTED = 'accepted',
-}
+import { FriendshipStatus } from '../constants/index.js'
 
 @Entity()
 export class Friendship extends BaseEntity {

@@ -167,7 +167,7 @@ router.patch(
  */
 router.delete(
     '/:id',
-    (request: Request, response: Response) => friendshipController.deleteFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.declineFriendship(request, response),
 )
 
 export const friendshipRoutes = router

@@ -36,7 +36,6 @@ router.get(
     (_request: Request, response: Response) => userController.getAllUsers(response),
 )
 
-// TODO: get with id or uid - why? - every route with id should be cloned for usage with uid if there is a reason for it
 /**
  * @openapi
  * /users/{id}:

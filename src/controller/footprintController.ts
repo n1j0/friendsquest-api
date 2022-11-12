@@ -106,7 +106,6 @@ export default class FootprintController {
             const em = $app.em.fork()
             const footprint = await em.findOneOrFail('Footprint', { id } as any)
             const user = await em.findOneOrFail('User', {
-                // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             const reaction = new FootprintReaction(user, message, footprint)
@@ -130,7 +129,6 @@ export default class FootprintController {
         try {
             const em = $app.em.fork()
             const user = await em.findOneOrFail('User', {
-                // eslint-disable-next-line security/detect-object-injection
                 uid: request.headers[AUTH_HEADER_UID] as string,
             } as any)
             const [ photoURL, audioURL ] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])

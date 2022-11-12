@@ -64,7 +64,6 @@ export default class UserController {
         }
 
         try {
-            // eslint-disable-next-line security/detect-object-injection
             const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
             const { username, email } = await this.checkUsernameAndMail(request)
             if (email !== 0 || username !== 0) {
