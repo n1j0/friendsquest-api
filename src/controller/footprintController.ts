@@ -1,6 +1,7 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import ErrorController from './errorController.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
+import { NewFootprint } from '../types/footprint'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
@@ -17,9 +18,9 @@ export default class FootprintController {
         }
     }
 
-    public getFootprintById = async (request: Request, response: Response) => {
+    public getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
         try {
-            const footprint = await this.footprintRepository.getFootprintById(request.params.id)
+            const footprint = await this.footprintRepository.getFootprintById(id)
             if (footprint) {
                 return response.status(200).json(footprint)
             }
@@ -29,30 +30,30 @@ export default class FootprintController {
         }
     }
 
-    public getFootprintReactions = async (request: Request, response: Response) => {
-        const { id: footprintId } = request.params
-        if (!footprintId) {
+    public getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
+        if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
-            return response.status(200).json(await this.footprintRepository.getFootprintReactions(footprintId))
+            return response.status(200).json(await this.footprintRepository.getFootprintReactions(id))
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
     }
 
-    public createFootprintReaction = async (request: Request, response: Response) => {
-        const message = request.body.message.trim()
+    public createFootprintReaction = async (
+        { id, message, uid }: { id: number | string, message: string, uid: string },
+        response: Response,
+    ) => {
         if (!message) {
             return ErrorController.sendError(response, 500, 'Message is missing')
         }
-        const { id } = request.params
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
 
         try {
-            const reaction = await this.footprintRepository.createFootprintReaction(request, id, message)
+            const reaction = await this.footprintRepository.createFootprintReaction(id, message.trim(), uid)
             const reactionWithFootprintId = {
                 ...reaction,
                 footprint: reaction.footprint.id,
@@ -63,14 +64,19 @@ export default class FootprintController {
         }
     }
 
-    public createFootprint = async (request: Request, response: Response) => {
-        if (!request.body.title && !request.body.latitude
-            && !request.body.longitude && !request.body.createdBy && !request.body.files) {
+    public createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
+        if (!title || !latitude || !longitude || !files) {
             return ErrorController.sendError(response, 400, 'Missing required fields')
         }
 
         try {
-            const footprint = await this.footprintRepository.createFootprint(request)
+            const footprint = await this.footprintRepository.createFootprint({
+                title,
+                latitude,
+                longitude,
+                files,
+                uid,
+            })
             const footprintWithCoordinatesAsNumbers = {
                 ...footprint,
                 longitude: Number(footprint.longitude),

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
+import { AUTH_HEADER_UID } from '../constants'
 
 const router = express.Router()
 const friendshipService = new FriendshipPostgresRepository()
@@ -45,7 +46,10 @@ const friendshipController = new FriendshipController(friendshipService, userPos
  */
 router.get(
     '/',
-    (request: Request, response: Response) => friendshipController.getFriendships(request, response),
+    (request: Request, response: Response) => friendshipController.getFriendships(
+        { userId: String(request.query.userId) },
+        response,
+    ),
 )
 
 /**
@@ -88,7 +92,10 @@ router.get(
  */
 router.post(
     '/',
-    (request: Request, response: Response) => friendshipController.createFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.createFriendship(
+        { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
+        response,
+    ),
 )
 
 /**
@@ -125,7 +132,13 @@ router.post(
  */
 router.patch(
     '/:id',
-    (request: Request, response: Response) => friendshipController.acceptFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.acceptFriendship(
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    ),
 )
 
 /**
@@ -158,7 +171,13 @@ router.patch(
  */
 router.delete(
     '/:id',
-    (request: Request, response: Response) => friendshipController.declineOrDeleteFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.declineOrDeleteFriendship(
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    ),
 )
 
 export const friendshipRoutes = router

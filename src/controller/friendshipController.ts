@@ -1,6 +1,6 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import ErrorController from './errorController.js'
-import { AUTH_HEADER_UID, FriendshipStatus } from '../constants/index.js'
+import { FriendshipStatus } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 
@@ -48,9 +48,7 @@ export default class FriendshipController {
         }
     })
 
-    getFriendships = async (request: Request, response: Response) => {
-        let { userId } = request.query
-        userId = String(userId)
+    getFriendships = async ({ userId }: { userId: string }, response: Response) => {
         if (!userId) {
             return this.idNotFoundError(response)
         }
@@ -58,9 +56,7 @@ export default class FriendshipController {
         return response.status(200).json(this.mapFriendshipToObject(friendships))
     }
 
-    createFriendship = async (request: Request, response: Response) => {
-        const { friendsCode } = request.body
-        const uid = request.headers[AUTH_HEADER_UID] as string
+    createFriendship = async ({ friendsCode, uid }: { friendsCode: string, uid: string }, response: Response) => {
         if (!friendsCode) {
             return ErrorController.sendError(response, 403, 'Missing friendsCode')
         }
@@ -97,9 +93,7 @@ export default class FriendshipController {
         return response.status(200).json(friendshipWithFriendData)
     }
 
-    acceptFriendship = async (request: Request, response: Response) => {
-        const { id } = request.params
-        const uid = request.headers[AUTH_HEADER_UID] as string
+    acceptFriendship = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
         if (!id) {
             return this.idNotFoundError(response)
         }
@@ -125,9 +119,7 @@ export default class FriendshipController {
         }
     }
 
-    declineOrDeleteFriendship = async (request: Request, response: Response) => {
-        const { id } = request.params
-        const uid = request.headers[AUTH_HEADER_UID] as string
+    declineOrDeleteFriendship = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
         if (!id) {
             return this.idNotFoundError(response)
         }

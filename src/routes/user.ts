@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import UserController from '../controller/userController.js'
 import { userPermissionMiddleware } from '../middlewares/userPermission.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
+import { AUTH_HEADER_UID } from '../constants/index.js'
 
 const router = express.Router()
 const userPostgresRepository = new UserPostgresRepository()
@@ -72,7 +73,7 @@ router.get(
  */
 router.get(
     '/:id',
-    (request: Request, response: Response) => userController.getUserById(request, response),
+    (request: Request, response: Response) => userController.getUserById({ id: request.params.id }, response),
 )
 
 /**
@@ -109,7 +110,7 @@ router.get(
  */
 router.get(
     '/uid/:uid',
-    (request: Request, response: Response) => userController.getUserByUid(request, response),
+    (request: Request, response: Response) => userController.getUserByUid({ uid: request.params.uid }, response),
 )
 
 /**
@@ -162,7 +163,14 @@ router.get(
  */
 router.post(
     '/',
-    (request: Request, response: Response) => userController.createUser(request, response),
+    (request: Request, response: Response) => userController.createUser(
+        {
+            email: request.body.email,
+            username: request.body.username,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    ),
 )
 
 /**
@@ -224,8 +232,19 @@ router.post(
  */
 router.patch(
     '/:id',
-    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(uid, request)),
-    (request: Request, response: Response) => userController.updateUser(request, response),
+    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(
+        uid,
+        request.params.id,
+    )),
+    (request: Request, response: Response) => userController.updateUser(
+        {
+            email: request.body.email,
+            username: request.body.username,
+            id: request.params.id,
+            body: request.body,
+        },
+        response,
+    ),
 )
 
 /**
@@ -263,8 +282,11 @@ router.patch(
  */
 router.delete(
     '/:id',
-    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(uid, request)),
-    (request: Request, response: Response) => userController.deleteUser(request, response),
+    userPermissionMiddleware((uid: string, request: Request) => userController.isAllowedToEditUser(
+        uid,
+        request.params.id,
+    )),
+    (request: Request, response: Response) => userController.deleteUser({ id: request.params.id }, response),
 )
 
 export const usersRoutes = router

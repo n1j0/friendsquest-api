@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express'
 import FootprintController from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
+import { AUTH_HEADER_UID } from '../constants/index.js'
+import { MulterFiles } from '../types/multer.js'
 
 const router = express.Router()
 const footprintService = new FootprintService()
@@ -81,7 +83,10 @@ router.get(
  */
 router.post(
     '/:id/reactions',
-    (request: Request, response: Response) => footprintController.createFootprintReaction(request, response),
+    (request: Request, response: Response) => footprintController.createFootprintReaction(
+        { id: request.params.id, message: request.body.message, uid: request.headers[AUTH_HEADER_UID] as string },
+        response,
+    ),
 )
 
 /**
@@ -116,7 +121,7 @@ router.post(
  */
 router.get(
     '/:id',
-    (request: Request, response: Response) => footprintController.getFootprintById(request, response),
+    (request: Request, response: Response) => footprintController.getFootprintById({ id: request.params.id }, response),
 )
 
 /**
@@ -155,7 +160,10 @@ router.get(
  */
 router.get(
     '/:id/reactions',
-    (request: Request, response: Response) => footprintController.getFootprintReactions(request, response),
+    (request: Request, response: Response) => footprintController.getFootprintReactions(
+        { id: request.params.id },
+        response,
+    ),
 )
 
 /**
@@ -209,7 +217,16 @@ router.get(
 router.post(
     '/',
     footprintService.uploadMiddleware.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
-    (request: Request, response: Response) => footprintController.createFootprint(request, response),
+    (request: Request, response: Response) => footprintController.createFootprint(
+        {
+            title: request.body.title,
+            latitude: request.body.latitude,
+            longitude: request.body.longitude,
+            files: request.body.files as MulterFiles['files'],
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    ),
 )
 
 export const footprintRoutes = router

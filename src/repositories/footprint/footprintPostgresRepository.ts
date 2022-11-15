@@ -1,11 +1,10 @@
-import { Request } from 'express'
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { $app } from '../../$app.js'
-import { AUTH_HEADER_UID } from '../../constants/index.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
 import { MulterFiles } from '../../types/multer.js'
 import { Footprint } from '../../entities/footprint.js'
 import { FootprintService } from '../../services/footprintService.js'
+import { NewFootprint } from '../../types/footprint.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private footprintService: FootprintService
@@ -14,19 +13,17 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         this.footprintService = footprintService
     }
 
-    createFootprint = async (request: Request) => {
+    createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint) => {
         const em = $app.em.fork()
-        const user = await em.findOneOrFail('User', {
-            uid: request.headers[AUTH_HEADER_UID] as string,
-        } as any)
+        const user = await em.findOneOrFail('User', { uid } as any)
         const [ photoURL, audioURL ] = await this
             .footprintService
-            .uploadFilesToFireStorage(request.files as MulterFiles['files'])
+            .uploadFilesToFireStorage(files as MulterFiles['files'])
         const footprint = new Footprint(
-            request.body.title,
+            title,
             user,
-            request.body.latitude,
-            request.body.longitude,
+            latitude,
+            longitude,
             photoURL,
             audioURL,
         )
@@ -34,12 +31,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         return footprint
     }
 
-    createFootprintReaction = async (request: Request, id: number | string, message: string) => {
+    createFootprintReaction = async (id: number | string, message: string, uid: string) => {
         const em = $app.em.fork()
         const footprint = await em.findOneOrFail('Footprint', { id } as any)
-        const user = await em.findOneOrFail('User', {
-            uid: request.headers[AUTH_HEADER_UID] as string,
-        } as any)
+        const user = await em.findOneOrFail('User', { uid } as any)
         const reaction = new FootprintReaction(user, message, footprint)
         await em.persistAndFlush(reaction)
         return reaction

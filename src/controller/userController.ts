@@ -1,6 +1,5 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { User } from '../entities/user.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
 import { UserNotFoundError } from '../errors/UserNotFoundError.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
@@ -14,9 +13,9 @@ export default class UserController {
 
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
-    isAllowedToEditUser = async (uid: string, request: Request) => {
+    isAllowedToEditUser = async (uid: string, id: string) => {
         try {
-            const user = await this.userRepository.getUserById(request.params.id)
+            const user = await this.userRepository.getUserById(id)
             return user.uid === uid
         } catch {
             return false
@@ -25,8 +24,7 @@ export default class UserController {
 
     getAllUsers = async (response: Response) => response.status(200).json(await this.userRepository.getAllUsers())
 
-    getUserById = async (request: Request, response: Response) => {
-        const { id } = request.params
+    getUserById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return response.status(500).json({ message: 'Missing id' })
         }
@@ -38,8 +36,7 @@ export default class UserController {
         }
     }
 
-    getUserByUid = async (request: Request, response: Response) => {
-        const { uid } = request.params
+    getUserByUid = async ({ uid }: { uid: number | string }, response: Response) => {
         if (!uid) {
             return response.status(500).json({ message: 'Missing uid' })
         }
@@ -51,17 +48,20 @@ export default class UserController {
         }
     }
 
-    createUser = async (request: Request, response: Response) => {
-        if (!request.body.email) {
+    createUser = async (
+        { email, username, uid }: { email: string, username: string, uid: string },
+        response: Response,
+    ) => {
+        if (!email) {
             return ErrorController.sendError(response, 403, 'Email is missing')
         }
 
         try {
-            const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
-            const [ username, email ] = await this
+            const user = new User(email, uid, username)
+            const [ numberOfSameUsername, numberOfSameMail ] = await this
                 .userRepository
-                .checkUsernameAndMail(request.body.username, request.body.email)
-            if (email !== 0 || username !== 0) {
+                .checkUsernameAndMail(username, email)
+            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
             return response.status(201).json(await this.userRepository.createUser(user))
@@ -70,18 +70,21 @@ export default class UserController {
         }
     }
 
-    updateUser = async (request: Request, response: Response) => {
+    updateUser = async (
+        { email, username, id, body }: { email: string, username: string, id: number | string, body: any },
+        response: Response,
+    ) => {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
         try {
-            const [ username, email ] = await this
+            const [ numberOfSameUsername, numberOfSameMail ] = await this
                 .userRepository
-                .checkUsernameAndMail(request.body.username, request.body.email)
-            if (email !== 0 || username !== 0) {
+                .checkUsernameAndMail(username, email)
+            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
 
-            return response.status(200).json(await this.userRepository.updateUser(request.params.id, request.body))
+            return response.status(200).json(await this.userRepository.updateUser(id, body))
         } catch (error: any) {
             return error instanceof UserNotFoundError
                 ? this.userNotFoundError(response)
@@ -89,8 +92,7 @@ export default class UserController {
         }
     }
 
-    deleteUser = async (request: Request, response: Response) => {
-        const { id } = request.params
+    deleteUser = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
