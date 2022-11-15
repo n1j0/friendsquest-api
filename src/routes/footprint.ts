@@ -1,10 +1,12 @@
 import express, { Request, Response } from 'express'
 import FootprintController from '../controller/footprintController.js'
+import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
 
 const router = express.Router()
 const footprintService = new FootprintService()
-const footprintController = new FootprintController(footprintService)
+const footprintRepository = new FootprintPostgresRepository(footprintService)
+const footprintController = new FootprintController(footprintRepository)
 
 /**
  * @openapi

@@ -1,9 +1,10 @@
 import { wrap } from '@mikro-orm/core'
-import { $app } from '../$app.js'
-import { User } from '../entities/user.js'
-import { UserNotFoundError } from '../errors/UserNotFoundError.js'
+import { $app } from '../../$app.js'
+import { User } from '../../entities/user.js'
+import { UserNotFoundError } from '../../errors/UserNotFoundError.js'
+import { UserRepositoryInterface } from './userRepositoryInterface.js'
 
-export class UserService {
+export class UserPostgresRepository implements UserRepositoryInterface {
     checkUsernameAndMail = async (username: string, email: string): Promise<[number, number]> => {
         const em = $app.em.fork()
         return Promise.all([

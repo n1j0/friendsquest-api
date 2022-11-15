@@ -2,28 +2,28 @@ import { Request, Response } from 'express'
 import { User } from '../entities/user.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
-import { UserService } from '../services/userService.js'
 import { UserNotFoundError } from '../errors/UserNotFoundError.js'
+import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 
 export default class UserController {
-    private userService: UserService
+    private userRepository: UserRepositoryInterface
 
-    constructor(userService: UserService) {
-        this.userService = userService
+    constructor(userRepository: UserRepositoryInterface) {
+        this.userRepository = userRepository
     }
 
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
     isAllowedToEditUser = async (uid: string, request: Request) => {
         try {
-            const user = await this.userService.getUserById(request.params.id)
+            const user = await this.userRepository.getUserById(request.params.id)
             return user.uid === uid
         } catch {
             return false
         }
     }
 
-    getAllUsers = async (response: Response) => response.status(200).json(await this.userService.getAllUsers())
+    getAllUsers = async (response: Response) => response.status(200).json(await this.userRepository.getAllUsers())
 
     getUserById = async (request: Request, response: Response) => {
         const { id } = request.params
@@ -31,7 +31,7 @@ export default class UserController {
             return response.status(500).json({ message: 'Missing id' })
         }
         try {
-            const user = await this.userService.getUserById(id)
+            const user = await this.userRepository.getUserById(id)
             return response.status(200).json(user)
         } catch {
             return this.userNotFoundError(response)
@@ -44,7 +44,7 @@ export default class UserController {
             return response.status(500).json({ message: 'Missing uid' })
         }
         try {
-            const user = await this.userService.getUserByUid(uid)
+            const user = await this.userRepository.getUserByUid(uid)
             return response.status(200).json(user)
         } catch {
             return this.userNotFoundError(response)
@@ -59,12 +59,12 @@ export default class UserController {
         try {
             const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
             const [ username, email ] = await this
-                .userService
+                .userRepository
                 .checkUsernameAndMail(request.body.username, request.body.email)
             if (email !== 0 || username !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
-            return response.status(201).json(await this.userService.createUser(user))
+            return response.status(201).json(await this.userRepository.createUser(user))
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
@@ -75,13 +75,13 @@ export default class UserController {
         // right now this would probably throw an error "Email or Username already taken"
         try {
             const [ username, email ] = await this
-                .userService
+                .userRepository
                 .checkUsernameAndMail(request.body.username, request.body.email)
             if (email !== 0 || username !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
 
-            return response.status(200).json(await this.userService.updateUser(request.params.id, request.body))
+            return response.status(200).json(await this.userRepository.updateUser(request.params.id, request.body))
         } catch (error: any) {
             return error instanceof UserNotFoundError
                 ? this.userNotFoundError(response)
@@ -95,7 +95,7 @@ export default class UserController {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
-            await this.userService.deleteUser(id)
+            await this.userRepository.deleteUser(id)
             return response.status(204).json()
         } catch (error: any) {
             return error instanceof UserNotFoundError

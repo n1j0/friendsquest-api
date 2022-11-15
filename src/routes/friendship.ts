@@ -1,12 +1,12 @@
 import express, { Request, Response } from 'express'
 import FriendshipController from '../controller/friendshipController.js'
-import { FriendshipService } from '../services/friendshipService.js'
-import { UserService } from '../services/userService.js'
+import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
+import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 
 const router = express.Router()
-const friendshipService = new FriendshipService()
-const userService = new UserService()
-const friendshipController = new FriendshipController(friendshipService, userService)
+const friendshipService = new FriendshipPostgresRepository()
+const userPostgresRepository = new UserPostgresRepository()
+const friendshipController = new FriendshipController(friendshipService, userPostgresRepository)
 
 /**
  * @openapi

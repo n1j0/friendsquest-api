@@ -1,10 +1,12 @@
-import { $app } from '../$app'
-import { FriendshipAlreadyExistsError } from '../errors/FriendshipAlreadyExistsError.js'
-import { Friendship } from '../entities/friendship.js'
-import { User } from '../entities/user.js'
-import { FriendshipStatus } from '../constants'
+import { wrap } from '@mikro-orm/core'
+import { $app } from '../../$app.js'
+import { FriendshipAlreadyExistsError } from '../../errors/FriendshipAlreadyExistsError.js'
+import { Friendship } from '../../entities/friendship.js'
+import { User } from '../../entities/user.js'
+import { FriendshipStatus } from '../../constants/index.js'
+import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface'
 
-export class FriendshipService {
+export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
     getFriendships = async (userId: number | string) => {
         const em = $app.em.fork()
         const connection = em.getConnection()
@@ -37,13 +39,14 @@ export class FriendshipService {
         return friendship
     }
 
-    acceptFriendship = async (friendship: Friendship, status: string = FriendshipStatus.ACCEPTED) => {
+    acceptFriendship = async (friendship: Friendship) => {
         const em = $app.em.fork()
-        const friendshipWithUpdatedStatus = {
+        const acceptedFriendship = {
             ...friendship,
-            status,
+            status: FriendshipStatus.ACCEPTED,
         }
-        await em.persistAndFlush(friendshipWithUpdatedStatus)
+        wrap(friendship).assign(acceptedFriendship)
+        return em.persistAndFlush(friendship)
     }
 
     declineOrDeleteExistingFriendship = async (friendship: Friendship) => {

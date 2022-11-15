@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
 import ErrorController from './errorController.js'
-import { FootprintService } from '../services/footprintService.js'
+import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 
 export default class FootprintController {
-    private footprintService: FootprintService
+    private footprintRepository: FootprintRepositoryInterface
 
-    constructor(footprintService: FootprintService) {
-        this.footprintService = footprintService
+    constructor(footprintRepository: FootprintRepositoryInterface) {
+        this.footprintRepository = footprintRepository
     }
 
     public getAllFootprints = async (response: Response) => {
         try {
-            return response.status(200).json(await this.footprintService.getAllFootprints())
+            return response.status(200).json(await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
@@ -19,7 +19,7 @@ export default class FootprintController {
 
     public getFootprintById = async (request: Request, response: Response) => {
         try {
-            const footprint = await this.footprintService.getFootprintById(request.params.id)
+            const footprint = await this.footprintRepository.getFootprintById(request.params.id)
             if (footprint) {
                 return response.status(200).json(footprint)
             }
@@ -35,7 +35,7 @@ export default class FootprintController {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
-            return response.status(200).json(await this.footprintService.getFootprintReactions(footprintId))
+            return response.status(200).json(await this.footprintRepository.getFootprintReactions(footprintId))
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
@@ -52,7 +52,7 @@ export default class FootprintController {
         }
 
         try {
-            const reaction = await this.footprintService.createFootprintReaction(request, id, message)
+            const reaction = await this.footprintRepository.createFootprintReaction(request, id, message)
             const reactionWithFootprintId = {
                 ...reaction,
                 footprint: reaction.footprint.id,
@@ -70,7 +70,7 @@ export default class FootprintController {
         }
 
         try {
-            const footprint = await this.footprintService.createFootprint(request)
+            const footprint = await this.footprintRepository.createFootprint(request)
             const footprintWithCoordinatesAsNumbers = {
                 ...footprint,
                 longitude: Number(footprint.longitude),

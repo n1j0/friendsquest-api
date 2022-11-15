@@ -3,6 +3,10 @@ components:
     Friendship:
       type: object
       properties:
+        id:
+          type: integer
+          description: The id of the friendship
+          example: 1
         invitor:
           type: object
           description: The user who sent the friendship request
@@ -21,6 +25,10 @@ components:
     ExportFriendship:
       type: object
       properties:
+        id:
+          type: integer
+          description: The id of the friendship
+          example: 1
         invitor:
           type: integer
           description: The id of the user who sent the friendship request

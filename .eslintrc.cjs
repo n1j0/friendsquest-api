@@ -98,5 +98,11 @@ module.exports = {
                 'sonarjs/no-duplicate-string': 0,
             },
         },
+        {
+            files: ['src/repositories/**/*Interface.*'],
+            rules: {
+                'no-unused-vars': 0,
+            },
+        },
     ],
 }

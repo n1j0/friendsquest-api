@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express'
 import UserController from '../controller/userController.js'
 import { userPermissionMiddleware } from '../middlewares/userPermission.js'
-import { UserService } from '../services/userService.js'
+import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 
 const router = express.Router()
-const userService = new UserService()
-const userController = new UserController(userService)
+const userPostgresRepository = new UserPostgresRepository()
+const userController = new UserController(userPostgresRepository)
 
 /**
  * @openapi
