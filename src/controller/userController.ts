@@ -9,9 +9,10 @@ export default class UserController {
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
     private checkUsernameAndMail = async (request: Request) => {
+        const em = $app.em.fork()
         const [ username, email ] = await Promise.all([
-            $app.userRepository.count({ username: request.body.username }),
-            $app.userRepository.count({ email: request.body.email }),
+            em.count('User', { username: request.body.username }),
+            em.count('User', { email: request.body.email }),
         ])
         return {
             username,
@@ -29,7 +30,10 @@ export default class UserController {
         }
     }
 
-    public getAllUsers = async (response: Response) => response.status(200).json(await $app.userRepository.findAll())
+    public getAllUsers = async (response: Response) => {
+        const em = $app.em.fork()
+        return response.status(200).json(await em.getRepository('User').findAll())
+    }
 
     public getUserById = async (request: Request, response: Response) => {
         const { id } = request.params

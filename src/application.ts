@@ -3,10 +3,6 @@ import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
 import Router from './router.js'
-import { User } from './entities/user.js'
-import { Friendship } from './entities/friendship.js'
-import { Footprint } from './entities/footprint.js'
-import { FootprintReaction } from './entities/footprintReaction.js'
 import { $app } from './$app.js'
 
 export default class Application {
@@ -28,10 +24,6 @@ export default class Application {
 
     public init = (): void => {
         $app.em = $app.orm.em
-        $app.userRepository = $app.em.getRepository(User)
-        $app.footprintRepository = $app.em.getRepository(Footprint)
-        $app.footprintReactionRepository = $app.em.getRepository(FootprintReaction)
-        $app.friendshipRepository = $app.em.getRepository(Friendship)
 
         this.server.use(express.json())
         this.server.use(express.urlencoded({ extended: true }))

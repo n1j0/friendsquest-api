@@ -1,12 +1,8 @@
-import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/core'
+import { EntityManager, MikroORM } from '@mikro-orm/core'
 import { App, cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
 import { getStorage, Storage } from 'firebase-admin/storage'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import mikroOrmConfig from './config/mikro-orm.config.js'
-import { Footprint } from './entities/footprint.js'
-import { FootprintReaction } from './entities/footprintReaction.js'
-import { User } from './entities/user.js'
-import { Friendship } from './entities/friendship.js'
 
 const serviceAccount = {
     type: 'service_account',
@@ -31,10 +27,6 @@ export const $app = {
     port: number,
     orm: MikroORM<PostgreSqlDriver>,
     em: EntityManager,
-    footprintRepository: EntityRepository<Footprint>,
-    footprintReactionRepository: EntityRepository<FootprintReaction>,
-    friendshipRepository: EntityRepository<Friendship>,
-    userRepository: EntityRepository<User>,
     firebase: App,
-    storage: Storage
+    storage: Storage,
 }
