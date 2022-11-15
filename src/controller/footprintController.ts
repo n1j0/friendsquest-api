@@ -1,70 +1,25 @@
-import { Express, Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
-import { $app } from '../$app.js'
-import { FootprintReaction } from '../entities/footprintReaction.js'
-import { Footprint } from '../entities/footprint.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { Request, Response } from 'express'
 import ErrorController from './errorController.js'
-import { fullPath } from '../services/footprintService.js'
-
-interface MulterFiles extends Express.Request {
-    files: {
-        image: Express.Multer.File[]
-        audio: Express.Multer.File[]
-    }
-}
-
-const createPersistentDownloadUrl = (
-    bucket: string,
-    pathToFile: string,
-    downloadToken: string,
-    // eslint-disable-next-line max-len
-) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
-
-async function uploadFilesToFirestorage(files: MulterFiles['files']) {
-    const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
-    const images: Express.Multer.File[] = files.image
-    const audios: Express.Multer.File[] = files.audio
-    const concatFiles = [ ...images, ...audios ]
-    const promises: Promise<void>[] = []
-
-    const downloadURLs = concatFiles.map((value: Express.Multer.File) => {
-        const fileName = uuidv4()
-        const bucketFile = bucket.file(fullPath(value, fileName))
-        const downloadToken = uuidv4()
-
-        promises.push(bucketFile.save(value.buffer, {
-            metadata: {
-                contentType: value.mimetype,
-                downloadTokens: downloadToken,
-            },
-        }))
-
-        return createPersistentDownloadUrl(bucket.name, fullPath(value, fileName), downloadToken)
-    })
-
-    await Promise.all(promises)
-
-    return downloadURLs
-}
+import { FootprintService } from '../services/footprintService.js'
 
 export default class FootprintController {
+    private footprintService: FootprintService
+
+    constructor(footprintService: FootprintService) {
+        this.footprintService = footprintService
+    }
+
     public getAllFootprints = async (response: Response) => {
         try {
-            const em = $app.em.fork()
-            const footprints = await em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
-            return response.status(200).json(footprints)
+            return response.status(200).json(await this.footprintService.getAllFootprints())
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
     }
 
-    // TODO: should getFootprint include the reactions?
-    // TODO: every time this is called the viewCount needs to be increased
     public getFootprintById = async (request: Request, response: Response) => {
         try {
-            const em = $app.em.fork()
-            const footprint = await em.findOne('Footprint', { id: request.params.id } as any)
+            const footprint = await this.footprintService.getFootprintById(request)
             if (footprint) {
                 return response.status(200).json(footprint)
             }
@@ -75,18 +30,12 @@ export default class FootprintController {
     }
 
     public getFootprintReactions = async (request: Request, response: Response) => {
-        const footprintId = request.params.id
+        const { id: footprintId } = request.params
         if (!footprintId) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
         try {
-            const em = $app.em.fork()
-            const footprints = await em.find(
-                'FootprintReaction',
-                { footprint: { id: footprintId } } as any,
-                { populate: ['createdBy'] } as any,
-            )
-            return response.status(200).json(footprints)
+            return response.status(200).json(await this.footprintService.getFootprintReactions(footprintId))
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }
@@ -103,18 +52,12 @@ export default class FootprintController {
         }
 
         try {
-            const em = $app.em.fork()
-            const footprint = await em.findOneOrFail('Footprint', { id } as any)
-            const user = await em.findOneOrFail('User', {
-                uid: request.headers[AUTH_HEADER_UID] as string,
-            } as any)
-            const reaction = new FootprintReaction(user, message, footprint)
-            await em.persistAndFlush(reaction)
-            const reactionForExport = {
+            const reaction = await this.footprintService.createFootprintReaction(request, id, message)
+            const reactionWithFootprintId = {
                 ...reaction,
                 footprint: reaction.footprint.id,
             }
-            return response.status(201).json(reactionForExport)
+            return response.status(201).json(reactionWithFootprintId)
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
@@ -127,26 +70,13 @@ export default class FootprintController {
         }
 
         try {
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', {
-                uid: request.headers[AUTH_HEADER_UID] as string,
-            } as any)
-            const [ photoURL, audioURL ] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])
-            const footprint = new Footprint(
-                request.body.title,
-                user,
-                request.body.latitude,
-                request.body.longitude,
-                photoURL,
-                audioURL,
-            )
-            await em.persistAndFlush(footprint)
-            const footprintForExport = {
+            const footprint = await this.footprintService.createFootprint(request)
+            const footprintWithCoordinatesAsNumbers = {
                 ...footprint,
                 longitude: Number(footprint.longitude),
                 latitude: Number(footprint.latitude),
             }
-            return response.status(201).json(footprintForExport)
+            return response.status(201).json(footprintWithCoordinatesAsNumbers)
         } catch (error: any) {
             return ErrorController.sendError(response, 500, error)
         }

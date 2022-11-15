@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express'
 import FootprintController from '../controller/footprintController.js'
-import upload from '../services/footprintService.js'
+import { FootprintService } from '../services/footprintService.js'
 
 const router = express.Router()
-const footprintController = new FootprintController()
+const footprintService = new FootprintService()
+const footprintController = new FootprintController(footprintService)
 
 /**
  * @openapi
@@ -205,7 +206,7 @@ router.get(
  */
 router.post(
     '/',
-    upload.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
+    footprintService.uploadMiddleware.fields([{ name: 'image', maxCount: 1 }, { name: 'audio', maxCount: 1 }]),
     (request: Request, response: Response) => footprintController.createFootprint(request, response),
 )
 
