@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
-import { AUTH_HEADER_UID } from '../constants'
+import { AUTH_HEADER_UID } from '../constants/index.js'
 
 const router = express.Router()
 const friendshipService = new FriendshipPostgresRepository()
