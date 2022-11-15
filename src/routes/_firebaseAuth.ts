@@ -11,11 +11,11 @@ const router = express.Router()
  *     summary: Receive a firebase token for a specified test user
  *     parameters:
  *       - in: header
- *         name: userId
+ *         name: userid
  *         schema:
  *           type: string
  *           required: true
- *           description: Number of the test user
+ *           description: Number of the test user (1 or 2)
  *     responses:
  *       200:
  *         description: Returns the idToken
@@ -23,7 +23,10 @@ const router = express.Router()
  *         description: Internal server error
  */
 router.get('/token', async (request: Request, response: Response) => {
-    const user = request.headers.userId
+    const user = request.headers.userid as string
+    if (![ '1', '2' ].includes(user)) {
+        return ErrorController.sendError(response, 500, 'Test user not specified')
+    }
     const body = {
         email: user === '1' ? process.env.FIREBASE_TEST_USER1 : process.env.FIREBASE_TEST_USER2,
         password: user === '1' ? process.env.FIREBASE_TEST_PASSWORD1 : process.env.FIREBASE_TEST_PASSWORD2,
