@@ -19,7 +19,7 @@ export default class FootprintController {
 
     public getFootprintById = async (request: Request, response: Response) => {
         try {
-            const footprint = await this.footprintService.getFootprintById(request)
+            const footprint = await this.footprintService.getFootprintById(request.params.id)
             if (footprint) {
                 return response.status(200).json(footprint)
             }

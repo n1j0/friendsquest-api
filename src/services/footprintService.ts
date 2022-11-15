@@ -3,9 +3,9 @@ import { Express, Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { $app } from '../$app.js'
 import { MulterFiles } from '../types/multer.js'
-import { AUTH_HEADER_UID } from '../constants'
-import { FootprintReaction } from '../entities/footprintReaction'
-import { Footprint } from '../entities/footprint'
+import { AUTH_HEADER_UID } from '../constants/index.js'
+import { FootprintReaction } from '../entities/footprintReaction.js'
+import { Footprint } from '../entities/footprint.js'
 
 export class FootprintService {
     private fullPath = (value: Express.Multer.File, fileName: string): string => {
@@ -82,9 +82,9 @@ export class FootprintService {
 
     // TODO: should getFootprint include the reactions?
     // TODO: every time this is called the viewCount needs to be increased
-    getFootprintById = async (request: Request) => {
+    getFootprintById = async (id: string | number) => {
         const em = $app.em.fork()
-        return em.findOne('Footprint', { id: request.params.id } as any)
+        return em.findOne('Footprint', { id } as any)
     }
 
     getFootprintReactions = async (id: number | string) => {

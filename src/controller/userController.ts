@@ -1,51 +1,41 @@
 import { Request, Response } from 'express'
-import { wrap } from '@mikro-orm/core'
-import { $app } from '../$app.js'
 import { User } from '../entities/user.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
+import { UserService } from '../services/userService.js'
+import { UserNotFoundError } from '../errors/UserNotFoundError.js'
 
 export default class UserController {
-    private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
+    private userService: UserService
 
-    private checkUsernameAndMail = async (request: Request) => {
-        const em = $app.em.fork()
-        const [ username, email ] = await Promise.all([
-            em.count('User', { username: request.body.username }),
-            em.count('User', { email: request.body.email }),
-        ])
-        return {
-            username,
-            email,
-        }
+    constructor(userService: UserService) {
+        this.userService = userService
     }
+
+    private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
     public isAllowedToEditUser = async (uid: string, request: Request) => {
         try {
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', request.params.id as any)
+            const user = await this.userService.getUserById(request.params.id)
             return user.uid === uid
         } catch {
             return false
         }
     }
 
-    public getAllUsers = async (response: Response) => {
-        const em = $app.em.fork()
-        return response.status(200).json(await em.getRepository('User').findAll())
-    }
+    public getAllUsers = async (response: Response) => response.status(200).json(await this.userService.getAllUsers())
 
     public getUserById = async (request: Request, response: Response) => {
         const { id } = request.params
         if (!id) {
             return response.status(500).json({ message: 'Missing id' })
         }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { id } as any)
-        if (user) {
+        try {
+            const user = await this.userService.getUserById(id)
             return response.status(200).json(user)
+        } catch {
+            return this.userNotFoundError(response)
         }
-        return this.userNotFoundError(response)
     }
 
     public getUserByUid = async (request: Request, response: Response) => {
@@ -53,12 +43,12 @@ export default class UserController {
         if (!uid) {
             return response.status(500).json({ message: 'Missing uid' })
         }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { uid } as any)
-        if (user) {
+        try {
+            const user = await this.userService.getUserByUid(uid)
             return response.status(200).json(user)
+        } catch {
+            return this.userNotFoundError(response)
         }
-        return this.userNotFoundError(response)
     }
 
     public createUser = async (request: Request, response: Response) => {
@@ -68,36 +58,34 @@ export default class UserController {
 
         try {
             const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
-            const { username, email } = await this.checkUsernameAndMail(request)
+            const [ username, email ] = await this
+                .userService
+                .checkUsernameAndMail(request.body.username, request.body.email)
             if (email !== 0 || username !== 0) {
-                return response.status(400).json({ message: 'Email or Username already taken' })
+                return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
-            const em = $app.em.fork()
-            await em.persistAndFlush(user)
-            const userInDatabase = await em.findOne('User', { uid: user.uid } as any)
-            userInDatabase.friendsCode = (userInDatabase.id - 1).toString(16).padStart(6, '0').toUpperCase()
-            wrap(user).assign(userInDatabase)
-            await em.persistAndFlush(user)
-            return response.status(201).json(user)
+            return response.status(201).json(await this.userService.createUser(user))
         } catch (error: any) {
             return ErrorController.sendError(response, 403, error)
         }
     }
 
     public updateUser = async (request: Request, response: Response) => {
+        // TODO: what if just one attribute has changed?
+        // right now this would probably throw an error "Email or Username already taken"
         try {
-            const { username, email } = await this.checkUsernameAndMail(request)
+            const [ username, email ] = await this
+                .userService
+                .checkUsernameAndMail(request.body.username, request.body.email)
             if (email !== 0 || username !== 0) {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
 
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', request.params.id as any)
-            wrap(user).assign(request.body)
-            await em.persistAndFlush(user)
-            return response.status(200).json(user)
-        } catch {
-            return this.userNotFoundError(response)
+            return response.status(200).json(await this.userService.updateUser(request.params.id, request.body))
+        } catch (error: any) {
+            return error instanceof UserNotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, 500, error)
         }
     }
 
@@ -106,16 +94,13 @@ export default class UserController {
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { id } as any)
-        if (user) {
-            try {
-                await em.removeAndFlush(user)
-                return response.status(204).json()
-            } catch (error: any) {
-                return ErrorController.sendError(response, 500, error)
-            }
+        try {
+            await this.userService.deleteUser(id)
+            return response.status(204).json()
+        } catch (error: any) {
+            return error instanceof UserNotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, 500, error)
         }
-        return this.userNotFoundError(response)
     }
 }

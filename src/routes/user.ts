@@ -1,9 +1,11 @@
 import express, { Request, Response } from 'express'
 import UserController from '../controller/userController.js'
 import { userPermissionMiddleware } from '../middlewares/userPermission.js'
+import { UserService } from '../services/userService.js'
 
 const router = express.Router()
-const userController = new UserController()
+const userService = new UserService()
+const userController = new UserController(userService)
 
 /**
  * @openapi
@@ -58,7 +60,7 @@ router.get(
  *         description: Numeric ID of the user to get
  *     responses:
  *       200:
- *         description: Returns a user by uid
+ *         description: Returns a user by id
  *         content:
  *           application/json:
  *             schema:
@@ -167,7 +169,7 @@ router.post(
  * @openapi
  * /users/{id}:
  *   patch:
- *     summary: Update a user by uid
+ *     summary: Update a user by id
  *     tags:
  *       - User
  *     parameters:
@@ -230,7 +232,7 @@ router.patch(
  * @openapi
  * /users/{id}:
  *   delete:
- *     summary: Delete a user by uid
+ *     summary: Delete a user by id
  *     tags:
  *       - User
  *     parameters:
