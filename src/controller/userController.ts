@@ -14,7 +14,7 @@ export default class UserController {
 
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
-    public isAllowedToEditUser = async (uid: string, request: Request) => {
+    isAllowedToEditUser = async (uid: string, request: Request) => {
         try {
             const user = await this.userService.getUserById(request.params.id)
             return user.uid === uid
@@ -23,9 +23,9 @@ export default class UserController {
         }
     }
 
-    public getAllUsers = async (response: Response) => response.status(200).json(await this.userService.getAllUsers())
+    getAllUsers = async (response: Response) => response.status(200).json(await this.userService.getAllUsers())
 
-    public getUserById = async (request: Request, response: Response) => {
+    getUserById = async (request: Request, response: Response) => {
         const { id } = request.params
         if (!id) {
             return response.status(500).json({ message: 'Missing id' })
@@ -38,7 +38,7 @@ export default class UserController {
         }
     }
 
-    public getUserByUid = async (request: Request, response: Response) => {
+    getUserByUid = async (request: Request, response: Response) => {
         const { uid } = request.params
         if (!uid) {
             return response.status(500).json({ message: 'Missing uid' })
@@ -51,7 +51,7 @@ export default class UserController {
         }
     }
 
-    public createUser = async (request: Request, response: Response) => {
+    createUser = async (request: Request, response: Response) => {
         if (!request.body.email) {
             return ErrorController.sendError(response, 403, 'Email is missing')
         }
@@ -70,7 +70,7 @@ export default class UserController {
         }
     }
 
-    public updateUser = async (request: Request, response: Response) => {
+    updateUser = async (request: Request, response: Response) => {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
         try {
@@ -89,7 +89,7 @@ export default class UserController {
         }
     }
 
-    public deleteUser = async (request: Request, response: Response) => {
+    deleteUser = async (request: Request, response: Response) => {
         const { id } = request.params
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')

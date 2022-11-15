@@ -48,7 +48,7 @@ export default class FriendshipController {
         }
     })
 
-    public getFriendships = async (request: Request, response: Response) => {
+    getFriendships = async (request: Request, response: Response) => {
         let { userId } = request.query
         userId = String(userId)
         if (!userId) {
@@ -58,7 +58,7 @@ export default class FriendshipController {
         return response.status(200).json(this.mapFriendshipToObject(friendships))
     }
 
-    public createFriendship = async (request: Request, response: Response) => {
+    createFriendship = async (request: Request, response: Response) => {
         const { friendsCode } = request.body
         const uid = request.headers[AUTH_HEADER_UID] as string
         if (!friendsCode) {
@@ -97,10 +97,9 @@ export default class FriendshipController {
         return response.status(200).json(friendshipWithFriendData)
     }
 
-    public acceptFriendship = async (request: Request, response: Response) => {
+    acceptFriendship = async (request: Request, response: Response) => {
         const { id } = request.params
         const uid = request.headers[AUTH_HEADER_UID] as string
-        // TODO: status shouldn't be passed in body
         if (!id) {
             return this.idNotFoundError(response)
         }
@@ -126,7 +125,7 @@ export default class FriendshipController {
         }
     }
 
-    public declineOrDeleteFriendship = async (request: Request, response: Response) => {
+    declineOrDeleteFriendship = async (request: Request, response: Response) => {
         const { id } = request.params
         const uid = request.headers[AUTH_HEADER_UID] as string
         if (!id) {
