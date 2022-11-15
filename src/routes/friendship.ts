@@ -1,8 +1,12 @@
 import express, { Request, Response } from 'express'
 import FriendshipController from '../controller/friendshipController.js'
+import { FriendshipService } from '../services/friendshipService.js'
+import { UserService } from '../services/userService.js'
 
 const router = express.Router()
-const friendshipController = new FriendshipController()
+const friendshipService = new FriendshipService()
+const userService = new UserService()
+const friendshipController = new FriendshipController(friendshipService, userService)
 
 /**
  * @openapi
@@ -91,7 +95,7 @@ router.post(
  * @openapi
  * /friendships/{id}:
  *   patch:
- *     summary: Update a friendship
+ *     summary: Accept a friendship
  *     tags:
  *       - Friendship
  *     parameters:
@@ -106,23 +110,10 @@ router.post(
  *         schema:
  *           type: integer
  *           required: true
- *           description: Numeric ID of the friendship to update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 required: true
- *                 enum: [invited, accepted]
- *                 description: Status of the friendship
- *                 example: accepted
+ *           description: Numeric ID of the friendship to accept
  *     responses:
  *       200:
- *         description: Returns the updated friendship
+ *         description: Returns the accepted friendship
  *         content:
  *           application/json:
  *             schema:
@@ -134,7 +125,7 @@ router.post(
  */
 router.patch(
     '/:id',
-    (request: Request, response: Response) => friendshipController.updateFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.acceptFriendship(request, response),
 )
 
 /**
@@ -167,7 +158,7 @@ router.patch(
  */
 router.delete(
     '/:id',
-    (request: Request, response: Response) => friendshipController.declineFriendship(request, response),
+    (request: Request, response: Response) => friendshipController.declineOrDeleteFriendship(request, response),
 )
 
 export const friendshipRoutes = router

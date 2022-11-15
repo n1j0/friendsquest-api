@@ -22,6 +22,11 @@ export class UserService {
         return em.findOneOrFail('User', { uid } as any)
     }
 
+    getUserByFriendsCode = async (friendsCode: number | string) => {
+        const em = $app.em.fork()
+        return em.findOneOrFail('User', { friendsCode } as any)
+    }
+
     getAllUsers = async () => {
         const em = $app.em.fork()
         return em.getRepository('User').findAll()
