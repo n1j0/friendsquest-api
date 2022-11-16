@@ -5,7 +5,7 @@ import { $app } from '../$app.js'
 import { MulterFiles } from '../types/multer.js'
 
 export class FootprintService {
-    private fullPath = (value: Express.Multer.File, fileName: string): string => {
+    fullPath = (value: Express.Multer.File, fileName: string): string => {
         if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
             && value.fieldname === 'image') {
             return `images/${fileName}.${value.mimetype.split('/')[1]}`
@@ -20,7 +20,7 @@ export class FootprintService {
         return ''
     }
 
-    private createPersistentDownloadUrl = (
+    createPersistentDownloadUrl = (
         bucket: string,
         pathToFile: string,
         downloadToken: string,
