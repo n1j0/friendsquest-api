@@ -2,9 +2,7 @@ import { config } from 'dotenv'
 import Application from './application.js'
 import { ORM } from './orm.js'
 
-if (process.env.NODE_ENV !== 'production') {
-    config()
-}
+config()
 
 try {
     const orm = await ORM.init()

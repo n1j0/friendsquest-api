@@ -1,9 +1,7 @@
 import { ServiceAccount } from 'firebase-admin/app'
 import { config } from 'dotenv'
 
-if (process.env.NODE_ENV !== 'production') {
-    config()
-}
+config()
 
 export const serviceAccountConfig = {
     type: 'service_account',
