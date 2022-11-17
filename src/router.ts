@@ -1,41 +1,54 @@
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
-import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
-import { PostgreSqlDriver } from '@mikro-orm/postgresql'
+import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
 import { openapiSpecification } from './docs/swagger.js'
-import { usersRoutes } from './routes/user.js'
-import { footprintRoutes } from './routes/footprint.js'
-import { friendshipRoutes } from './routes/friendship.js'
-import { $app } from './$app.js'
+import { UserRouter } from './routes/user.js'
+import { FootprintRouter } from './routes/footprint.js'
+import { FriendshipRouter } from './routes/friendship.js'
 import { firebaseRoutes } from './routes/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
+import { ORM } from './orm.js'
 
 export default class Router {
     private server: express.Application
 
-    private readonly em: EntityManager<PostgreSqlDriver>
+    private readonly orm: ORM
 
-    constructor(server: express.Application, orm: MikroORM<PostgreSqlDriver>) {
+    constructor(server: express.Application, orm: ORM) {
         this.server = server
-        this.em = orm.em
+        this.orm = orm
     }
 
-    public initRoutes = () => {
+    initRoutes = (port: number) => {
         // TODO: remove this when ready for production
         this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-        console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
+        console.log(`📖 Docs generated: http://localhost:${port}/docs`)
 
         this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
-            RequestContext.create(this.em, next)
+            RequestContext.create(this.orm.orm.em, next)
         })
 
         this.server.use(actuator())
 
-        this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
-        this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
-        this.server.use('/friendships', firebaseAuthMiddleware(getAuth()), friendshipRoutes)
+        const router = express.Router()
+
+        this.server.use(
+            '/users',
+            firebaseAuthMiddleware(getAuth()),
+            new UserRouter(router, this.orm).createAndReturnRoutes(),
+        )
+        this.server.use(
+            '/footprints',
+            firebaseAuthMiddleware(getAuth()),
+            new FootprintRouter(router, this.orm).createAndReturnRoutes(),
+        )
+        this.server.use(
+            '/friendships',
+            firebaseAuthMiddleware(getAuth()),
+            new FriendshipRouter(router, this.orm).createAndReturnRoutes(),
+        )
         // TODO: remove this when ready for production
         this.server.use('/firebase', firebaseRoutes)
 

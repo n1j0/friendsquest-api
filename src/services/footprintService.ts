@@ -1,10 +1,16 @@
 import Multer from 'multer'
 import { Express, Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { $app } from '../$app.js'
+import { getStorage, Storage } from 'firebase-admin/storage'
 import { MulterFiles } from '../types/multer.js'
 
 export class FootprintService {
+    readonly storage: Storage
+
+    constructor() {
+        this.storage = getStorage()
+    }
+
     fullPath = (value: Express.Multer.File, fileName: string): string => {
         if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
             && value.fieldname === 'image') {
@@ -28,7 +34,7 @@ export class FootprintService {
     ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
     uploadFilesToFireStorage = async (files: MulterFiles['files']) => {
-        const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
+        const bucket = this.storage.bucket('gs://friends-quest.appspot.com/')
         const images: Express.Multer.File[] = files.image
         const audios: Express.Multer.File[] = files.audio
         const concatFiles = [ ...images, ...audios ]

@@ -2,7 +2,13 @@ import { Express } from 'express'
 import { Readable } from 'node:stream'
 import { FootprintService } from '../../src/services/footprintService'
 
-jest.mock('../../src/$app', () => {})
+jest.mock('firebase-admin/storage', () => ({
+    getStorage: (): { bucket: () => jest.Mock, storageClient: string, appInternal: string } => ({
+        appInternal: '',
+        storageClient: '',
+        bucket: () => jest.fn(),
+    }),
+}))
 
 const generateFile = (fieldname: string, mimetype: string): Express.Multer.File => ({
     fieldname,

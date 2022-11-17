@@ -1,10 +1,11 @@
-import { EntityManager, MikroORM } from '@mikro-orm/core'
-import { App, cert, initializeApp, ServiceAccount } from 'firebase-admin/app'
-import { getStorage, Storage } from 'firebase-admin/storage'
-import { PostgreSqlDriver } from '@mikro-orm/postgresql'
-import mikroOrmConfig from './config/mikro-orm.config.js'
+import { ServiceAccount } from 'firebase-admin/app'
+import { config } from 'dotenv'
 
-const serviceAccount = {
+if (process.env.NODE_ENV !== 'production') {
+    config()
+}
+
+export const serviceAccountConfig = {
     type: 'service_account',
     project_id: process.env.FIREBASE_PROJECT_ID,
     private_key_id: process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
@@ -17,16 +18,3 @@ const serviceAccount = {
     auth_provider_x509_cert_url: process.env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
     client_x509_cert_url: process.env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL,
 } as ServiceAccount
-
-export const $app = {
-    port: Number.parseInt(process.env.PORT as string, 10) || 3000,
-    orm: await MikroORM.init(mikroOrmConfig),
-    firebase: initializeApp({ credential: cert(serviceAccount) }),
-    storage: getStorage(),
-} as {
-    port: number,
-    orm: MikroORM<PostgreSqlDriver>,
-    em: EntityManager,
-    firebase: App,
-    storage: Storage,
-}

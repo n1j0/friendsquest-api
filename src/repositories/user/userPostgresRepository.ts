@@ -1,12 +1,18 @@
 import { wrap } from '@mikro-orm/core'
-import { $app } from '../../$app.js'
+import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
 import { UserNotFoundError } from '../../errors/UserNotFoundError.js'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
+    private readonly orm: ORM
+
+    constructor(orm: ORM) {
+        this.orm = orm
+    }
+
     checkUsernameAndMail = async (username: string, email: string): Promise<[number, number]> => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return Promise.all([
             em.count('User', { username }),
             em.count('User', { email }),
@@ -14,27 +20,27 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     }
 
     getUserById = async (id: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.findOneOrFail('User', { id } as any)
     }
 
     getUserByUid = async (uid: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.findOneOrFail('User', { uid } as any)
     }
 
     getUserByFriendsCode = async (friendsCode: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.findOneOrFail('User', { friendsCode } as any)
     }
 
     getAllUsers = async () => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.getRepository('User').findAll()
     }
 
     createUser = async (user: User) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         await em.persistAndFlush(user)
         const userInDatabase = await em.findOne('User', { uid: user.uid } as any)
         userInDatabase.friendsCode = (userInDatabase.id - 1).toString(16).padStart(6, '0').toUpperCase()
@@ -44,7 +50,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     }
 
     updateUser = async (id: number | string, userData: any) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const user = await em.findOne('User', { id } as any)
         if (!user) {
             throw new UserNotFoundError()
@@ -55,7 +61,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     }
 
     deleteUser = async (id: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const user = await em.findOne('User', { id } as any)
         if (!user) {
             throw new UserNotFoundError()

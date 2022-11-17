@@ -1,5 +1,5 @@
 import { wrap } from '@mikro-orm/core'
-import { $app } from '../../$app.js'
+import { ORM } from '../../orm.js'
 import { FriendshipAlreadyExistsError } from '../../errors/FriendshipAlreadyExistsError.js'
 import { Friendship } from '../../entities/friendship.js'
 import { User } from '../../entities/user.js'
@@ -7,8 +7,14 @@ import { FriendshipStatus } from '../../constants/index.js'
 import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface'
 
 export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
+    private readonly orm: ORM
+
+    constructor(orm: ORM) {
+        this.orm = orm
+    }
+
     getFriendships = async (userId: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const connection = em.getConnection()
         // TODO: security issue!! userId is from query. So it could be eval input :(
         // TODO: try to simplify this statement as well!
@@ -17,12 +23,12 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
     }
 
     getFriendshipById = async (id: number | string) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
     }
 
     checkForExistingFriendship = async (invitor: User, invitee: User) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const [ invitorFriendship, inviteeFriendship ] = await Promise.all([
             em.count('Friendship', { invitor, invitee } as any),
             em.count('Friendship', { invitee: invitor, invitor: invitee } as any),
@@ -33,14 +39,14 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
     }
 
     createFriendship = async (invitor: User, invitee: User) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const friendship = new Friendship(invitor, invitee)
         await em.persistAndFlush(friendship)
         return friendship
     }
 
     acceptFriendship = async (friendship: Friendship) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         const acceptedFriendship = {
             ...friendship,
             status: FriendshipStatus.ACCEPTED,
@@ -50,7 +56,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
     }
 
     declineOrDeleteExistingFriendship = async (friendship: Friendship) => {
-        const em = $app.em.fork()
+        const em = this.orm.forkEm()
         return em.removeAndFlush(friendship)
     }
 }
