@@ -1,14 +1,13 @@
 import { Express } from 'express'
 import { Readable } from 'node:stream'
+import { Storage } from 'firebase-admin/storage'
 import { FootprintService } from '../../src/services/footprintService'
 
-jest.mock('firebase-admin/storage', () => ({
-    getStorage: (): { bucket: () => jest.Mock, storageClient: string, appInternal: string } => ({
-        appInternal: '',
-        storageClient: '',
-        bucket: () => jest.fn(),
-    }),
-}))
+const storage: { bucket: jest.Mock, storageClient: string, appInternal: string } = {
+    appInternal: '',
+    storageClient: '',
+    bucket: jest.fn(),
+}
 
 const generateFile = (fieldname: string, mimetype: string): Express.Multer.File => ({
     fieldname,
@@ -27,7 +26,7 @@ describe('FootprintService', () => {
     let footprintService: FootprintService
 
     beforeEach(() => {
-        footprintService = new FootprintService()
+        footprintService = new FootprintService(storage as unknown as Storage)
     })
 
     it('creates persistent download Url', () => {
@@ -57,4 +56,10 @@ describe('FootprintService', () => {
             expect(footprintService.fullPath(file, filename)).toBe(path)
         },
     )
+
+    it('uploads files to firebase storage and returns urls', () => {
+        footprintService.uploadFilesToFireStorage({ audio: [], image: [] })
+        expect(storage.bucket).toHaveBeenCalledWith('gs://friends-quest.appspot.com/')
+        // TODO: test more specific things
+    })
 })

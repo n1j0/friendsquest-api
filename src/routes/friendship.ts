@@ -16,11 +16,17 @@ export class FriendshipRouter {
 
     private readonly friendshipController: FriendshipController
 
-    constructor(router: Router, orm: ORM) {
+    constructor(
+        router: Router,
+        orm: ORM,
+        friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(orm),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(orm),
+        friendshipController: FriendshipController = new FriendshipController(friendshipRepository, userRepository),
+    ) {
         this.router = router
-        this.friendshipRepository = new FriendshipPostgresRepository(orm)
-        this.userRepository = new UserPostgresRepository(orm)
-        this.friendshipController = new FriendshipController(this.friendshipRepository, this.userRepository)
+        this.friendshipRepository = friendshipRepository
+        this.userRepository = userRepository
+        this.friendshipController = friendshipController
     }
 
     createAndReturnRoutes = () => {

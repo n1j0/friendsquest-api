@@ -7,8 +7,8 @@ import { MulterFiles } from '../types/multer.js'
 export class FootprintService {
     readonly storage: Storage
 
-    constructor() {
-        this.storage = getStorage()
+    constructor(storage: Storage = getStorage()) {
+        this.storage = storage
     }
 
     fullPath = (value: Express.Multer.File, fileName: string): string => {

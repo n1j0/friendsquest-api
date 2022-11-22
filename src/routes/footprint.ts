@@ -16,11 +16,17 @@ export class FootprintRouter {
 
     private readonly footprintController: FootprintController
 
-    constructor(router: Router, orm: ORM) {
+    constructor(
+        router: Router,
+        orm: ORM,
+        footprintService: FootprintService = new FootprintService(),
+        footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(footprintService, orm),
+        footprintController: FootprintController = new FootprintController(footprintRepository),
+    ) {
         this.router = router
-        this.footprintService = new FootprintService()
-        this.footprintRepository = new FootprintPostgresRepository(this.footprintService, orm)
-        this.footprintController = new FootprintController(this.footprintRepository)
+        this.footprintService = footprintService
+        this.footprintRepository = footprintRepository
+        this.footprintController = footprintController
     }
 
     createAndReturnRoutes = () => {

@@ -9,14 +9,19 @@ import { ORM } from '../orm.js'
 export class UserRouter {
     private readonly router: Router
 
-    private readonly userPostgresRepository: UserRepositoryInterface
+    private readonly userRepository: UserRepositoryInterface
 
     private readonly userController: UserController
 
-    constructor(router: Router, orm: ORM) {
+    constructor(
+        router: Router,
+        orm: ORM,
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(orm),
+        userController: UserController = new UserController(userRepository),
+    ) {
         this.router = router
-        this.userPostgresRepository = new UserPostgresRepository(orm)
-        this.userController = new UserController(this.userPostgresRepository)
+        this.userRepository = userRepository
+        this.userController = userController
     }
 
     createAndReturnRoutes = () => {
