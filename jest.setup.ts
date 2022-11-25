@@ -1,3 +1,9 @@
+process.env.DB_USER = 'user'
+process.env.DB_PASSWORD = 'password'
+process.env.DB_DATABASE = 'dbName'
+process.env.DB_HOST = '111.222.111'
+process.env.DB_PORT = '1234'
+
 process.env.FIREBASE_PROJECT_ID = 'project_id'
 process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID = 'admin_private_key_id'
 process.env.FIREBASE_ADMIN_PRIVATE_KEY = 'sample\\ntest'
