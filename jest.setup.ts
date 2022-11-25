@@ -1,0 +1,7 @@
+process.env.FIREBASE_PROJECT_ID = 'project_id'
+process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID = 'admin_private_key_id'
+process.env.FIREBASE_ADMIN_PRIVATE_KEY = 'sample\\ntest'
+process.env.FIREBASE_ADMIN_CLIENT_EMAIL = 'admin_client_email'
+process.env.FIREBASE_ADMIN_CLIENT_ID = 'admin_client_id'
+process.env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL = 'admin_auth_cert_url'
+process.env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL = 'admin_client_cert_url'
