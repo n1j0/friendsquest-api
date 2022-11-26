@@ -33,6 +33,8 @@ describe('MikroORM config', () => {
             fileName: expect.any(Function),
         }
         expect(mikroOrmConfig.seeder).toStrictEqual(seeder)
+        // @ts-ignore
+        expect(mikroOrmConfig.seeder.fileName('test')).toBe('test')
     })
 
     it('sets postgresql as the database type', () => {
