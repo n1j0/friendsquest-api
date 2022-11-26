@@ -37,12 +37,13 @@ export class FootprintService {
         const bucket = this.storage.bucket('gs://friends-quest.appspot.com/')
         const images: Express.Multer.File[] = files.image
         const audios: Express.Multer.File[] = files.audio
-        const concatFiles = [ ...images, ...audios ]
+        const allFiles = [ ...images, ...audios ]
         const promises: Promise<void>[] = []
 
-        const downloadURLs = concatFiles.map((value: Express.Multer.File) => {
+        const downloadURLs = allFiles.map((value: Express.Multer.File) => {
             const fileName = uuidv4()
-            const bucketFile = bucket.file(this.fullPath(value, fileName))
+            const fullPath = this.fullPath(value, fileName)
+            const bucketFile = bucket.file(fullPath)
             const downloadToken = uuidv4()
 
             promises.push(bucketFile.save(value.buffer, {
@@ -52,7 +53,7 @@ export class FootprintService {
                 },
             }))
 
-            return this.createPersistentDownloadUrl(bucket.name, this.fullPath(value, fileName), downloadToken)
+            return this.createPersistentDownloadUrl(bucket.name, fullPath, downloadToken)
         })
 
         await Promise.all(promises)
