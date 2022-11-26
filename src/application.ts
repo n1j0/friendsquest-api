@@ -10,7 +10,7 @@ import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
 export default class Application {
     server: express.Application = express()
 
-    router: Router | undefined
+    router: Router
 
     orm: ORM
 
@@ -18,6 +18,7 @@ export default class Application {
 
     constructor(orm: ORM) {
         this.orm = orm
+        this.router = new Router(this.server, this.orm)
         this.port = Number.parseInt(process.env.PORT as string, 10) || 3000
         initializeApp({ credential: cert(serviceAccountConfig) })
     }
@@ -43,7 +44,6 @@ export default class Application {
 
         this.server.disable('x-powered-by')
 
-        this.router = new Router(this.server, this.orm)
         this.router.initRoutes(this.port)
 
         try {
