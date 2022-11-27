@@ -183,7 +183,7 @@ describe('FootprintController', () => {
             [{ uid: 'a', title: '', latitude: '1', longitude: '2', files: { image: [], audio: [] } }],
             [{ uid: 'a', title: 'b', latitude: '', longitude: '2', files: { image: [], audio: [] } }],
             [{ uid: 'a', title: 'b', latitude: '1', longitude: '', files: { image: [], audio: [] } }],
-            [{ uid: 'a', title: '', latitude: '1', longitude: '2', files: undefined }],
+            [{ uid: 'a', title: 'b', latitude: '1', longitude: '2', files: undefined }],
         ])('sends an error if data is missing', async (newFootprint) => {
             await footprintController.createFootprint(newFootprint as unknown as NewFootprint, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, 400, 'Missing required fields')
