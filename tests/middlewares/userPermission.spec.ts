@@ -88,4 +88,24 @@ describe('UserPermission', () => {
         await middleware(request as unknown as Request, response, next)
         expect(next).toHaveBeenCalled()
     })
+
+    it('sets fallback error message', async () => {
+        const middleware = userPermissionMiddleware(
+            // eslint-disable-next-line unicorn/error-message
+            jest.fn().mockImplementation(() => { throw new Error() }),
+            {
+                uidHeader: 'test',
+            },
+        )
+        const request = {
+            headers: {
+                test: 'sample',
+            },
+        }
+        await middleware(request as unknown as Request, response, jest.fn())
+        expect(response.json).toHaveBeenCalledWith({
+            error: 'UNAUTHORIZED',
+            ok: false,
+        })
+    })
 })
