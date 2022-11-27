@@ -79,7 +79,30 @@ describe('FootprintService', () => {
         expect(result).toHaveProperty('length', 2)
     })
 
-    it('sets up upload middleware', () => {
-        expect(footprintService.uploadMiddleware).toHaveProperty('fileFilter', expect.any(Function))
+    describe('uploadMiddleware', () => {
+        const footprintService2 = new FootprintService(storage as unknown as Storage)
+        const middleware = footprintService2.uploadMiddleware as any
+        const callback = jest.fn()
+
+        it.each([
+            /* eslint-disable unicorn/no-null */
+            ['image/jpeg'],
+            ['image/png'],
+            ['image/jpg'],
+            ['audio/wav'],
+            ['audio/mpeg'],
+            ['audio/mp3'],
+            ['video/mp4'],
+            /* eslint-enable unicorn/no-null */
+        ])('handles correct mimetype %s', (mimetype: string) => {
+            middleware.fileFilter({}, generateFile('foo', mimetype), callback)
+            /* eslint-disable-next-line unicorn/no-null */
+            expect(callback).toHaveBeenCalledWith(null, true)
+        })
+
+        it('rejects invalid mimetype', () => {
+            middleware.fileFilter({}, generateFile('foo', 'not/valid'), callback)
+            expect(callback).toHaveBeenCalledWith(new Error('Type of file is not supported'))
+        })
     })
 })
