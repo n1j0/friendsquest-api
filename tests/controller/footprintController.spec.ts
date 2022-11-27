@@ -124,6 +124,15 @@ describe('FootprintController', () => {
             expect(response.json).toHaveBeenCalledWith(result)
         })
 
+        it('trims the message of a new reaction', async () => {
+            const id = 1
+            const message = ' sample '
+            const trimmedMessage = 'sample'
+            const uid = 'abcdef'
+            await footprintController.createFootprintReaction({ id, message, uid }, response)
+            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith(id, trimmedMessage, uid)
+        })
+
         it('sends an error if something goes wrong', async () => {
             const error = new Error('test')
             // @ts-ignore
