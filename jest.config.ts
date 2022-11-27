@@ -20,7 +20,7 @@ const jestSetup: JestConfigWithTsJest = {
     collectCoverage: false,
     collectCoverageFrom: [
         '<rootDir>/src/**/*.{js,ts}',
-        '!<rootDir>/src/{entities,migrations,seeders}/**/*.*',
+        '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
     ],
     setupFiles: ['<rootDir>/jest.setup.ts'],
 }
