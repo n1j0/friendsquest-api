@@ -1,5 +1,4 @@
 import { MikroORM } from '@mikro-orm/core'
-
 import { EntityManager, PostgreSqlDriver } from '@mikro-orm/postgresql'
 import mikroOrmConfig from './config/mikro-orm.config.js'
 
