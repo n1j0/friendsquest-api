@@ -5,6 +5,7 @@
  * @param options - Options for the middleware
  * @param options.checkRevoked - Whether to check if the token has been revoked
  * @param options.attachUserTo - The name of the header attribute to attach the user to
+ * @param options.authHeaderKey - The name of the header auth attribute
  * @param options.errorJSON - The JSON to attach to the error response
  * @param options.errorMessage - The error message to send to the client
  * @returns The middleware function
@@ -22,6 +23,7 @@ export const firebaseAuthMiddleware = (
     {
         checkRevoked = false,
         attachUserTo = AUTH_HEADER_UID,
+        authHeaderKey = AUTH_HEADER_KEY,
         errorJSON = { ok: false },
         errorMessage = (errorObject: { message: any }) => errorObject.message || 'UNAUTHORIZED',
     } = {},
@@ -44,12 +46,9 @@ export const firebaseAuthMiddleware = (
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
             // eslint-disable-next-line security/detect-object-injection
-            if (request.headers[AUTH_HEADER_KEY]) {
+            if (request.headers[authHeaderKey]) {
                 // eslint-disable-next-line security/detect-object-injection
-                let authHeader = request.headers[AUTH_HEADER_KEY]
-                if (typeof authHeader !== 'string') {
-                    [authHeader] = authHeader
-                }
+                const authHeader = request.headers[authHeaderKey] as string
                 const decodedToken = await firebaseAuth.verifyIdToken(authHeader, checkRevoked)
                 // eslint-disable-next-line security/detect-object-injection
                 request.headers[attachUserTo] = decodedToken.uid
