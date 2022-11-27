@@ -19,6 +19,9 @@ export default class FootprintController {
     }
 
     public getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
+        if (!id) {
+            return ErrorController.sendError(response, 500, 'ID is missing')
+        }
         try {
             const footprint = await this.footprintRepository.getFootprintById(id)
             if (footprint) {
@@ -60,7 +63,7 @@ export default class FootprintController {
             }
             return response.status(201).json(reactionWithFootprintId)
         } catch (error: any) {
-            return ErrorController.sendError(response, 403, error)
+            return ErrorController.sendError(response, 500, error)
         }
     }
 

@@ -67,6 +67,7 @@ module.exports = {
         ],
         'unicorn/no-array-for-each': 0,
         'class-methods-use-this': 0,
+        'sonarjs/no-duplicate-string': 0,
     },
     overrides: [
         {
