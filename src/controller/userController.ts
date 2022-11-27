@@ -56,6 +56,10 @@ export default class UserController {
             return ErrorController.sendError(response, 403, 'Email is missing')
         }
 
+        if (!username) {
+            return ErrorController.sendError(response, 403, 'Username is missing')
+        }
+
         try {
             const user = new User(email, uid, username)
             const [ numberOfSameUsername, numberOfSameMail ] = await this
