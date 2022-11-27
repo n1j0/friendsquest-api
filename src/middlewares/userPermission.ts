@@ -2,7 +2,7 @@
  * Authorization middleware using Firebase Auth
  * @param predicate - The predicate function to check if the user is authorized
  * @param options - Options for the middleware
- * @param options.attachUserTo - The name of the header attribute to attach the user to
+ * @param options.uidHeader - The name of the header attribute the user id is attached to
  * @param options.errorJSON - The JSON to attach to the error response
  * @param options.errorMessage - The error message to send to the client
  * @returns The middleware function
@@ -18,12 +18,11 @@ export const userPermissionMiddleware = (
     /* eslint-enable no-unused-vars */
     ) => Promise<boolean>,
     {
-        attachUserTo = AUTH_HEADER_UID,
+        uidHeader = AUTH_HEADER_UID,
         errorJSON = { ok: false },
         errorMessage = (errorObject: { message: any }) => errorObject.message || 'UNAUTHORIZED',
     } = {},
 ) => {
-    // Assume that it can only be a string or function
     if (typeof errorMessage !== 'function') {
         throw new TypeError('Only Functions or Strings are allowed for errorMessage')
     }
@@ -42,13 +41,10 @@ export const userPermissionMiddleware = (
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
             // eslint-disable-next-line security/detect-object-injection
-            if (request.headers[attachUserTo]) {
+            if (request.headers[uidHeader]) {
                 // eslint-disable-next-line security/detect-object-injection
-                let uid = request.headers[attachUserTo]
-                if (uid && typeof uid !== 'string') {
-                    [uid] = uid
-                }
-                if (uid && (await predicate(uid, request))) {
+                const uid = request.headers[uidHeader] as string
+                if (await predicate(uid, request)) {
                     return next()
                 }
             }
