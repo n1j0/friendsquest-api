@@ -85,7 +85,6 @@ describe('FootprintService', () => {
         const callback = jest.fn()
 
         it.each([
-            /* eslint-disable unicorn/no-null */
             ['image/jpeg'],
             ['image/png'],
             ['image/jpg'],
@@ -93,7 +92,6 @@ describe('FootprintService', () => {
             ['audio/mpeg'],
             ['audio/mp3'],
             ['video/mp4'],
-            /* eslint-enable unicorn/no-null */
         ])('handles correct mimetype %s', (mimetype: string) => {
             middleware.fileFilter({}, generateFile('foo', mimetype), callback)
             /* eslint-disable-next-line unicorn/no-null */
