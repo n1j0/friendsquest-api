@@ -3,9 +3,10 @@ import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
 import { cert, initializeApp } from 'firebase-admin/app'
-import Router from './router.js'
+import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
+import { routes } from './routes/routes.js'
 
 export default class Application {
     server: express.Application = express()
@@ -44,7 +45,7 @@ export default class Application {
 
         this.server.disable('x-powered-by')
 
-        this.router.initRoutes(this.port)
+        this.router.initRoutes(this.port, routes)
 
         try {
             this.server.listen(this.port, () => {
