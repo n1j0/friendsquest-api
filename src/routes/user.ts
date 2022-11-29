@@ -5,8 +5,9 @@ import { UserPostgresRepository } from '../repositories/user/userPostgresReposit
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ORM } from '../orm.js'
+import { RouterInterface } from './routerInterface.js'
 
-export class UserRouter {
+export class UserRouter implements RouterInterface {
     private readonly router: Router
 
     private readonly userRepository: UserRepositoryInterface

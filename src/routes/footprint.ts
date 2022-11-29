@@ -6,8 +6,9 @@ import { AUTH_HEADER_UID } from '../constants/index.js'
 import { MulterFiles } from '../types/multer.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { ORM } from '../orm.js'
+import { RouterInterface } from './routerInterface.js'
 
-export class FootprintRouter {
+export class FootprintRouter implements RouterInterface {
     private readonly router: Router
 
     private readonly footprintService: FootprintService

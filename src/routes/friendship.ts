@@ -6,8 +6,9 @@ import { AUTH_HEADER_UID } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface'
 import { ORM } from '../orm.js'
+import { RouterInterface } from './routerInterface.js'
 
-export class FriendshipRouter {
+export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
 
     private readonly friendshipRepository: FriendshipRepositoryInterface
