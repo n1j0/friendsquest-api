@@ -49,9 +49,7 @@ export default class Application {
         this.router.initRoutes(this.port, routes)
 
         try {
-            this.server.listen(this.port, () => {
-                console.log(`🚀 Server started: http://localhost:${this.port}`)
-            })
+            this.server.listen(this.port)
         } catch (error: any) {
             console.error('Could not start server', error)
         }

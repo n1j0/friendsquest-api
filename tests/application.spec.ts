@@ -111,7 +111,7 @@ describe('Application', () => {
         })
 
         it('starts the server', () => {
-            expect(serverMock.listen).toHaveBeenCalledWith(1234, expect.any(Function))
+            expect(serverMock.listen).toHaveBeenCalledWith(1234)
         })
 
         it('throws an error if server cannot be started', () => {
