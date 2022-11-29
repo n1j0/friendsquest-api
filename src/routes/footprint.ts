@@ -9,7 +9,7 @@ import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 
 export class FootprintRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly footprintService: FootprintService
 
