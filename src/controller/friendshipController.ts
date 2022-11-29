@@ -23,37 +23,31 @@ export default class FriendshipController {
     }
 
     // TODO: refactor. hard to read
-    private mapFriendshipToObject = (friendship: any) => friendship.map((f: any) => {
-        const fs = {
-            id: f.fs_id,
-            createdAt: f.fs_created_at,
-            updatedAt: f.fs_updated_at,
-            invitor: f.fs_invitor_id,
-            invitee: f.fs_invitee_id,
-            status: f.fs_status,
-        }
-        const friend = {
-            id: f.id,
-            createdAt: f.created_at,
-            updatedAt: f.updated_at,
-            username: f.username,
-            email: f.email,
-            uid: f.uid,
-            imageURL: f.image_url,
-            friendsCode: f.friends_code,
-        }
-        return {
-            ...fs,
-            friend,
-        }
-    })
+    private mapFriendshipsToObject = (friendships: any) => friendships.map((friendship: any) => ({
+        id: friendship.fs_id,
+        createdAt: friendship.fs_created_at,
+        updatedAt: friendship.fs_updated_at,
+        invitor: friendship.fs_invitor_id,
+        invitee: friendship.fs_invitee_id,
+        status: friendship.fs_status,
+        friend: {
+            id: friendship.id,
+            createdAt: friendship.created_at,
+            updatedAt: friendship.updated_at,
+            username: friendship.username,
+            email: friendship.email,
+            uid: friendship.uid,
+            imageURL: friendship.image_url,
+            friendsCode: friendship.friends_code,
+        },
+    }))
 
     getFriendships = async ({ userId }: { userId: string }, response: Response) => {
         if (!userId) {
             return this.idNotFoundError(response)
         }
         const friendships = await this.friendshipRepository.getFriendships(userId)
-        return response.status(200).json(this.mapFriendshipToObject(friendships))
+        return response.status(200).json(this.mapFriendshipsToObject(friendships))
     }
 
     createFriendship = async ({ friendsCode, uid }: { friendsCode: string, uid: string }, response: Response) => {
