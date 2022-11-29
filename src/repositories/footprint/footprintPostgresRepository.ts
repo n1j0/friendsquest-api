@@ -18,10 +18,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
 
     createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint) => {
         const em = this.orm.forkEm()
-        const user = await em.findOneOrFail('User', { uid } as any)
-        const [ photoURL, audioURL ] = await this
-            .footprintService
-            .uploadFilesToFireStorage(files as MulterFiles['files'])
+        const [ user, [ photoURL, audioURL ] ] = await Promise.all([
+            em.findOneOrFail('User', { uid } as any),
+            this.footprintService.uploadFilesToFireStorage(files as MulterFiles['files']),
+        ])
         const footprint = new Footprint(
             title,
             user,
@@ -34,10 +34,12 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         return footprint
     }
 
-    createFootprintReaction = async (id: number | string, message: string, uid: string) => {
+    createFootprintReaction = async ({ id, message, uid }: { id: number | string, message: string, uid: string }) => {
         const em = this.orm.forkEm()
-        const footprint = await em.findOneOrFail('Footprint', { id } as any)
-        const user = await em.findOneOrFail('User', { uid } as any)
+        const [ footprint, user ] = await Promise.all([
+            em.findOneOrFail('Footprint', { id } as any),
+            em.findOneOrFail('User', { uid } as any),
+        ])
         const reaction = new FootprintReaction(user, message, footprint)
         await em.persistAndFlush(reaction)
         return reaction

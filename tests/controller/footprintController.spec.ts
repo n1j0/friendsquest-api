@@ -119,7 +119,7 @@ describe('FootprintController', () => {
             // @ts-ignore
             footprintRepository.createFootprintReaction.mockReturnValue(reaction)
             await footprintController.createFootprintReaction({ id, message, uid }, response)
-            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith(id, message, uid)
+            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith({ id, message, uid })
             expect(response.status).toHaveBeenCalledWith(201)
             expect(response.json).toHaveBeenCalledWith(result)
         })
@@ -130,7 +130,11 @@ describe('FootprintController', () => {
             const trimmedMessage = 'sample'
             const uid = 'abcdef'
             await footprintController.createFootprintReaction({ id, message, uid }, response)
-            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith(id, trimmedMessage, uid)
+            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith({
+                id,
+                message: trimmedMessage,
+                uid,
+            })
         })
 
         it('sends an error if something goes wrong', async () => {

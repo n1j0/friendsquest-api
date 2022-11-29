@@ -56,7 +56,11 @@ export default class FootprintController {
         }
 
         try {
-            const reaction = await this.footprintRepository.createFootprintReaction(id, message.trim(), uid)
+            const reaction = await this.footprintRepository.createFootprintReaction({
+                id,
+                message: message.trim(),
+                uid,
+            })
             const reactionWithFootprintId = {
                 ...reaction,
                 footprint: reaction.footprint.id,
