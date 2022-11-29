@@ -10,7 +10,7 @@ export default class FootprintController {
         this.footprintRepository = footprintRepository
     }
 
-    public getAllFootprints = async (response: Response) => {
+    getAllFootprints = async (response: Response) => {
         try {
             return response.status(200).json(await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
@@ -18,7 +18,7 @@ export default class FootprintController {
         }
     }
 
-    public getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
+    getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
@@ -33,7 +33,7 @@ export default class FootprintController {
         }
     }
 
-    public getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
+    getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, 500, 'ID is missing')
         }
@@ -44,7 +44,7 @@ export default class FootprintController {
         }
     }
 
-    public createFootprintReaction = async (
+    createFootprintReaction = async (
         { id, message, uid }: { id: number | string, message: string, uid: string },
         response: Response,
     ) => {
@@ -71,7 +71,7 @@ export default class FootprintController {
         }
     }
 
-    public createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
+    createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
         if (!title || !latitude || !longitude || !files) {
             return ErrorController.sendError(response, 400, 'Missing required fields')
         }
