@@ -3,11 +3,15 @@ import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
 import { UserNotFoundError } from '../../errors/UserNotFoundError.js'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
+import { UserService } from '../../services/userService.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
+    private readonly userService: UserService
+
     private readonly orm: ORM
 
-    constructor(orm: ORM) {
+    constructor(userService: UserService, orm: ORM) {
+        this.userService = userService
         this.orm = orm
     }
 
@@ -43,7 +47,8 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         const em = this.orm.forkEm()
         await em.persistAndFlush(user)
         const userInDatabase = await em.findOne('User', { uid: user.uid } as any)
-        userInDatabase.friendsCode = (userInDatabase.id - 1).toString(16).padStart(6, '0').toUpperCase()
+        // TODO: don't forget to handle the errors "numberToBase36String" can throw
+        userInDatabase.friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
         wrap(user).assign(userInDatabase)
         await em.persistAndFlush(user)
         return user

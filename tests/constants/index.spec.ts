@@ -6,11 +6,15 @@ describe('constants', () => {
     })
 
     it('exports auth header key', () => {
-        expect(constants.AUTH_HEADER_KEY).toBeDefined()
+        expect(constants.AUTH_HEADER_KEY).toBe('x-auth')
     })
 
     it('exports auth header uid', () => {
-        expect(constants.AUTH_HEADER_UID).toBeDefined()
+        expect(constants.AUTH_HEADER_UID).toBe('authenticatedUser')
+    })
+
+    it('exports friends code length', () => {
+        expect(constants.FRIENDS_CODE_LENGTH).toBe(5)
     })
 
     it('exports enum FriendshipStatus', () => {

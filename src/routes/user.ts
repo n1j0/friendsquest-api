@@ -6,9 +6,12 @@ import { AUTH_HEADER_UID } from '../constants/index.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
+import { UserService } from '../services/userService.js'
 
 export class UserRouter implements RouterInterface {
     private readonly router: Router
+
+    private readonly userService: UserService
 
     private readonly userRepository: UserRepositoryInterface
 
@@ -17,10 +20,12 @@ export class UserRouter implements RouterInterface {
     constructor(
         router: Router,
         orm: ORM,
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(orm),
+        userService: UserService = new UserService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
         userController: UserController = new UserController(userRepository),
     ) {
         this.router = router
+        this.userService = userService
         this.userRepository = userRepository
         this.userController = userController
     }

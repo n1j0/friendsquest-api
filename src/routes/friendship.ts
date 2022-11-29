@@ -7,9 +7,12 @@ import { FriendshipRepositoryInterface } from '../repositories/friendship/friend
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface'
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
+import { UserService } from '../services/userService.js'
 
 export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
+
+    private readonly userService: UserService
 
     private readonly friendshipRepository: FriendshipRepositoryInterface
 
@@ -20,11 +23,13 @@ export class FriendshipRouter implements RouterInterface {
     constructor(
         router: Router,
         orm: ORM,
+        userService: UserService = new UserService(),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(orm),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(orm),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
         friendshipController: FriendshipController = new FriendshipController(friendshipRepository, userRepository),
     ) {
         this.router = router
+        this.userService = userService
         this.friendshipRepository = friendshipRepository
         this.userRepository = userRepository
         this.friendshipController = friendshipController
