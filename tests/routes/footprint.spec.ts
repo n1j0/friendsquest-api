@@ -9,6 +9,10 @@ import { FootprintRouter } from '../../src/routes/footprint'
 import responseMock from '../helper/responseMock'
 import { MulterFiles } from '../../src/types/multer'
 
+jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
+    FootprintPostgresRepository: {},
+}))
+
 jest.mock('../../src/constants/index.js', () => ({
     AUTH_HEADER_UID: 'uidHeader',
 }))
