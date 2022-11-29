@@ -30,7 +30,12 @@ export class FootprintRouter implements RouterInterface {
         this.footprintController = footprintController
     }
 
-    createAndReturnRoutes = () => {
+    getAllFootprintsHandler = (
+        _request: Request,
+        response: Response,
+    ) => this.footprintController.getAllFootprints(response)
+
+    generateGetAllFootprintsRoute = () => {
         /**
          * @openapi
          * /footprints:
@@ -59,11 +64,22 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         description: Error
          */
-        this.router.get(
-            '/',
-            (_request: Request, response: Response) => this.footprintController.getAllFootprints(response),
-        )
+        this.router.get('/', this.getAllFootprintsHandler)
+    }
 
+    createFootprintReactionHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.createFootprintReaction(
+        {
+            id: request.params.id,
+            message: request.body.message,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateCreateFootprintReactionRoute = () => {
         /**
          * @openapi
          * /footprints/{id}/reactions:
@@ -102,18 +118,15 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         description: Error
          */
-        this.router.post(
-            '/:id/reactions',
-            (request: Request, response: Response) => this.footprintController.createFootprintReaction(
-                {
-                    id: request.params.id,
-                    message: request.body.message,
-                    uid: request.headers[AUTH_HEADER_UID] as string,
-                },
-                response,
-            ),
-        )
+        this.router.post('/:id/reactions', this.createFootprintReactionHandler)
+    }
 
+    getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
+        { id: request.params.id },
+        response,
+    )
+
+    generateGetFootprintByIdRoute = () => {
         /**
          * @openapi
          * /footprints/{id}:
@@ -144,14 +157,18 @@ export class FootprintRouter implements RouterInterface {
          *       403:
          *         description: Forbidden access or invalid token
          */
-        this.router.get(
-            '/:id',
-            (request: Request, response: Response) => this.footprintController.getFootprintById(
-                { id: request.params.id },
-                response,
-            ),
-        )
+        this.router.get('/:id', this.getFootprintByIdHandler)
+    }
 
+    getFootprintReactionsHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.getFootprintReactions(
+        { id: request.params.id },
+        response,
+    )
+
+    generateGetFootprintReactionsRoute = () => {
         /**
          * @openapi
          * /footprints/{id}/reactions:
@@ -186,14 +203,21 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         description: Error
          */
-        this.router.get(
-            '/:id/reactions',
-            (request: Request, response: Response) => this.footprintController.getFootprintReactions(
-                { id: request.params.id },
-                response,
-            ),
-        )
+        this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
+    }
 
+    createFootprintHandler = (request: Request, response: Response) => this.footprintController.createFootprint(
+        {
+            title: request.body.title,
+            latitude: request.body.latitude,
+            longitude: request.body.longitude,
+            files: request.body.files as MulterFiles['files'],
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateCreateFootprintRoute = () => {
         /**
          * @openapi
          * /footprints:
@@ -248,17 +272,16 @@ export class FootprintRouter implements RouterInterface {
                 [{ name: 'image', maxCount: 1 },
                     { name: 'audio', maxCount: 1 }],
             ),
-            (request: Request, response: Response) => this.footprintController.createFootprint(
-                {
-                    title: request.body.title,
-                    latitude: request.body.latitude,
-                    longitude: request.body.longitude,
-                    files: request.body.files as MulterFiles['files'],
-                    uid: request.headers[AUTH_HEADER_UID] as string,
-                },
-                response,
-            ),
+            this.createFootprintHandler,
         )
+    }
+
+    createAndReturnRoutes = () => {
+        this.generateGetAllFootprintsRoute()
+        this.generateCreateFootprintReactionRoute()
+        this.generateGetFootprintByIdRoute()
+        this.generateGetFootprintReactionsRoute()
+        this.generateCreateFootprintRoute()
 
         return this.router
     }
