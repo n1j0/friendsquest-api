@@ -30,7 +30,12 @@ export class FriendshipRouter implements RouterInterface {
         this.friendshipController = friendshipController
     }
 
-    createAndReturnRoutes = () => {
+    getFriendshipsHandler = (request: Request, response: Response) => this.friendshipController.getFriendships(
+        { userId: String(request.query.userId) },
+        response,
+    )
+
+    generateGetAllFriendshipsRoute = () => {
         /**
          * @openapi
          * /friendships:
@@ -66,14 +71,15 @@ export class FriendshipRouter implements RouterInterface {
          *      404:
          *        description: User not found
          */
-        this.router.get(
-            '/',
-            (request: Request, response: Response) => this.friendshipController.getFriendships(
-                { userId: String(request.query.userId) },
-                response,
-            ),
-        )
+        this.router.get('/', this.getFriendshipsHandler)
+    }
 
+    createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
+        { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
+        response,
+    )
+
+    generateCreateFriendshipRoute = () => {
         /**
          * @openapi
          * /friendships:
@@ -112,14 +118,18 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         description: User not found
          */
-        this.router.post(
-            '/',
-            (request: Request, response: Response) => this.friendshipController.createFriendship(
-                { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
-                response,
-            ),
-        )
+        this.router.post('/', this.createFriendshipHandler)
+    }
 
+    acceptFriendshipHandler = (request: Request, response: Response) => this.friendshipController.acceptFriendship(
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateAcceptFriendshipRoute = () => {
         /**
          * @openapi
          * /friendships/{id}:
@@ -152,17 +162,21 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         description: Friendship not found
          */
-        this.router.patch(
-            '/:id',
-            (request: Request, response: Response) => this.friendshipController.acceptFriendship(
-                {
-                    id: request.params.id,
-                    uid: request.headers[AUTH_HEADER_UID] as string,
-                },
-                response,
-            ),
-        )
+        this.router.patch('/:id', this.acceptFriendshipHandler)
+    }
 
+    declineOrDeleteFriendshipHandler = (
+        request: Request,
+        response: Response,
+    ) => this.friendshipController.declineOrDeleteFriendship(
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateDeclineOrDeleteFriendshipRoute = () => {
         /**
          * @openapi
          * /friendships/{id}:
@@ -191,16 +205,14 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         description: Friendship not found
          */
-        this.router.delete(
-            '/:id',
-            (request: Request, response: Response) => this.friendshipController.declineOrDeleteFriendship(
-                {
-                    id: request.params.id,
-                    uid: request.headers[AUTH_HEADER_UID] as string,
-                },
-                response,
-            ),
-        )
+        this.router.delete('/:id', this.declineOrDeleteFriendshipHandler)
+    }
+
+    createAndReturnRoutes = () => {
+        this.generateGetAllFriendshipsRoute()
+        this.generateCreateFriendshipRoute()
+        this.generateAcceptFriendshipRoute()
+        this.generateDeclineOrDeleteFriendshipRoute()
 
         return this.router
     }
