@@ -20,7 +20,7 @@ describe.skip('index', () => {
 
     it('creates, connects and initializes Application', () => {
         expect(applicationMock).toHaveBeenCalledWith(ormMock)
-        expect(applicationMock.connect).toHaveBeenCalled()
+        expect(applicationMock.migrate).toHaveBeenCalled()
         expect(applicationMock.init).toHaveBeenCalled()
     })
 

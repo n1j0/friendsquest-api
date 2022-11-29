@@ -10,8 +10,7 @@ jest.mock('swagger-ui-express', () => ({
     setup: () => 'setup',
 }))
 
-// eslint-disable-next-line unicorn/consistent-function-scoping
-jest.mock('express-actuator', () => () => 'actuator')
+jest.mock('express-actuator', () => jest.fn().mockReturnValue('actuator'))
 
 jest.mock('../src/routes/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',

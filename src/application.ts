@@ -1,4 +1,4 @@
-import express from 'express'
+import { Application as ExpressApplication, json, urlencoded } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
@@ -9,7 +9,7 @@ import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
 import { routes } from './routes/routes.js'
 
 export default class Application {
-    server: express.Application = express()
+    server: ExpressApplication
 
     router: Router
 
@@ -17,14 +17,15 @@ export default class Application {
 
     port: number
 
-    constructor(orm: ORM) {
+    constructor(orm: ORM, server: ExpressApplication) {
         this.orm = orm
+        this.server = server
         this.router = new Router(this.server, this.orm)
         this.port = Number.parseInt(process.env.PORT as string, 10) || 3000
         initializeApp({ credential: cert(serviceAccountConfig) })
     }
 
-    connect = async (): Promise<void> => {
+    migrate = async (): Promise<void> => {
         try {
             const migrator = this.orm.orm.getMigrator()
             const migrations = await migrator.getPendingMigrations()
@@ -37,8 +38,8 @@ export default class Application {
     }
 
     init = (): void => {
-        this.server.use(express.json())
-        this.server.use(express.urlencoded({ extended: true }))
+        this.server.use(json())
+        this.server.use(urlencoded({ extended: true }))
         this.server.use(helmet())
         this.server.use(cors())
         this.server.use(compression())
