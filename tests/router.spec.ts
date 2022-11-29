@@ -1,9 +1,12 @@
 import { mock } from 'jest-mock-extended'
-import { Application } from 'express'
+import { Application, ErrorRequestHandler, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
+import { RequestContext } from '@mikro-orm/core'
 import { Router } from '../src/router'
 import { ORM } from '../src/orm'
 import { Route } from '../src/types/routes'
+import responseMock from './helper/responseMock'
+import ErrorController from '../src/controller/errorController'
 
 jest.mock('swagger-ui-express', () => ({
     serve: 'serve',
@@ -11,6 +14,12 @@ jest.mock('swagger-ui-express', () => ({
 }))
 
 jest.mock('express-actuator', () => jest.fn().mockReturnValue('actuator'))
+
+jest.mock('@mikro-orm/core', () => ({
+    RequestContext: {
+        create: jest.fn(),
+    },
+}))
 
 jest.mock('../src/routes/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',
@@ -22,6 +31,9 @@ describe('Router', () => {
     let orm: ORM
 
     describe('general setup', () => {
+        const response = responseMock
+        const sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
+
         beforeEach(() => {
             server = mock<Application>()
             orm = mock<ORM>()
@@ -29,13 +41,31 @@ describe('Router', () => {
             router.initRoutes(1234, [], jest.fn(), {} as unknown as Auth)
         })
 
+        it('creates the RequestContext for the orm', () => {
+            const next = jest.fn()
+            router.createRequestContext({} as unknown as Request, {} as unknown as Response, next)
+            expect(RequestContext.create).toHaveBeenCalledWith(orm.orm.em, next)
+        })
+
+        it('creates custom 404 response', () => {
+            router.custom404({} as unknown as Request, response)
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, 404, "Sorry can't find that!")
+        })
+
+        it('creates custom 500 response', () => {
+            const consoleSpy = jest.spyOn(console, 'error')
+            const error = new Error('test')
+            router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
+            expect(consoleSpy).toHaveBeenCalledWith(error)
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, 500, 'Something broke!')
+        })
+
         it('generates "docs" route', () => {
             expect(server.use).toHaveBeenNthCalledWith(1, '/docs', 'serve', 'setup')
         })
 
-        // TODO: how to test inner function?
-        it.skip('sets orm request context', () => {
-            expect(server.use).toHaveBeenNthCalledWith(2, '')
+        it('sets orm request context', () => {
+            expect(server.use).toHaveBeenNthCalledWith(2, router.createRequestContext)
         })
 
         it('calls "actuator"', () => {
@@ -46,14 +76,12 @@ describe('Router', () => {
             expect(server.use).toHaveBeenNthCalledWith(4, '/firebase', 'firebaseRoutes')
         })
 
-        // TODO: how to test inner function?
-        it.skip('sets custom 404 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(5, expect.any(Function))
+        it('sets custom 404 page', () => {
+            expect(server.use).toHaveBeenNthCalledWith(5, router.custom404)
         })
 
-        // TODO: how to test inner function?
-        it.skip('sets custom 500 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(6, expect.any(Function))
+        it('sets custom 500 page', () => {
+            expect(server.use).toHaveBeenNthCalledWith(6, router.custom500)
         })
     })
 

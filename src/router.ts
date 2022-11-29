@@ -8,6 +8,7 @@ import { firebaseRoutes } from './routes/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
 import { ORM } from './orm.js'
 import { Route } from './types/routes'
+import ErrorController from './controller/errorController.js'
 
 export class Router {
     private server: Application
@@ -17,6 +18,19 @@ export class Router {
     constructor(server: Application, orm: ORM) {
         this.server = server
         this.orm = orm
+    }
+
+    createRequestContext = (_request: Request, _response: Response, next: NextFunction) => {
+        RequestContext.create(this.orm.orm.em, next)
+    }
+
+    custom404 = (_request: Request, response: Response) => {
+        ErrorController.sendError(response, 404, "Sorry can't find that!")
+    }
+
+    custom500 = (error: ErrorRequestHandler, _request: Request, response: Response) => {
+        console.error(error)
+        ErrorController.sendError(response, 500, 'Something broke!')
     }
 
     initRoutes = (
@@ -29,9 +43,7 @@ export class Router {
         this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
         console.log(`📖 Docs generated: http://localhost:${port}/docs`)
 
-        this.server.use((_request: Request, _response: Response, next: NextFunction) => {
-            RequestContext.create(this.orm.orm.em, next)
-        })
+        this.server.use(this.createRequestContext)
 
         this.server.use(actuator())
 
@@ -50,13 +62,8 @@ export class Router {
         this.server.use('/firebase', firebaseRoutes)
 
         // custom 404
-        this.server.use((_request: Request, response: Response) => {
-            response.status(404).send("Sorry can't find that!")
-        })
+        this.server.use(this.custom404)
         // custom 500
-        this.server.use((error: ErrorRequestHandler, _request: Request, response: Response) => {
-            console.error(error)
-            response.status(500).send('Something broke!')
-        })
+        this.server.use(this.custom500)
     }
 }
