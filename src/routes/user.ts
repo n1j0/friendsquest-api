@@ -25,7 +25,9 @@ export class UserRouter implements RouterInterface {
         this.userController = userController
     }
 
-    createAndReturnRoutes = () => {
+    getAllUsersHandler = (_request: Request, response: Response) => this.userController.getAllUsers(response)
+
+    generateAllUsersHandlerRoute = () => {
         /**
          * @openapi
          * /users:
@@ -52,11 +54,15 @@ export class UserRouter implements RouterInterface {
          *       403:
          *         description: Forbidden access or invalid token
          */
-        this.router.get(
-            '/',
-            (_request: Request, response: Response) => this.userController.getAllUsers(response),
-        )
+        this.router.get('/', this.getAllUsersHandler)
+    }
 
+    getUserByIdHandler = (request: Request, response: Response) => this.userController.getUserById(
+        { id: request.params.id },
+        response,
+    )
+
+    generateGetUserByIdRoute = () => {
         /**
          * @openapi
          * /users/{id}:
@@ -89,14 +95,15 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         description: User not found
          */
-        this.router.get(
-            '/:id',
-            (request: Request, response: Response) => this.userController.getUserById(
-                { id: request.params.id },
-                response,
-            ),
-        )
+        this.router.get('/:id', this.getUserByIdHandler)
+    }
 
+    getUserByUidHandler = (request: Request, response: Response) => this.userController.getUserByUid(
+        { uid: request.params.uid },
+        response,
+    )
+
+    generateGetUserByUidRoute = () => {
         /**
          * @openapi
          * /users/uid/{uid}:
@@ -129,14 +136,19 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         description: User not found
          */
-        this.router.get(
-            '/uid/:uid',
-            (request: Request, response: Response) => this.userController.getUserByUid(
-                { uid: request.params.uid },
-                response,
-            ),
-        )
+        this.router.get('/uid/:uid', this.getUserByUidHandler)
+    }
 
+    createUserHandler = (request: Request, response: Response) => this.userController.createUser(
+        {
+            email: request.body.email,
+            username: request.body.username,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateCreateUserRoute = () => {
         /**
          * @openapi
          * /users:
@@ -185,18 +197,25 @@ export class UserRouter implements RouterInterface {
          *       403:
          *         description: Forbidden access or invalid token
          */
-        this.router.post(
-            '/',
-            (request: Request, response: Response) => this.userController.createUser(
-                {
-                    email: request.body.email,
-                    username: request.body.username,
-                    uid: request.headers[AUTH_HEADER_UID] as string,
-                },
-                response,
-            ),
-        )
+        this.router.post('/', this.createUserHandler)
+    }
 
+    checkPermission = (uid: string, request: Request) => this.userController.isAllowedToEditUser(
+        uid,
+        request.params.id,
+    )
+
+    updateUserHandler = (request: Request, response: Response) => this.userController.updateUser(
+        {
+            email: request.body.email,
+            username: request.body.username,
+            id: request.params.id,
+            body: request.body,
+        },
+        response,
+    )
+
+    generateUpdateUserRoute = () => {
         /**
          * @openapi
          * /users/{id}:
@@ -256,21 +275,17 @@ export class UserRouter implements RouterInterface {
          */
         this.router.patch(
             '/:id',
-            userPermissionMiddleware((uid: string, request: Request) => this.userController.isAllowedToEditUser(
-                uid,
-                request.params.id,
-            )),
-            (request: Request, response: Response) => this.userController.updateUser(
-                {
-                    email: request.body.email,
-                    username: request.body.username,
-                    id: request.params.id,
-                    body: request.body,
-                },
-                response,
-            ),
+            userPermissionMiddleware(this.checkPermission),
+            this.updateUserHandler,
         )
+    }
 
+    deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
+        { id: request.params.id },
+        response,
+    )
+
+    generateDeleteUserRoute = () => {
         /**
          * @openapi
          * /users/{id}:
@@ -306,15 +321,18 @@ export class UserRouter implements RouterInterface {
          */
         this.router.delete(
             '/:id',
-            userPermissionMiddleware((uid: string, request: Request) => this.userController.isAllowedToEditUser(
-                uid,
-                request.params.id,
-            )),
-            (request: Request, response: Response) => this.userController.deleteUser(
-                { id: request.params.id },
-                response,
-            ),
+            userPermissionMiddleware(this.checkPermission),
+            this.deleteUserHandler,
         )
+    }
+
+    createAndReturnRoutes = () => {
+        this.generateAllUsersHandlerRoute()
+        this.generateGetUserByIdRoute()
+        this.generateGetUserByUidRoute()
+        this.generateCreateUserRoute()
+        this.generateUpdateUserRoute()
+        this.generateDeleteUserRoute()
 
         return this.router
     }
