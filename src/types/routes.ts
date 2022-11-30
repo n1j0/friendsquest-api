@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { ORM } from '../orm.js'
-import { RouterInterface } from '../routes/routerInterface'
+import { RouterInterface } from '../router/routerInterface'
 
 export interface Route {
     path: string

@@ -6,7 +6,7 @@ import { cert, initializeApp } from 'firebase-admin/app'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
-import { routes } from './routes/routes.js'
+import { routes } from './router/routes.js'
 
 export default class Application {
     server: ExpressApplication

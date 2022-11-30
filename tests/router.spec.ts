@@ -21,7 +21,7 @@ jest.mock('@mikro-orm/core', () => ({
     },
 }))
 
-jest.mock('../src/routes/_firebaseAuth.js', () => ({
+jest.mock('../src/router/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',
 }))
 

@@ -27,7 +27,7 @@ jest.mock('../src/router.js', () => ({
     })),
 }))
 
-jest.mock('../src/routes/routes', () => ({
+jest.mock('../src/router/routes', () => ({
     routes: [],
 }))
 

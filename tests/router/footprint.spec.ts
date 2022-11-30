@@ -5,7 +5,7 @@ import { FootprintService } from '../../src/services/footprintService'
 import { FootprintRepositoryInterface } from '../../src/repositories/footprint/footprintRepositoryInterface'
 import FootprintController from '../../src/controller/footprintController'
 import { FootprintPostgresRepository } from '../../src/repositories/footprint/footprintPostgresRepository'
-import { FootprintRouter } from '../../src/routes/footprint'
+import { FootprintRouter } from '../../src/router/footprintRouter'
 import responseMock from '../helper/responseMock'
 import { MulterFiles } from '../../src/types/multer'
 

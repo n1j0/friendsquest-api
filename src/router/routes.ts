@@ -1,7 +1,7 @@
 import { Route } from '../types/routes'
-import { UserRouter } from './user.js'
-import { FootprintRouter } from './footprint.js'
-import { FriendshipRouter } from './friendship.js'
+import { UserRouter } from './userRouter.js'
+import { FootprintRouter } from './footprintRouter.js'
+import { FriendshipRouter } from './friendshipRouter.js'
 
 export const routes: Route[] = [
     {

@@ -1,17 +1,17 @@
-import { routes } from '../../src/routes/routes'
-import { UserRouter } from '../../src/routes/user'
-import { FootprintRouter } from '../../src/routes/footprint'
-import { FriendshipRouter } from '../../src/routes/friendship'
+import { routes } from '../../src/router/routes'
+import { UserRouter } from '../../src/router/userRouter'
+import { FootprintRouter } from '../../src/router/footprintRouter'
+import { FriendshipRouter } from '../../src/router/friendshipRouter'
 
-jest.mock('../../src/routes/user.js', () => ({
+jest.mock('../../src/router/userRouter.js', () => ({
     UserRouter: {},
 }))
 
-jest.mock('../../src/routes/footprint.js', () => ({
+jest.mock('../../src/router/footprintRouter.js', () => ({
     FootprintRouter: {},
 }))
 
-jest.mock('../../src/routes/friendship.js', () => ({
+jest.mock('../../src/router/friendshipRouter.js', () => ({
     FriendshipRouter: {},
 }))
 
