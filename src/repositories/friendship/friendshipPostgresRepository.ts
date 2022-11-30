@@ -4,7 +4,7 @@ import { FriendshipAlreadyExistsError } from '../../errors/FriendshipAlreadyExis
 import { Friendship } from '../../entities/friendship.js'
 import { User } from '../../entities/user.js'
 import { FriendshipStatus } from '../../constants/index.js'
-import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface'
+import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface.js'
 
 export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
     private readonly orm: ORM
