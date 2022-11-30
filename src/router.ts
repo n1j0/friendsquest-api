@@ -47,14 +47,12 @@ export class Router {
 
         this.server.use(actuator())
 
-        const router = ExpressRouter()
-
         routes.forEach((route) => {
             this.server.use(
                 route.path,
                 authMiddleware(auth),
                 // eslint-disable-next-line new-cap
-                new route.routerClass(router, this.orm).createAndReturnRoutes(),
+                new route.routerClass(ExpressRouter(), this.orm).createAndReturnRoutes(),
             )
         })
 
