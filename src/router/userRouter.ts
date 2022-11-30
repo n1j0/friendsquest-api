@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express'
 import UserController from '../controller/userController.js'
-import { userPermissionMiddleware } from '../middlewares/userPermission.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
@@ -205,17 +204,12 @@ export class UserRouter implements RouterInterface {
         this.router.post('/', this.createUserHandler)
     }
 
-    checkPermission = (uid: string, request: Request) => this.userController.isAllowedToEditUser(
-        uid,
-        request.params.id,
-    )
-
     updateUserHandler = (request: Request, response: Response) => this.userController.updateUser(
         {
             email: request.body.email,
             username: request.body.username,
-            id: request.params.id,
             body: request.body,
+            uid: request.headers[AUTH_HEADER_UID] as string,
         },
         response,
     )
@@ -223,9 +217,9 @@ export class UserRouter implements RouterInterface {
     generateUpdateUserRoute = () => {
         /**
          * @openapi
-         * /users/{id}:
+         * /users:
          *   patch:
-         *     summary: Update a user by id
+         *     summary: Update a user
          *     tags:
          *       - User
          *     parameters:
@@ -235,12 +229,6 @@ export class UserRouter implements RouterInterface {
          *           type: string
          *         required: true
          *         description: Authorization header
-         *       - in: path
-         *         name: id
-         *         schema:
-         *           type: integer
-         *         required: true
-         *         description: Numeric ID of the user to update
          *     requestBody:
          *       required: true
          *       content:
@@ -279,23 +267,22 @@ export class UserRouter implements RouterInterface {
          *         description: User not found
          */
         this.router.patch(
-            '/:id',
-            userPermissionMiddleware(this.checkPermission),
+            '/',
             this.updateUserHandler,
         )
     }
 
     deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
-        { id: request.params.id },
+        { uid: request.headers[AUTH_HEADER_UID] as string },
         response,
     )
 
     generateDeleteUserRoute = () => {
         /**
          * @openapi
-         * /users/{id}:
+         * /users:
          *   delete:
-         *     summary: Delete a user by id
+         *     summary: Delete a user
          *     tags:
          *       - User
          *     parameters:
@@ -305,12 +292,6 @@ export class UserRouter implements RouterInterface {
          *           type: string
          *         required: true
          *         description: Authorization header
-         *       - in: path
-         *         name: id
-         *         schema:
-         *           type: integer
-         *         required: true
-         *         description: Numeric ID of the user to delete
          *     responses:
          *       204:
          *         description: Returns the deleted user
@@ -325,8 +306,7 @@ export class UserRouter implements RouterInterface {
          *         description: User not found
          */
         this.router.delete(
-            '/:id',
-            userPermissionMiddleware(this.checkPermission),
+            '/',
             this.deleteUserHandler,
         )
     }

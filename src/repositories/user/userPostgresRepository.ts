@@ -54,9 +54,9 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return user
     }
 
-    updateUser = async (id: number | string, userData: any) => {
+    updateUser = async (uid: string, userData: any) => {
         const em = this.orm.forkEm()
-        const user = await em.findOne('User', { id } as any)
+        const user = await em.findOne('User', { uid } as any)
         if (!user) {
             throw new UserNotFoundError()
         }
@@ -65,9 +65,9 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return user
     }
 
-    deleteUser = async (id: number | string) => {
+    deleteUser = async (uid: string) => {
         const em = this.orm.forkEm()
-        const user = await em.findOne('User', { id } as any)
+        const user = await em.findOne('User', { uid } as any)
         if (!user) {
             throw new UserNotFoundError()
         }

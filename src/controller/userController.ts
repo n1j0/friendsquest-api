@@ -13,15 +13,6 @@ export default class UserController {
 
     private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
 
-    isAllowedToEditUser = async (uid: string, id: string) => {
-        try {
-            const user = await this.userRepository.getUserById(id)
-            return user.uid === uid
-        } catch {
-            return false
-        }
-    }
-
     getAllUsers = async (response: Response) => response.status(200).json(await this.userRepository.getAllUsers())
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
@@ -75,7 +66,7 @@ export default class UserController {
     }
 
     updateUser = async (
-        { email, username, id, body }: { email: string, username: string, id: number | string, body: any },
+        { email, username, uid, body }: { email: string, username: string, uid: string, body: any },
         response: Response,
     ) => {
         // TODO: what if just one attribute has changed?
@@ -88,7 +79,7 @@ export default class UserController {
                 return ErrorController.sendError(response, 400, 'Email or Username already taken')
             }
 
-            return response.status(200).json(await this.userRepository.updateUser(id, body))
+            return response.status(200).json(await this.userRepository.updateUser(uid, body))
         } catch (error: any) {
             return error instanceof UserNotFoundError
                 ? this.userNotFoundError(response)
@@ -96,12 +87,9 @@ export default class UserController {
         }
     }
 
-    deleteUser = async ({ id }: { id: number | string }, response: Response) => {
-        if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
-        }
+    deleteUser = async ({ uid }: { uid: string }, response: Response) => {
         try {
-            await this.userRepository.deleteUser(id)
+            await this.userRepository.deleteUser(uid)
             return response.status(204).json()
         } catch (error: any) {
             return error instanceof UserNotFoundError
