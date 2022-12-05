@@ -3,6 +3,10 @@ import ErrorController from './errorController.js'
 import { FriendshipStatus } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { ForbiddenError } from '../errors/ForbiddenError.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
 
 export default class FriendshipController {
     private friendshipRepository: FriendshipRepositoryInterface
@@ -15,11 +19,11 @@ export default class FriendshipController {
     }
 
     private friendshipNotFoundError = (response: Response) => {
-        ErrorController.sendError(response, 404, 'Friendship not found')
+        ErrorController.sendError(response, NotFoundError.getErrorDocument('The friendship'))
     }
 
     private idNotFoundError = (response: Response) => {
-        ErrorController.sendError(response, 500, 'Missing id')
+        ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
     }
 
     // TODO: refactor. hard to read
@@ -52,25 +56,27 @@ export default class FriendshipController {
 
     createFriendship = async ({ friendsCode, uid }: { friendsCode: string, uid: string }, response: Response) => {
         if (!friendsCode) {
-            return ErrorController.sendError(response, 403, 'Missing friendsCode')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('FriendsCode'))
         }
         const [ invitor, invitee ] = await Promise.all([
             this.userRepository.getUserByUid(uid),
             this.userRepository.getUserByFriendsCode(friendsCode),
         ])
 
-        if (!invitor || !invitee) {
+        if (!(invitor && invitee)) {
             return this.friendshipNotFoundError(response)
         }
 
         if (invitor.friendsCode === invitee.friendsCode) {
-            return ErrorController.sendError(response, 403, 'You can not add yourself')
+            return ErrorController.sendError(response, ForbiddenError.getErrorDocument('You can not add yourself.'))
         }
 
         try {
             await this.friendshipRepository.checkForExistingFriendship(invitor, invitee)
-        } catch {
-            return ErrorController.sendError(response, 403, 'Friendship already exists')
+        } catch (error: any) {
+            return error instanceof ForbiddenError
+                ? ErrorController.sendError(response, ForbiddenError.getErrorDocument())
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument())
         }
 
         const friendship = await this.friendshipRepository.createFriendship(invitor, invitee)
@@ -98,18 +104,21 @@ export default class FriendshipController {
         }
 
         if (friendship.invitee.uid !== uid) {
-            return ErrorController.sendError(response, 403, 'You are not allowed to accept this friendship')
+            return ErrorController.sendError(
+                response,
+                ForbiddenError.getErrorDocument('You are not allowed to accept this friendship.'),
+            )
         }
 
         if (friendship.status === FriendshipStatus.ACCEPTED) {
-            return ErrorController.sendError(response, 403, 'Friendship already accepted')
+            return ErrorController.sendError(response, ForbiddenError.getErrorDocument('Friendship already accepted.'))
         }
 
         try {
             await this.friendshipRepository.acceptFriendship(friendship)
             return response.status(200).json(friendship)
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
@@ -124,14 +133,17 @@ export default class FriendshipController {
         }
 
         if (friendship.invitor.uid !== uid && friendship.invitee.uid !== uid) {
-            return ErrorController.sendError(response, 403, 'You are not allowed to decline or delete this friendship')
+            return ErrorController.sendError(
+                response,
+                ForbiddenError.getErrorDocument('You are not allowed to decline or delete this friendship.'),
+            )
         }
 
         try {
             await this.friendshipRepository.declineOrDeleteExistingFriendship(friendship)
             return response.status(200).json('Friendship deleted')
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 }

@@ -1,5 +1,5 @@
 import { UserService } from '../../src/services/userService'
-import { NegativNumbersNotAllowedError } from '../../src/errors/NegativNumbersNotAllowedError'
+import { NegativeNumbersNotAllowedError } from '../../src/errors/NegativeNumbersNotAllowedError'
 import { MaximumFriendsCodeLimitExceededError } from '../../src/errors/MaximumFriendsCodeLimitExceededError'
 
 describe('UserService', () => {
@@ -23,7 +23,7 @@ describe('UserService', () => {
     )
 
     it('returns error for negativ decimal numbers', () => {
-        expect(() => userService.numberToBase36String(-1)).toThrow(NegativNumbersNotAllowedError)
+        expect(() => userService.numberToBase36String(-1)).toThrow(NegativeNumbersNotAllowedError)
     })
 
     it('returns error if maximum number for 5-letters is exceeded', () => {

@@ -8,6 +8,7 @@ const jestSetup: JestConfigWithTsJest = {
         '^(\\.{1,2}/.*)\\.js$': '$1',
         '^@mikro-orm/*$': '<rootDir>/node_modules/@mikro-orm/$1',
     },
+    moduleFileExtensions: [ 'ts', 'js' ],
     testMatch: ['<rootDir>/tests/**/?(*.)+(spec|test).[jt]s'],
     transform: {
         '^.+\\.m?[tj]sx?$': [

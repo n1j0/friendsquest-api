@@ -5,6 +5,7 @@ import { MulterFiles } from '../../types/multer.js'
 import { Footprint } from '../../entities/footprint.js'
 import { FootprintService } from '../../services/footprintService.js'
 import { NewFootprint } from '../../types/footprint.js'
+import { NotFoundError } from '../../errors/NotFoundError.js';
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private footprintService: FootprintService
@@ -54,7 +55,11 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
     // TODO: every time this is called the viewCount needs to be increased
     getFootprintById = async (id: string | number) => {
         const em = this.orm.forkEm()
-        return em.findOne('Footprint', { id } as any)
+        return em.findOneOrFail(
+            'Footprint',
+            { id } as any,
+            { failHandler: () => { throw new NotFoundError('The footprint') } },
+        )
     }
 
     getFootprintReactions = async (id: number | string) => {

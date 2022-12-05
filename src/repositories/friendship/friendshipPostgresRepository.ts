@@ -5,6 +5,7 @@ import { Friendship } from '../../entities/friendship.js'
 import { User } from '../../entities/user.js'
 import { FriendshipStatus } from '../../constants/index.js'
 import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface.js'
+import { NotFoundError } from '../../errors/NotFoundError'
 
 export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
     private readonly orm: ORM
@@ -24,7 +25,14 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
 
     getFriendshipById = async (id: number | string) => {
         const em = this.orm.forkEm()
-        return em.findOne('Friendship', { id } as any, { populate: [ 'invitor', 'invitee' ] })
+        return em.findOneOrFail(
+            'Friendship',
+            { id } as any,
+            {
+                populate: [ 'invitor', 'invitee' ],
+                failHandler: () => { throw new NotFoundError('The friendship') },
+            },
+        )
     }
 
     checkForExistingFriendship = async (invitor: User, invitee: User) => {
@@ -47,11 +55,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
 
     acceptFriendship = async (friendship: Friendship) => {
         const em = this.orm.forkEm()
-        const acceptedFriendship = {
-            ...friendship,
-            status: FriendshipStatus.ACCEPTED,
-        }
-        wrap(friendship).assign(acceptedFriendship)
+        wrap(friendship).assign({ status: FriendshipStatus.ACCEPTED })
         return em.persistAndFlush(friendship)
     }
 

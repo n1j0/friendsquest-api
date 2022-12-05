@@ -1,8 +1,14 @@
 import { Response } from 'express'
 import { User } from '../entities/user.js'
 import ErrorController from './errorController.js'
-import { UserNotFoundError } from '../errors/UserNotFoundError.js'
+import { NotFoundError } from '../errors/NotFoundError'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
+import { ForbiddenError } from '../errors/ForbiddenError.js'
+import { ValueAlreadyExistsError } from '../errors/ValueAlreadyExistsError.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
+import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError'
+import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError'
 
 export default class UserController {
     private userRepository: UserRepositoryInterface
@@ -11,7 +17,10 @@ export default class UserController {
         this.userRepository = userRepository
     }
 
-    private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
+    private userNotFoundError = (response: Response) => ErrorController.sendError(
+        response,
+        NotFoundError.getErrorDocument('The user'),
+    )
 
     isAllowedToEditUser = async (uid: string, id: string) => {
         try {
@@ -26,25 +35,29 @@ export default class UserController {
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
-            return response.status(500).json({ message: 'Missing id' })
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
             const user = await this.userRepository.getUserById(id)
             return response.status(200).json(user)
-        } catch {
-            return this.userNotFoundError(response)
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getUserByUid = async ({ uid }: { uid: number | string }, response: Response) => {
         if (!uid) {
-            return response.status(500).json({ message: 'Missing uid' })
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('UID'))
         }
         try {
             const user = await this.userRepository.getUserByUid(uid)
             return response.status(200).json(user)
-        } catch {
-            return this.userNotFoundError(response)
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
@@ -53,11 +66,11 @@ export default class UserController {
         response: Response,
     ) => {
         if (!email) {
-            return ErrorController.sendError(response, 403, 'Email is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Email'))
         }
 
         if (!username) {
-            return ErrorController.sendError(response, 403, 'Username is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Username'))
         }
 
         try {
@@ -66,11 +79,27 @@ export default class UserController {
                 .userRepository
                 .checkUsernameAndMail(username, email)
             if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
-                return ErrorController.sendError(response, 400, 'Email or Username already taken')
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
+                )
             }
             return response.status(201).json(await this.userRepository.createUser(user))
         } catch (error: any) {
-            return ErrorController.sendError(response, 403, error)
+            switch (error.constructor) {
+            case ForbiddenError: {
+                return ErrorController.sendError(response, ForbiddenError.getErrorDocument())
+            }
+            case NegativeNumbersNotAllowedError: {
+                return ErrorController.sendError(response, NegativeNumbersNotAllowedError.getErrorDocument())
+            }
+            case MaximumFriendsCodeLimitExceededError: {
+                return ErrorController.sendError(response, MaximumFriendsCodeLimitExceededError.getErrorDocument())
+            }
+            default: {
+                return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            }
+            }
         }
     }
 
@@ -85,28 +114,31 @@ export default class UserController {
                 .userRepository
                 .checkUsernameAndMail(username, email)
             if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
-                return ErrorController.sendError(response, 400, 'Email or Username already taken')
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
+                )
             }
 
             return response.status(200).json(await this.userRepository.updateUser(id, body))
         } catch (error: any) {
-            return error instanceof UserNotFoundError
+            return error instanceof NotFoundError
                 ? this.userNotFoundError(response)
-                : ErrorController.sendError(response, 500, error)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     deleteUser = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
             await this.userRepository.deleteUser(id)
             return response.status(204).json()
         } catch (error: any) {
-            return error instanceof UserNotFoundError
+            return error instanceof NotFoundError
                 ? this.userNotFoundError(response)
-                : ErrorController.sendError(response, 500, error)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 }

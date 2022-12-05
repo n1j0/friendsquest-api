@@ -1,7 +1,7 @@
 import { wrap } from '@mikro-orm/core'
 import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
-import { UserNotFoundError } from '../../errors/UserNotFoundError.js'
+import { NotFoundError } from '../../errors/NotFoundError'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
 
@@ -25,17 +25,29 @@ export class UserPostgresRepository implements UserRepositoryInterface {
 
     getUserById = async (id: number | string) => {
         const em = this.orm.forkEm()
-        return em.findOneOrFail('User', { id } as any)
+        return em.findOneOrFail(
+            'User',
+            { id } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
     }
 
     getUserByUid = async (uid: number | string) => {
         const em = this.orm.forkEm()
-        return em.findOneOrFail('User', { uid } as any)
+        return em.findOneOrFail(
+            'User',
+            { uid } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
     }
 
     getUserByFriendsCode = async (friendsCode: number | string) => {
         const em = this.orm.forkEm()
-        return em.findOneOrFail('User', { friendsCode } as any)
+        return em.findOneOrFail(
+            'User',
+            { friendsCode } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
     }
 
     getAllUsers = async () => {
@@ -46,7 +58,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     createUser = async (user: User) => {
         const em = this.orm.forkEm()
         await em.persistAndFlush(user)
-        const userInDatabase = await em.findOne('User', { uid: user.uid } as any)
+        const userInDatabase = await em.findOneOrFail(
+            'User',
+            { uid: user.uid } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
         // TODO: don't forget to handle the errors "numberToBase36String" can throw
         userInDatabase.friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
         wrap(user).assign(userInDatabase)
@@ -56,10 +72,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
 
     updateUser = async (id: number | string, userData: any) => {
         const em = this.orm.forkEm()
-        const user = await em.findOne('User', { id } as any)
-        if (!user) {
-            throw new UserNotFoundError()
-        }
+        const user = await em.findOneOrFail(
+            'User',
+            { id } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
         wrap(user).assign(userData)
         await em.persistAndFlush(user)
         return user
@@ -67,10 +84,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
 
     deleteUser = async (id: number | string) => {
         const em = this.orm.forkEm()
-        const user = await em.findOne('User', { id } as any)
-        if (!user) {
-            throw new UserNotFoundError()
-        }
+        const user = await em.findOneOrFail(
+            'User',
+            { id } as any,
+            { failHandler: () => { throw new NotFoundError() } },
+        )
         return em.removeAndFlush(user)
     }
 }

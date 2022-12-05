@@ -2,6 +2,7 @@ import { mock } from 'jest-mock-extended'
 import { Application, ErrorRequestHandler, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
 import { RequestContext } from '@mikro-orm/core'
+import { ReasonPhrases } from 'http-status-codes'
 import { Router } from '../src/router'
 import { ORM } from '../src/orm'
 import { Route } from '../src/types/routes'
@@ -49,7 +50,11 @@ describe('Router', () => {
 
         it('creates custom 404 response', () => {
             router.custom404({} as unknown as Request, response)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, 404, "Sorry can't find that!")
+            const error: Error.ProblemDocument = {
+                title: ReasonPhrases.NOT_FOUND,
+                status: 404,
+            }
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, error)
         })
 
         it('creates custom 500 response', () => {
@@ -57,7 +62,11 @@ describe('Router', () => {
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, 500, 'Something broke!')
+            const error500: Error.ProblemDocument = {
+                title: ReasonPhrases.INTERNAL_SERVER_ERROR,
+                status: 500,
+            }
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, error500)
         })
 
         it('generates "docs" route', () => {

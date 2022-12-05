@@ -9,6 +9,8 @@ import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
 import { ORM } from './orm.js'
 import { Route } from './types/routes'
 import ErrorController from './controller/errorController.js'
+import { NotFoundError } from './errors/NotFoundError.js'
+import { InternalServerError } from './errors/InternalServerError.js'
 
 export class Router {
     private server: Application
@@ -25,12 +27,12 @@ export class Router {
     }
 
     custom404 = (_request: Request, response: Response) => {
-        ErrorController.sendError(response, 404, "Sorry can't find that!")
+        ErrorController.sendError(response, NotFoundError.getErrorDocument())
     }
 
     custom500 = (error: ErrorRequestHandler, _request: Request, response: Response) => {
         console.error(error)
-        ErrorController.sendError(response, 500, 'Something broke!')
+        ErrorController.sendError(response, InternalServerError.getErrorDocument('Internal Server Error'))
     }
 
     initRoutes = (
