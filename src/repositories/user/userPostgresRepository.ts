@@ -4,6 +4,7 @@ import { User } from '../../entities/user.js'
 import { NotFoundError } from '../../errors/NotFoundError'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
+import Points from '../../constants/points'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
@@ -69,7 +70,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     updateUser = async (uid: string, userData: any) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        wrap(user).assign(userData)
+        wrap(user).assign({
+            ...userData,
+            points: user.points + Points.PROFILE_EDITED,
+        })
         await em.persistAndFlush(user)
         return user
     }
