@@ -6,11 +6,16 @@ import { User } from '../../entities/user.js'
 import { FriendshipStatus } from '../../constants/index.js'
 import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface.js'
 import { NotFoundError } from '../../errors/NotFoundError'
+import { UserRepositoryInterface } from '../user/userRepositoryInterface'
+import Points from '../../constants/points'
 
 export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
     private readonly orm: ORM
 
-    constructor(orm: ORM) {
+    private readonly userRepository: UserRepositoryInterface
+
+    constructor(userRepository: UserRepositoryInterface, orm: ORM) {
+        this.userRepository = userRepository
         this.orm = orm
     }
 
@@ -58,7 +63,13 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         wrap(friendship).assign({
             status: FriendshipStatus.ACCEPTED,
         })
-        return em.persistAndFlush(friendship)
+        /* eslint-disable-next-line no-unused-vars */
+        const [ _, invitor, invitee ] = await Promise.all([
+            em.persistAndFlush(friendship),
+            this.userRepository.addPoints(friendship.invitor.uid, Points.NEW_FRIENDSHIP),
+            this.userRepository.addPoints(friendship.invitee.uid, Points.NEW_FRIENDSHIP),
+        ])
+        return { invitor, invitee }
     }
 
     declineOrDeleteExistingFriendship = async (friendship: Friendship) => {
