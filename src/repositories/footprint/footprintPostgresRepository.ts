@@ -46,7 +46,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             photoURL,
             audioURL,
         )
-        await em.persistAndFlush(footprint)
+        await Promise.all([
+            em.persistAndFlush(footprint),
+            this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED),
+        ])
         return footprint
     }
 
