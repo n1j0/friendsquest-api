@@ -34,13 +34,14 @@ describe('Router', () => {
 
     describe('general setup', () => {
         const response = responseMock
-        const sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
+        let sendErrorSpy: jest.SpyInstance
 
         beforeEach(() => {
             server = mock<Application>()
             orm = mock<ORM>()
             router = new Router(server, orm)
             router.initRoutes(1234, [], jest.fn(), {} as unknown as Auth)
+            sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
         })
 
         it('creates the RequestContext for the orm', () => {
@@ -59,7 +60,10 @@ describe('Router', () => {
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument())
+            expect(sendErrorSpy).toHaveBeenCalledWith(
+                response,
+                InternalServerError.getErrorDocument('Internal Server Error'),
+            )
         })
 
         it('generates "docs" route', () => {
