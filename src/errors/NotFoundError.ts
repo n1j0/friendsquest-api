@@ -3,9 +3,10 @@ import {
     getReasonPhrase,
 } from 'http-status-codes'
 import { Mapper } from './ProblemDocument.js'
+import { ProblemDocument } from '../types/problemDocument'
 
 export class NotFoundError extends Error {
-    static getErrorDocument(parameter: string = 'The parameter'): Error.ProblemDocument {
+    static getErrorDocument(parameter: string = 'The parameter'): ProblemDocument {
         return Mapper.mapError({
             detail: `${parameter} you are looking for does not exist.`,
             status: StatusCodes.NOT_FOUND,
