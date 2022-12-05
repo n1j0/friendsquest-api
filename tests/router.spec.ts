@@ -7,6 +7,8 @@ import { ORM } from '../src/orm'
 import { Route } from '../src/types/routes'
 import responseMock from './helper/responseMock'
 import ErrorController from '../src/controller/errorController'
+import { NotFoundError } from '../src/errors/NotFoundError'
+import { InternalServerError } from '../src/errors/InternalServerError'
 
 jest.mock('swagger-ui-express', () => ({
     serve: 'serve',
@@ -32,13 +34,14 @@ describe('Router', () => {
 
     describe('general setup', () => {
         const response = responseMock
-        const sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
+        let sendErrorSpy: jest.SpyInstance
 
         beforeEach(() => {
             server = mock<Application>()
             orm = mock<ORM>()
             router = new Router(server, orm)
             router.initRoutes(1234, [], jest.fn(), {} as unknown as Auth)
+            sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
         })
 
         it('creates the RequestContext for the orm', () => {
@@ -49,7 +52,7 @@ describe('Router', () => {
 
         it('creates custom 404 response', () => {
             router.custom404({} as unknown as Request, response)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, 404, "Sorry can't find that!")
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument())
         })
 
         it('creates custom 500 response', () => {
@@ -57,7 +60,10 @@ describe('Router', () => {
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, 500, 'Something broke!')
+            expect(sendErrorSpy).toHaveBeenCalledWith(
+                response,
+                InternalServerError.getErrorDocument('Internal Server Error'),
+            )
         })
 
         it('generates "docs" route', () => {

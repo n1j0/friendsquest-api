@@ -24,6 +24,7 @@ const jestSetup: JestConfigWithTsJest = {
         '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
     ],
     setupFiles: ['<rootDir>/jest.setup.ts'],
+    restoreMocks: true,
 }
 
 export default jestSetup

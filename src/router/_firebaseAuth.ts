@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express'
 import fetch from 'node-fetch'
 import ErrorController from '../controller/errorController.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
 
 const router = express.Router()
 
@@ -25,7 +26,7 @@ const router = express.Router()
 router.get('/token', async (request: Request, response: Response) => {
     const user = request.headers.userid as string
     if (![ '1', '2' ].includes(user)) {
-        return ErrorController.sendError(response, 500, 'Test user not specified')
+        return ErrorController.sendError(response, InternalServerError.getErrorDocument('Test user not specified'))
     }
     const body = {
         email: user === '1' ? process.env.FIREBASE_TEST_USER1 : process.env.FIREBASE_TEST_USER2,
@@ -48,7 +49,7 @@ router.get('/token', async (request: Request, response: Response) => {
         )
         return response.status(200).json((await token.json() as any).idToken)
     } catch (error: any) {
-        return ErrorController.sendError(response, 500, error)
+        return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
     }
 })
 

@@ -45,17 +45,24 @@ describe('FriendshipPostgresRepository', () => {
     })
 
     it('returns one friendship by id', async () => {
-        const findOne = jest.fn().mockReturnValue('friendship')
+        const findOneOrFail = jest.fn().mockReturnValue('friendship')
         // @ts-ignore
         orm.forkEm.mockImplementation(() => ({
-            findOne,
+            findOneOrFail,
         }))
 
         const id = 1
         const friendship = await friendshipPostgresRepository.getFriendshipById(id)
 
         expect(orm.forkEm).toHaveBeenCalled()
-        expect(findOne).toHaveBeenCalledWith('Friendship', { id }, { populate: [ 'invitor', 'invitee' ] })
+        expect(findOneOrFail).toHaveBeenCalledWith(
+            'Friendship',
+            { id },
+            {
+                populate: [ 'invitor', 'invitee' ],
+                failHandler: expect.any(Function),
+            },
+        )
         expect(friendship).toBe('friendship')
     })
 

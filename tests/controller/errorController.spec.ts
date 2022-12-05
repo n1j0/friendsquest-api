@@ -1,3 +1,7 @@
+import { mock } from 'jest-mock-extended'
+import {
+    ReasonPhrases,
+} from 'http-status-codes'
 import ErrorController from '../../src/controller/errorController'
 import responseMock from '../helper/responseMock'
 
@@ -5,29 +9,22 @@ const response = responseMock
 
 describe('ErrorController', () => {
     it('has a static method to send an error', () => {
-        expect(ErrorController.sendError(response, 0, '')).toBeDefined()
+        const error = {} as Error.ProblemDocument
+        expect(ErrorController.sendError(response, error)).toBeDefined()
     })
 
-    it.each([
-        [200],
-        [400],
-        [500],
-    ])('sets different codes for response', (code: number) => {
-        ErrorController.sendError(response, code, '')
-        expect(response.status).toHaveBeenCalledWith(code)
-    })
-
-    it('returns given string message as json', () => {
-        const message = 'hello'
-        ErrorController.sendError(response, 204, message)
-        expect(response.json).toHaveBeenCalledWith({ message })
+    it('returns given error as json', () => {
+        const error = mock<Error.ProblemDocument>()
+        ErrorController.sendError(response, error)
+        expect(response.json).toHaveBeenCalledWith(error)
     })
 
     it('returns message from error as json', () => {
-        const error = {
-            message: 'sample',
+        const error: Error.ProblemDocument = {
+            title: ReasonPhrases.INTERNAL_SERVER_ERROR,
+            status: 500,
         }
-        ErrorController.sendError(response, 204, error)
-        expect(response.json).toHaveBeenCalledWith({ message: error.message })
+        ErrorController.sendError(response, error)
+        expect(response.json).toHaveBeenCalledWith({ title: error.title, status: error.status })
     })
 })

@@ -1,5 +1,14 @@
+import {
+    getReasonPhrase,
+} from 'http-status-codes'
+import { Mapper } from './ProblemDocument.js'
+
 export class MaximumFriendsCodeLimitExceededError extends Error {
-    constructor(message: string = 'There are no more available friends codes') {
-        super(message)
+    static getErrorDocument(): Error.ProblemDocument {
+        return Mapper.mapError({
+            detail: 'There are no more friends codes available.',
+            status: 500,
+            type: `http://tempuri.org/${getReasonPhrase(500)}`,
+        })
     }
 }

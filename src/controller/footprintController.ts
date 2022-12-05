@@ -2,6 +2,9 @@ import { Response } from 'express'
 import ErrorController from './errorController.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { NewFootprint } from '../types/footprint'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
+import { InternalServerError } from '../errors/InternalServerError.js'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
@@ -14,33 +17,33 @@ export default class FootprintController {
         try {
             return response.status(200).json(await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
             const footprint = await this.footprintRepository.getFootprintById(id)
-            if (footprint) {
-                return response.status(200).json(footprint)
-            }
-            return ErrorController.sendError(response, 404, 'Footprint not found')
+            return response.status(200).json(footprint)
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            if (error instanceof NotFoundError) {
+                return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
+            }
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
             return response.status(200).json(await this.footprintRepository.getFootprintReactions(id))
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
@@ -49,10 +52,10 @@ export default class FootprintController {
         response: Response,
     ) => {
         if (!message) {
-            return ErrorController.sendError(response, 500, 'Message is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Message'))
         }
         if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
 
         try {
@@ -67,13 +70,14 @@ export default class FootprintController {
             }
             return response.status(201).json(reactionWithFootprintId)
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
         if (!title || !latitude || !longitude || !files) {
-            return ErrorController.sendError(response, 400, 'Missing required fields')
+            // TODO get error message for multiple fields
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required fields'))
         }
 
         try {
@@ -91,7 +95,7 @@ export default class FootprintController {
             }
             return response.status(201).json(footprintWithCoordinatesAsNumbers)
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 }
