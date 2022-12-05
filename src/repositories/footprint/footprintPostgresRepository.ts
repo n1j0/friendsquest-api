@@ -57,7 +57,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
         ])
         const reaction = new FootprintReaction(user, message, footprint)
-        await em.persistAndFlush(reaction)
+        await Promise.all([
+            em.persistAndFlush(reaction),
+            this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION),
+        ])
         return reaction
     }
 
