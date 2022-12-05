@@ -46,11 +46,12 @@ describe('FootprintController', () => {
     describe('getFootprintById', () => {
         it('returns footprint in response', async () => {
             const id = 1
+            const uid = 'abc'
             const result = 'sample'
             // @ts-ignore
             footprintRepository.getFootprintById.mockReturnValue(result)
-            await footprintController.getFootprintById({ id }, response)
-            expect(footprintRepository.getFootprintById).toHaveBeenCalledWith(1)
+            await footprintController.getFootprintById({ uid, id }, response)
+            expect(footprintRepository.getFootprintById).toHaveBeenCalledWith(uid, id)
             expect(response.status).toHaveBeenCalledWith(200)
             expect(response.json).toHaveBeenCalledWith(result)
         })
@@ -61,7 +62,7 @@ describe('FootprintController', () => {
             footprintRepository.getFootprintById.mockImplementation(() => {
                 throw error
             })
-            await footprintController.getFootprintById({ id: 1 }, response)
+            await footprintController.getFootprintById({ uid: 'abc', id: 1 }, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
         })
 
@@ -70,12 +71,15 @@ describe('FootprintController', () => {
             footprintRepository.getFootprintById.mockImplementation(() => {
                 throw new NotFoundError()
             })
-            await footprintController.getFootprintById({ id: 1 }, response)
+            await footprintController.getFootprintById({ uid: 'abc', id: 1 }, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument('The footprint'))
         })
 
         it('sends an error if id is missing', async () => {
-            await footprintController.getFootprintById({ id: undefined } as unknown as { id: number }, response)
+            await footprintController.getFootprintById(
+                { uid: 'abc', id: undefined } as unknown as { uid: string, id: number },
+                response,
+            )
             expect(sendErrorSpy).toHaveBeenCalledWith(response, AttributeIsMissingError.getErrorDocument('ID'))
         })
     })

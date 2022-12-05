@@ -7,13 +7,14 @@ import { MulterFiles } from '../types/multer.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
+import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
+import { UserService } from '../services/userService.js'
+import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 
 export class FootprintRouter implements RouterInterface {
     readonly router: Router
 
     private readonly footprintService: FootprintService
-
-    private readonly footprintRepository: FootprintRepositoryInterface
 
     private readonly footprintController: FootprintController
 
@@ -21,12 +22,17 @@ export class FootprintRouter implements RouterInterface {
         router: Router,
         orm: ORM,
         footprintService: FootprintService = new FootprintService(),
-        footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(footprintService, orm),
+        userService: UserService = new UserService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
+            footprintService,
+            userRepository,
+            orm,
+        ),
         footprintController: FootprintController = new FootprintController(footprintRepository),
     ) {
         this.router = router
         this.footprintService = footprintService
-        this.footprintRepository = footprintRepository
         this.footprintController = footprintController
     }
 
@@ -122,7 +128,10 @@ export class FootprintRouter implements RouterInterface {
     }
 
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
-        { id: request.params.id },
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
         response,
     )
 

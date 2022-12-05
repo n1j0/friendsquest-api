@@ -9,4 +9,4 @@ const Points = {
     FOOTPRINT_VIEWED: 500,
 }
 
-export default deepFreeze(Points)
+export default deepFreeze(Points) as typeof Points
