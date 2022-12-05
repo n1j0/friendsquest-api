@@ -5,7 +5,7 @@ import { MulterFiles } from '../../types/multer.js'
 import { Footprint } from '../../entities/footprint.js'
 import { FootprintService } from '../../services/footprintService.js'
 import { NewFootprint } from '../../types/footprint.js'
-import { NotFoundError } from '../../errors/NotFoundError.js';
+import { NotFoundError } from '../../errors/NotFoundError.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private footprintService: FootprintService
