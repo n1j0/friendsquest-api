@@ -2,12 +2,13 @@ import { mock } from 'jest-mock-extended'
 import { Application, ErrorRequestHandler, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
 import { RequestContext } from '@mikro-orm/core'
-import { ReasonPhrases } from 'http-status-codes'
 import { Router } from '../src/router'
 import { ORM } from '../src/orm'
 import { Route } from '../src/types/routes'
 import responseMock from './helper/responseMock'
 import ErrorController from '../src/controller/errorController'
+import { NotFoundError } from '../src/errors/NotFoundError'
+import { InternalServerError } from '../src/errors/InternalServerError'
 
 jest.mock('swagger-ui-express', () => ({
     serve: 'serve',
@@ -50,11 +51,7 @@ describe('Router', () => {
 
         it('creates custom 404 response', () => {
             router.custom404({} as unknown as Request, response)
-            const error: Error.ProblemDocument = {
-                title: ReasonPhrases.NOT_FOUND,
-                status: 404,
-            }
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, error)
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument())
         })
 
         it('creates custom 500 response', () => {
@@ -62,11 +59,7 @@ describe('Router', () => {
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)
-            const error500: Error.ProblemDocument = {
-                title: ReasonPhrases.INTERNAL_SERVER_ERROR,
-                status: 500,
-            }
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, error500)
+            expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument())
         })
 
         it('generates "docs" route', () => {

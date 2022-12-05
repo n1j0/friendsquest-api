@@ -27,11 +27,11 @@ export default class FootprintController {
         }
         try {
             const footprint = await this.footprintRepository.getFootprintById(id)
-            if (footprint) {
-                return response.status(200).json(footprint)
-            }
-            return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
+            return response.status(200).json(footprint)
         } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
+            }
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
