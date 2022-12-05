@@ -31,7 +31,7 @@ export class UserRouter implements RouterInterface {
 
     getAllUsersHandler = (_request: Request, response: Response) => this.userController.getAllUsers(response)
 
-    generateAllUsersHandlerRoute = () => {
+    generateAllUsersRoute = () => {
         /**
          * @openapi
          * /users:
@@ -312,7 +312,7 @@ export class UserRouter implements RouterInterface {
     }
 
     createAndReturnRoutes = () => {
-        this.generateAllUsersHandlerRoute()
+        this.generateAllUsersRoute()
         this.generateGetUserByIdRoute()
         this.generateGetUserByUidRoute()
         this.generateCreateUserRoute()

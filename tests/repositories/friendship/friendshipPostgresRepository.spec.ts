@@ -134,4 +134,22 @@ describe('FriendshipPostgresRepository', () => {
 
         // TODO: mock wrap().assign() and check if it was called with the correct arguments
     })
+
+    it('declines or deletes a friendship', async () => {
+        const removeAndFlush = jest.fn().mockResolvedValue(true)
+        // @ts-ignore
+        orm.forkEm.mockImplementation(() => ({
+            removeAndFlush,
+        }))
+
+        const friendship = {
+            id: 1,
+            foo: 'bar',
+        } as unknown as Friendship
+
+        await friendshipPostgresRepository.declineOrDeleteExistingFriendship(friendship)
+
+        expect(orm.forkEm).toHaveBeenCalled()
+        expect(removeAndFlush).toHaveBeenCalledWith(friendship)
+    })
 })
