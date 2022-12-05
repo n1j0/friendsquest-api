@@ -2,6 +2,7 @@ import { Route } from '../types/routes'
 import { UserRouter } from './userRouter.js'
 import { FootprintRouter } from './footprintRouter.js'
 import { FriendshipRouter } from './friendshipRouter.js'
+import { LeaderboardRouter } from './leaderboardRouter.js'
 
 export const routes: Route[] = [
     {
@@ -15,5 +16,9 @@ export const routes: Route[] = [
     {
         path: '/friendships',
         routerClass: FriendshipRouter,
+    },
+    {
+        path: '/leaderboard',
+        routerClass: LeaderboardRouter,
     },
 ]
