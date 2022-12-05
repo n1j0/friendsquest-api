@@ -17,21 +17,23 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "username": {
           "name": "username",
@@ -153,21 +155,23 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "invitor_id": {
           "name": "invitor_id",
@@ -194,6 +198,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "default": "'invited'",
           "enumItems": [
             "invited",
             "accepted"
@@ -255,21 +260,23 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "title": {
           "name": "title",
@@ -323,6 +330,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "0",
           "mappedType": "integer"
         },
         "image_url": {
@@ -386,21 +394,23 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "varchar(255)",
+          "type": "timestamptz(0)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "length": 6,
+          "mappedType": "datetime"
         },
         "created_by_id": {
           "name": "created_by_id",

@@ -12,6 +12,9 @@ jest.mock('@mikro-orm/core', () => ({
     Entity: jest.fn(),
     ManyToOne: jest.fn(),
     Enum: jest.fn(),
+    types: {
+        datetime: jest.fn(),
+    },
 }))
 
 jest.mock('../../../src/entities/friendship.js')
