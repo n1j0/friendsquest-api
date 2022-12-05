@@ -21,7 +21,7 @@ export default class Application {
         this.orm = orm
         this.server = server
         this.router = new Router(this.server, this.orm)
-        this.port = Number.parseInt(process.env.PORT as string, 10) || 3000
+        this.port = Number.parseInt(process.env.PORT as string, 10)
         initializeApp({ credential: cert(serviceAccountConfig) })
     }
 

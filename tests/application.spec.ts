@@ -50,10 +50,6 @@ describe('Application', () => {
         it('creates a new router instance', () => {
             expect(Router).toHaveBeenCalledWith(serverMock, ormMock)
         })
-
-        it('sets up fallback port', () => {
-            expect(app.port).toBe(1234)
-        })
     })
 
     describe('connect', () => {
