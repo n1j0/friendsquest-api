@@ -46,6 +46,6 @@ describe('MikroORM config', () => {
         expect(mikroOrmConfig.password).toBe('password')
         expect(mikroOrmConfig.dbName).toBe('dbName')
         expect(mikroOrmConfig.host).toBe('111.222.111')
-        expect(mikroOrmConfig.port).toBe(1234)
+        expect(mikroOrmConfig.port).toBe(3000)
     })
 })

@@ -3,6 +3,8 @@ import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
 import { cert, initializeApp } from 'firebase-admin/app'
+import * as Sentry from '@sentry/node'
+import * as Tracing from '@sentry/tracing'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
@@ -21,8 +23,23 @@ export default class Application {
         this.orm = orm
         this.server = server
         this.router = new Router(this.server, this.orm)
-        this.port = Number.parseInt(process.env.PORT as string, 10) || 3000
+        this.port = Number.parseInt(process.env.PORT as string, 10)
         initializeApp({ credential: cert(serviceAccountConfig) })
+        this.initSentry()
+    }
+
+    private initSentry(): void {
+        Sentry.init({
+            dsn: process.env.SENTRY_DSN,
+            integrations: [
+                // enable HTTP calls tracing
+                new Sentry.Integrations.Http({ tracing: true }),
+                // enable Express.js middleware tracing
+                new Tracing.Integrations.Express({ app: this.server }),
+            ],
+
+            tracesSampleRate: 1,
+        })
     }
 
     migrate = async (): Promise<void> => {
@@ -43,6 +60,8 @@ export default class Application {
         this.server.use(helmet())
         this.server.use(cors())
         this.server.use(compression())
+        this.server.use(Sentry.Handlers.requestHandler())
+        this.server.use(Sentry.Handlers.tracingHandler())
 
         this.server.disable('x-powered-by')
 

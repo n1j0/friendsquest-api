@@ -55,7 +55,9 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
 
     acceptFriendship = async (friendship: Friendship) => {
         const em = this.orm.forkEm()
-        wrap(friendship).assign({ status: FriendshipStatus.ACCEPTED })
+        wrap(friendship).assign({
+            status: FriendshipStatus.ACCEPTED,
+        })
         return em.persistAndFlush(friendship)
     }
 

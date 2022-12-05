@@ -82,12 +82,14 @@ describe('Router', () => {
             expect(server.use).toHaveBeenNthCalledWith(4, '/firebase', 'firebaseRoutes')
         })
 
+        it.todo('sets sentry middleware')
+
         it('sets custom 404 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(5, router.custom404)
+            expect(server.use).toHaveBeenNthCalledWith(6, router.custom404)
         })
 
         it('sets custom 500 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(6, router.custom500)
+            expect(server.use).toHaveBeenNthCalledWith(7, router.custom500)
         })
     })
 

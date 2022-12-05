@@ -70,11 +70,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return user
     }
 
-    updateUser = async (id: number | string, userData: any) => {
+    updateUser = async (uid: string, userData: any) => {
         const em = this.orm.forkEm()
         const user = await em.findOneOrFail(
             'User',
-            { id } as any,
+            { uid } as any,
             { failHandler: () => { throw new NotFoundError() } },
         )
         wrap(user).assign(userData)
@@ -82,11 +82,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return user
     }
 
-    deleteUser = async (id: number | string) => {
+    deleteUser = async (uid: string) => {
         const em = this.orm.forkEm()
         const user = await em.findOneOrFail(
             'User',
-            { id } as any,
+            { uid } as any,
             { failHandler: () => { throw new NotFoundError() } },
         )
         return em.removeAndFlush(user)

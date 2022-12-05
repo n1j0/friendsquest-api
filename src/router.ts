@@ -3,6 +3,7 @@ import swaggerUi from 'swagger-ui-express'
 import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
+import * as Sentry from '@sentry/node'
 import { openapiSpecification } from './docs/swagger.js'
 import { firebaseRoutes } from './router/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
@@ -49,19 +50,23 @@ export class Router {
 
         this.server.use(actuator())
 
-        const router = ExpressRouter()
-
         routes.forEach((route) => {
             this.server.use(
                 route.path,
                 authMiddleware(auth),
                 // eslint-disable-next-line new-cap
-                new route.routerClass(router, this.orm).createAndReturnRoutes(),
+                new route.routerClass(ExpressRouter(), this.orm).createAndReturnRoutes(),
             )
         })
 
         // TODO: remove this when ready for production
         this.server.use('/firebase', firebaseRoutes)
+
+        this.server.use(Sentry.Handlers.errorHandler({
+            shouldHandleError() {
+                return true
+            },
+        }))
 
         // custom 404
         this.server.use(this.custom404)
