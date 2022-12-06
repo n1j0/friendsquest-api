@@ -63,9 +63,9 @@ export class FriendshipRouter implements RouterInterface {
          *              items:
          *               $ref: '#/components/schemas/ExportFriendship'
          *      403:
-         *        description: Forbidden access or invalid token
+         *        $ref: '#/components/responses/Forbidden'
          *      404:
-         *        description: User not found
+         *        $ref: '#/components/responses/NotFound'
          */
         this.router.get('/', this.getFriendshipsHandler)
     }
@@ -110,9 +110,9 @@ export class FriendshipRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/ExportFriendship'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: User not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.post('/', this.createFriendshipHandler)
     }
@@ -154,9 +154,9 @@ export class FriendshipRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Friendship'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: Friendship not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.patch('/:id', this.acceptFriendshipHandler)
     }
@@ -197,9 +197,9 @@ export class FriendshipRouter implements RouterInterface {
          *       204:
          *         description: Ok
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: Friendship not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.delete('/:id', this.declineOrDeleteFriendshipHandler)
     }

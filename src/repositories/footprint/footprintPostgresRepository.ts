@@ -11,7 +11,7 @@ import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
-    private footprintService: FootprintService
+    private readonly footprintService: FootprintService
 
     private userRepository: UserRepositoryInterface
 
@@ -70,6 +70,24 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
     getAllFootprints = async () => {
         const em = this.orm.forkEm()
         return em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
+    }
+
+    getFootprintsOfFriendsAndUser = async (uid: string) => {
+        const em = this.orm.forkEm()
+        const user = await em.findOneOrFail(
+            'User',
+                { uid } as any,
+                { failHandler: () => { throw new NotFoundError('User') } },
+        )
+        const friendships = await em.find(
+            'Friendship',
+            { $or: [{ invitor: user }, { invitee: user }] } as any,
+            { fields: [{ invitor: ['id'] }, { invitee: ['id'] }] },
+        )
+        const friends = friendships.map(
+            friendship => (friendship.invitor.id === user.id ? friendship.invitee.id : friendship.invitor.id),
+        )
+        return em.find('Footprint', { createdBy: [ user, ...friends ] } as any)
     }
 
     getFootprintById = async (uid: string, id: string | number) => {

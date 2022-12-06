@@ -9,7 +9,7 @@ export class AttributeIsMissingError extends Error {
         return Mapper.mapError({
             detail: `${(fieldName)} is missing.`,
             status: 400,
-            type: `http://tempuri.org/${getReasonPhrase(400)}`,
+            type: `http://tempuri.org/${getReasonPhrase(400).trim()}`,
         })
     }
 }

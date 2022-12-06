@@ -159,7 +159,7 @@ describe('FootprintRouter', () => {
     describe('routes', () => {
         it('generates getAllFootprints route', () => {
             footprintRouter.generateGetAllFootprintsRoute()
-            expect(router.get).toHaveBeenCalledWith('/', footprintRouter.getAllFootprintsHandler)
+            expect(router.get).toHaveBeenCalledWith('/all', footprintRouter.getAllFootprintsHandler)
         })
 
         it('generates generateCreateFootprintReaction route', () => {

@@ -56,7 +56,7 @@ export class UserRouter implements RouterInterface {
          *               items:
          *                 $ref: '#/components/schemas/User'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          */
         this.router.get('/', this.getAllUsersHandler)
     }
@@ -95,9 +95,9 @@ export class UserRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/User'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: User not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.get('/:id', this.getUserByIdHandler)
     }
@@ -136,9 +136,9 @@ export class UserRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/User'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: User not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.get('/uid/:uid', this.getUserByUidHandler)
     }
@@ -197,9 +197,9 @@ export class UserRouter implements RouterInterface {
          *       201:
          *         description: Returns the created user
          *       400:
-         *         description: Username or email already exists
+         *         $ref: '#/components/responses/BadRequest'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          */
         this.router.post('/', this.createUserHandler)
     }
@@ -262,9 +262,9 @@ export class UserRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/User'
          *       400:
-         *         description: Email or Username already taken
+         *         $ref: '#/components/responses/BadRequest'
          *       404:
-         *         description: User not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.patch(
             '/',
@@ -301,9 +301,9 @@ export class UserRouter implements RouterInterface {
          *               type: object
          *               ref: '#/components/schemas/User'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       404:
-         *         description: User not found
+         *         $ref: '#/components/responses/NotFound'
          */
         this.router.delete(
             '/',

@@ -8,6 +8,7 @@ export interface FootprintRepositoryInterface {
         { id, message, uid }: { id: number | string, message: string, uid: string },
     ): Promise<FootprintReaction>
     getAllFootprints(): Promise<object[]>
+    getFootprintsOfFriendsAndUser(uid: string): Promise<object[]>
     getFootprintById(uid: string, id: number | string): Promise<Footprint>
     getFootprintReactions(id: number | string): Promise<any[]>
 }

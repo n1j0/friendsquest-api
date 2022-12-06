@@ -44,7 +44,7 @@ export class FootprintRouter implements RouterInterface {
     generateGetAllFootprintsRoute = () => {
         /**
          * @openapi
-         * /footprints:
+         * /footprints/all:
          *   get:
          *     summary: Returns all footprints
          *     tags:
@@ -66,11 +66,11 @@ export class FootprintRouter implements RouterInterface {
          *               items:
          *                 $ref: '#/components/schemas/Footprint'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.get('/', this.getAllFootprintsHandler)
+        this.router.get('/all', this.getAllFootprintsHandler)
     }
 
     createFootprintReactionHandler = (
@@ -120,9 +120,9 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/FootprintReaction'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.post('/:id/reactions', this.createFootprintReactionHandler)
     }
@@ -164,7 +164,7 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Footprint'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          */
         this.router.get('/:id', this.getFootprintByIdHandler)
     }
@@ -208,9 +208,9 @@ export class FootprintRouter implements RouterInterface {
          *               items:
          *                 $ref: '#/components/schemas/FootprintReaction'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
     }
@@ -269,11 +269,11 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Footprint'
          *       400:
-         *         description: Missing required fields
+         *         $ref: '#/components/responses/BadRequest'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.post(
             '/',
@@ -285,8 +285,49 @@ export class FootprintRouter implements RouterInterface {
         )
     }
 
+    getFootprintsOfFriendsAndUserHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.getFootprintsOfFriendsAndUser(
+        { uid: request.headers[AUTH_HEADER_UID] as string },
+        response,
+    )
+
+    generateGetFootprintsOfFriendsAndUserRoute = () => {
+        /**
+         * @openapi
+         * /footprints:
+         *   get:
+         *     summary: Returns footprints from friends and the user itself
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: header
+         *         name: X-Auth
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Authorization header
+         *     responses:
+         *       200:
+         *         description: Returns footprints
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/Footprint'
+         *       403:
+         *         description: Forbidden access or invalid token
+         *       500:
+         *         description: Error
+         */
+        this.router.get('/', this.getFootprintsOfFriendsAndUserHandler)
+    }
+
     createAndReturnRoutes = () => {
         this.generateGetAllFootprintsRoute()
+        this.generateGetFootprintsOfFriendsAndUserRoute()
         this.generateCreateFootprintReactionRoute()
         this.generateGetFootprintByIdRoute()
         this.generateGetFootprintReactionsRoute()

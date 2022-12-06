@@ -1,11 +1,16 @@
 import { Auth } from 'firebase-admin/auth'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { firebaseAuthMiddleware } from '../../src/middlewares/firebaseAuth'
 import responseMock from '../helper/responseMock'
 
-const response = responseMock
-
 describe('FirebaseAuth', () => {
+    let response: Response
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        response = responseMock
+    })
+
     it('throws an error if firebaseAuth is not passed in', () => {
         expect(() => firebaseAuthMiddleware(undefined as unknown as Auth))
             .toThrow('Firebase Admin auth service MUST BE passed into setup!')
@@ -43,8 +48,10 @@ describe('FirebaseAuth', () => {
         await middleware(request as unknown as Request, response, jest.fn())
         expect(response.status).toHaveBeenCalledWith(403)
         expect(response.json).toHaveBeenCalledWith({
-            error: 'error',
-            ok: false,
+            detail: 'error',
+            status: 403,
+            title: 'Forbidden',
+            type: 'http://tempuri.org/Forbidden',
         })
     })
 
@@ -63,8 +70,10 @@ describe('FirebaseAuth', () => {
         await middleware(request as unknown as Request, response, jest.fn())
         expect(response.status).toHaveBeenCalledWith(401)
         expect(response.json).toHaveBeenCalledWith({
-            error: 'MISSING OR MALFORMED AUTH',
-            ok: false,
+            detail: 'MISSING OR MALFORMED AUTH',
+            status: 401,
+            title: 'Unauthorized',
+            type: 'http://tempuri.org/Unauthorized',
         })
     })
 
@@ -132,8 +141,10 @@ describe('FirebaseAuth', () => {
         }
         await middleware(request as unknown as Request, response, jest.fn())
         expect(response.json).toHaveBeenCalledWith({
-            error: 'UNAUTHORIZED',
-            ok: false,
+            detail: 'UNAUTHORIZED',
+            status: 403,
+            title: 'Forbidden',
+            type: 'http://tempuri.org/Forbidden',
         })
     })
 })

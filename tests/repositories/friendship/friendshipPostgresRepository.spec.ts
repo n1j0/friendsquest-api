@@ -31,7 +31,7 @@ describe('FriendshipPostgresRepository', () => {
         friendshipPostgresRepository = new FriendshipPostgresRepository(userRepository, orm)
     })
 
-    it('returns all friendships for given user id', async () => {
+    it('returns all friendships of given user id', async () => {
         const execute = jest.fn().mockReturnValue('friendships')
         const getConnection = jest.fn().mockImplementation(() => ({
             execute,
@@ -39,6 +39,7 @@ describe('FriendshipPostgresRepository', () => {
         // @ts-ignore
         orm.forkEm.mockImplementation(() => ({
             getConnection,
+            findOneOrFail: jest.fn(),
         }))
 
         const friendships = await friendshipPostgresRepository.getFriendships(1)

@@ -17,6 +17,24 @@
 import { NextFunction, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
 import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants/index.js'
+import ErrorController from '../controller/errorController.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
+import { ForbiddenError } from '../errors/ForbiddenError.js'
+import { UnauthorizedError } from '../errors/UnauthorizedError.js'
+
+function authFailed(response: Response, status: number, error: string) {
+    switch (status) {
+    case 401: {
+        return ErrorController.sendError(response, UnauthorizedError.getErrorDocument(error))
+    }
+    case 403: {
+        return ErrorController.sendError(response, ForbiddenError.getErrorDocument(error))
+    }
+    default: {
+        return ErrorController.sendError(response, InternalServerError.getErrorDocument(error))
+    }
+    }
+}
 
 export const firebaseAuthMiddleware = (
     firebaseAuth: Auth,
@@ -24,7 +42,6 @@ export const firebaseAuthMiddleware = (
         checkRevoked = false,
         attachUserTo = AUTH_HEADER_UID,
         authHeaderKey = AUTH_HEADER_KEY,
-        errorJSON = { ok: false },
         errorMessage = (errorObject: { message: any }) => errorObject.message || 'UNAUTHORIZED',
     } = {},
 ) => {
@@ -34,13 +51,6 @@ export const firebaseAuthMiddleware = (
 
     if (typeof errorMessage !== 'function') {
         throw new TypeError('Only Functions or Strings are allowed for errorMessage')
-    }
-
-    function authFailed(response: Response, status: number, error: string) {
-        return response.status(status).json({
-            error,
-            ...errorJSON,
-        })
     }
 
     return async function auth(request: Request, response: Response, next: NextFunction) {

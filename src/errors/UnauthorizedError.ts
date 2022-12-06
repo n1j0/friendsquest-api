@@ -5,13 +5,13 @@ import {
 import { Mapper } from './ProblemDocument.js'
 import { ProblemDocument } from '../types/problemDocument'
 
-export class InternalServerError extends Error {
+export class UnauthorizedError extends Error {
     // eslint-disable-next-line no-unused-vars
-    static getErrorDocument(ErrorString?: string): ProblemDocument {
+    static getErrorDocument(ErrorString: string = 'Unauthorized'): ProblemDocument {
         return Mapper.mapError({
             detail: `${(ErrorString)}`,
-            status: StatusCodes.INTERNAL_SERVER_ERROR,
-            type: `http://tempuri.org/${getReasonPhrase(500).replace(/\s+/g, '')}`,
+            status: StatusCodes.UNAUTHORIZED,
+            type: `http://tempuri.org/${getReasonPhrase(401).replace(/\s+/g, '')}`,
         })
     }
 }
