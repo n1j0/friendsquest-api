@@ -44,8 +44,7 @@ describe('FriendshipPostgresRepository', () => {
         const friendships = await friendshipPostgresRepository.getFriendships(1)
 
         expect(orm.forkEm).toHaveBeenCalled()
-        // eslint-disable-next-line max-len
-        expect(friendships).toBe('friendships')
+        expect(friendships).toStrictEqual([])
     })
 
     it('returns one friendship by id', async () => {
