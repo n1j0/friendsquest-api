@@ -5,6 +5,7 @@ import { FriendshipPostgresRepository } from '../../../src/repositories/friendsh
 import { User } from '../../../src/entities/user'
 import { FriendshipAlreadyExistsError } from '../../../src/errors/FriendshipAlreadyExistsError'
 import { Friendship } from '../../../src/entities/friendship'
+import { UserRepositoryInterface } from '../../../src/repositories/user/userRepositoryInterface'
 
 jest.mock('@mikro-orm/core', () => ({
     PrimaryKey: jest.fn(),
@@ -12,17 +13,22 @@ jest.mock('@mikro-orm/core', () => ({
     Entity: jest.fn(),
     ManyToOne: jest.fn(),
     Enum: jest.fn(),
+    types: {
+        datetime: jest.fn(),
+    },
 }))
 
 jest.mock('../../../src/entities/friendship.js')
 
 describe('FriendshipPostgresRepository', () => {
     let orm: ORM
+    let userRepository: UserRepositoryInterface
     let friendshipPostgresRepository: FriendshipRepositoryInterface
 
     beforeEach(() => {
         orm = mock<ORM>()
-        friendshipPostgresRepository = new FriendshipPostgresRepository(orm)
+        userRepository = mock<UserRepositoryInterface>()
+        friendshipPostgresRepository = new FriendshipPostgresRepository(userRepository, orm)
     })
 
     it('returns all friendships of given user id', async () => {

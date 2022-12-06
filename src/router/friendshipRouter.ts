@@ -12,26 +12,17 @@ import { UserService } from '../services/userService.js'
 export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
 
-    private readonly userService: UserService
-
-    private readonly friendshipRepository: FriendshipRepositoryInterface
-
-    private readonly userRepository: UserRepositoryInterface
-
     private readonly friendshipController: FriendshipController
 
     constructor(
         router: Router,
         orm: ORM,
         userService: UserService = new UserService(),
-        friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(orm),
         userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         friendshipController: FriendshipController = new FriendshipController(friendshipRepository, userRepository),
     ) {
         this.router = router
-        this.userService = userService
-        this.friendshipRepository = friendshipRepository
-        this.userRepository = userRepository
         this.friendshipController = friendshipController
     }
 
@@ -203,8 +194,8 @@ export class FriendshipRouter implements RouterInterface {
          *           required: true
          *           description: Numeric ID of the friendship to delete
          *     responses:
-         *       200:
-         *         description: Returns message that friendship was deleted
+         *       204:
+         *         description: Ok
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:

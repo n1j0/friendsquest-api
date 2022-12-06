@@ -8,6 +8,8 @@ import { FootprintPostgresRepository } from '../../src/repositories/footprint/fo
 import { FootprintRouter } from '../../src/router/footprintRouter'
 import responseMock from '../helper/responseMock'
 import { MulterFiles } from '../../src/types/multer'
+import { UserService } from '../../src/services/userService'
+import { UserRepositoryInterface } from '../../src/repositories/user/userRepositoryInterface'
 
 jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
     FootprintPostgresRepository: {},
@@ -22,6 +24,8 @@ describe('FootprintRouter', () => {
     let orm: ORM
     let footprintService: FootprintService
     let footprintRepository: FootprintRepositoryInterface
+    let userService: UserService
+    let userRepository: UserRepositoryInterface
     let footprintController: FootprintController
     let footprintRouter: FootprintRouter
     let response: Response
@@ -31,11 +35,15 @@ describe('FootprintRouter', () => {
         orm = mock<ORM>()
         footprintService = mockDeep<FootprintService>()
         footprintRepository = mock<FootprintPostgresRepository>()
+        userService = mock<UserService>()
+        userRepository = mock<UserRepositoryInterface>()
         footprintController = mock<FootprintController>()
         footprintRouter = new FootprintRouter(
             router,
             orm,
             footprintService,
+            userService,
+            userRepository,
             footprintRepository,
             footprintController,
         )
@@ -93,14 +101,18 @@ describe('FootprintRouter', () => {
 
         it('handles getFootprintById', () => {
             const id = 1
+            const uid = 'uid'
             const request = {
                 params: {
                     id,
                 },
+                headers: {
+                    uidHeader: uid,
+                },
             } as unknown as Request
             footprintRouter.getFootprintByIdHandler(request, response)
             expect(footprintController.getFootprintById).toHaveBeenCalledWith(
-                { id },
+                { uid, id },
                 response,
             )
         })

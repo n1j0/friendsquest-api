@@ -18,6 +18,9 @@ export class User extends BaseEntity {
     @Property({ unique: true, index: true })
     public friendsCode?: string
 
+    @Property()
+    public points: number = 0
+
     constructor(email: string, uid: string, username: string) {
         super()
         this.email = email

@@ -4,6 +4,7 @@ import { User } from '../../entities/user.js'
 import { NotFoundError } from '../../errors/NotFoundError'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
+import Points from '../../constants/points'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
@@ -58,11 +59,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     createUser = async (user: User) => {
         const em = this.orm.forkEm()
         await em.persistAndFlush(user)
-        const userInDatabase = await em.findOneOrFail(
-            'User',
-            { uid: user.uid } as any,
-            { failHandler: () => { throw new NotFoundError() } },
-        )
+        const userInDatabase = await this.getUserByUid(user.uid)
         // TODO: don't forget to handle the errors "numberToBase36String" can throw
         userInDatabase.friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
         wrap(user).assign(userInDatabase)
@@ -72,23 +69,28 @@ export class UserPostgresRepository implements UserRepositoryInterface {
 
     updateUser = async (uid: string, userData: any) => {
         const em = this.orm.forkEm()
-        const user = await em.findOneOrFail(
-            'User',
-            { uid } as any,
-            { failHandler: () => { throw new NotFoundError() } },
-        )
-        wrap(user).assign(userData)
+        const user = await this.getUserByUid(uid)
+        wrap(user).assign({
+            ...userData,
+            points: user.points + Points.PROFILE_EDITED,
+        })
         await em.persistAndFlush(user)
         return user
     }
 
     deleteUser = async (uid: string) => {
         const em = this.orm.forkEm()
-        const user = await em.findOneOrFail(
-            'User',
-            { uid } as any,
-            { failHandler: () => { throw new NotFoundError() } },
-        )
+        const user = await this.getUserByUid(uid)
         return em.removeAndFlush(user)
+    }
+
+    addPoints = async (uid: string, points: number) => {
+        const em = this.orm.forkEm()
+        const user = await this.getUserByUid(uid)
+        wrap(user).assign({
+            points: user.points + points,
+        })
+        await em.persistAndFlush(user)
+        return user
     }
 }

@@ -29,12 +29,12 @@ export default class FootprintController {
         }
     }
 
-    getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
+    getFootprintById = async ({ uid, id }: { uid: string, id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
-            const footprint = await this.footprintRepository.getFootprintById(id)
+            const footprint = await this.footprintRepository.getFootprintById(uid, id)
             return response.status(200).json(footprint)
         } catch (error: any) {
             if (error instanceof NotFoundError) {

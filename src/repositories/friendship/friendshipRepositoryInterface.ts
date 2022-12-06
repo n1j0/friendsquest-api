@@ -6,6 +6,6 @@ export interface FriendshipRepositoryInterface {
     getFriendshipById(id: number | string): Promise<Friendship>
     checkForExistingFriendship(invitor: User, invitee: User): Promise<void>
     createFriendship(invitor: User, invitee: User): Promise<Friendship>
-    acceptFriendship(friendship: Friendship): Promise<void>
+    acceptFriendship(friendship: Friendship): Promise<{ invitor: User, invitee: User }>
     declineOrDeleteExistingFriendship(friendship: Friendship): Promise<void>
 }
