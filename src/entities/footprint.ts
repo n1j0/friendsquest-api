@@ -1,4 +1,4 @@
-import { Collection, Entity, ManyToMany, ManyToOne, OneToMany, Property, types } from '@mikro-orm/core'
+import { Collection, Entity, Formula, ManyToMany, ManyToOne, OneToMany, Property, types } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'
 // eslint-disable-next-line import/no-cycle
@@ -21,8 +21,9 @@ export class Footprint extends BaseEntity {
     @Property({ type: types.double })
     public longitude!: string
 
+    @Formula(() => '(SELECT COUNT(*) FROM "user_footprints")')
     @Property()
-    public viewCount: number = 0
+    public viewCount?: number = 0
 
     @Property()
     public imageURL!: string

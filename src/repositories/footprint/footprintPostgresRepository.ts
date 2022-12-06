@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { ORM } from '../../orm.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
@@ -46,10 +45,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             photoURL,
             audioURL,
         )
-        await Promise.all([
-            em.persistAndFlush(footprint),
-            this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED),
-        ])
+        await em.persistAndFlush(footprint)
+        await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
         return footprint
     }
 
@@ -60,10 +57,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
         ])
         const reaction = new FootprintReaction(user, message, footprint)
-        await Promise.all([
-            em.persistAndFlush(reaction),
-            this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION),
-        ])
+        await em.persistAndFlush(reaction)
+        await this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION)
         return reaction
     }
 
@@ -89,15 +84,18 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
 
     getFootprintById = async (uid: string, id: string | number) => {
         const em = this.orm.forkEm()
-        const footprint = await this.findFootprintById(id)
-        wrap(footprint).assign({
-            viewCount: footprint.viewCount + 1,
-        })
-        await Promise.all([
-            em.persistAndFlush(footprint),
-            this.userRepository.addPoints(uid, Points.FOOTPRINT_VIEWED),
+        const [ footprint, user ] = await Promise.all([
+            this.findFootprintById(id),
+            this.userRepository.getUserByUid(uid),
         ])
-        return footprint
+        footprint.users.add(user)
+        try {
+            await em.persistAndFlush(footprint)
+            await this.userRepository.addPoints(uid, Points.FOOTPRINT_VIEWED)
+            return this.findFootprintById(id)
+        } catch {
+            return footprint
+        }
     }
 
     getFootprintReactions = async (id: number | string) => {

@@ -12,7 +12,6 @@ export class FootprintSeeder extends Seeder {
             imageURL: 'https://firebasestorage.googleapis.com/v0/b/friends-quest.appspot.com/o/footprints%2Fdata%2Fuser%2F0%2Fat.friendsquest.app%2Fcache%2FCAP8581917939745183878.jpg?alt=media&token=4c705905-10f5-4033-8835-cc3bb7310199',
             latitude: '47.723738',
             longitude: '13.088369',
-            viewCount: 0,
             title: 'Hello world',
         })
     }

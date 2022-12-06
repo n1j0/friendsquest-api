@@ -90,7 +90,9 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         wrap(user).assign({
             points: user.points + points,
         })
-        await em.persistAndFlush(user)
+        try {
+            await em.persistAndFlush(user)
+        } catch { /* empty */ }
         return user
     }
 }
