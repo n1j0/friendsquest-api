@@ -50,8 +50,12 @@ export default class FriendshipController {
         if (!userId) {
             return this.idNotFoundError(response)
         }
-        const friendships = await this.friendshipRepository.getFriendships(userId)
-        return response.status(200).json(this.mapFriendshipsToObject(friendships))
+        try {
+            const friendships = await this.friendshipRepository.getFriendships(userId)
+            return response.status(200).json(this.mapFriendshipsToObject(friendships))
+        } catch (error: any) {
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
     }
 
     createFriendship = async ({ friendsCode, uid }: { friendsCode: string, uid: string }, response: Response) => {

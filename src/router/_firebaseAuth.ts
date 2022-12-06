@@ -21,7 +21,7 @@ const router = express.Router()
  *       200:
  *         description: Returns the idToken
  *       500:
- *         description: Internal server error
+ *         $ref: '#/components/responses/InternalServerError'
  */
 router.get('/token', async (request: Request, response: Response) => {
     const user = request.headers.userid as string

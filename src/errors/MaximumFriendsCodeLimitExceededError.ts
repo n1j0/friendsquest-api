@@ -9,7 +9,7 @@ export class MaximumFriendsCodeLimitExceededError extends Error {
         return Mapper.mapError({
             detail: 'There are no more friends codes available.',
             status: 500,
-            type: `http://tempuri.org/${getReasonPhrase(500)}`,
+            type: `http://tempuri.org/${getReasonPhrase(500).replace(/\s+/g, '')}`,
         })
     }
 }

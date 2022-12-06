@@ -1,0 +1,206 @@
+components:
+  ####################
+  # Common data models
+  ####################
+  schemas:
+    ProblemDetailsModel:
+      description: 'Implementation of [RFC7807](https://tools.ietf.org/html/rfc7807) Problem Details object.  Content type should always be ```application/problem+json```.  Problem type definitions MAY extend the problem details object with additional members'
+      type: object
+      required:
+        - title
+        - status
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          format: uri
+          description: 'A type URI'
+          example: 'http://tempuri.org/problems/400'
+        title:
+          type: string
+          description: 'A short, human-readable summary of the problem type'
+          example: 'Bad Request'
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          description: 'The HTTP status code for this occurrence of the problem'
+          example: 400
+        detail:
+          type: string
+          description: 'A human-readable explanation specific to this occurrence of the problem'
+          example: 'The request is invalid.'
+        #issues:
+        #  type: array
+        #  description: 'A list of issues that exist with the request. Note this is an extension that is supported by the RFC but specific to Advanced.'
+        #  maxItems: 50
+        #  items:
+        #    type: object
+        #    additionalProperties: false
+        #    properties:
+        #      fieldName:
+        #        type: string
+        #      error:
+        #        type: string
+        #  example:
+        #    - fieldName: 'fieldName'
+        #      error: 'This is the problem with the field'
+        #    - fieldName: 'fieldOther'
+        #      error: 'This is the problem with the field'
+        #instance:
+        #  type: string
+        #  description: 'A URI reference that identifies the specific occurrence of the problem.  It may or may not yield further information if dereferenced'
+        #  example: 'http://tempuri.org/problems/74837463'
+  ####################
+  # Common responses
+  ####################
+  responses:
+    ProblemResponse:
+      description: A problem occurred.  This is a generic object that can be reused in multiple scenarios.  The ProblemDetails object can be extended by the implementer where necessary.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/400'
+            title: 'Bad Request'
+            status: 400
+            detail: 'The request is invalid.'
+            #issues:
+            #  - fieldName: 'fieldName'
+            #    error: 'This is the problem with the field'
+            #  - fieldName: 'fieldOther'
+            #    error: 'This is the problem with the field'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/401'
+            title: 'Unauthorized'
+            status: 401
+    Forbidden:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/403'
+            title: 'Forbidden'
+            status: 403
+    NotFound:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/404'
+            title: 'Not Found'
+            status: 404
+            detail: 'The requested resource cannot be located.'
+    MethodNotAllowed:
+      description: Method Not Allowed
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/405'
+            title: 'Method Not Allowed'
+            status: 405
+            detail: 'The requested resource exists but the method is not allowed.'
+    NotAcceptable:
+      description: Not Acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/406'
+            title: 'Not Acceptable'
+            status: 406
+            detail: 'The server is unable to produce a response matching the list of acceptable values. The following types are available: application/json.'
+    Conflict:
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/409'
+            title: 'Conflict'
+            status: 409
+            detail: 'The request could not be completed due to a conflict with the current state of the target resource.'
+            #issues:
+            #  - fieldName: 'fieldName'
+            #    error: 'Value1 already exists against resource 1234 and must be unique'
+            #  - fieldName: 'fieldOther'
+            #    error: 'Value2 already exists against resource 1234 and must be unique'
+    UnsupportedMediaType:
+      description: Unsupported Media Type
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/415'
+            title: 'Unsupported Media Type'
+            status: 415
+            detail: 'The request could not be completed due to the request body being formed of an unsupported media type. Only application/json is accepted by this API.'
+    TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/429'
+            title: 'Too Many Requests'
+            status: 429
+            detail: 'The request could not be completed due to the client exceeding the request limit.'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/500'
+            title: 'An internal error occurred.'
+            status: 500
+            detail: 'The server is unable to process the request.'
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/503'
+            title: 'Service Unavailable.'
+            status: 503
+            detail: 'The service is down for maintenance or may be overloaded. Please try again later'
+    InternalServerErrorExtended:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsModel'
+          example:
+            type: 'http://tempuri.org/problems/500'
+            title: 'An internal error occurred.'
+            status: 500
+            detail: 'The server is unable to process the request.'
+            #instance: 'http://tempuri.org/problems/74837463'
