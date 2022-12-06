@@ -23,11 +23,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         const em = this.orm.forkEm()
         const connection = em.getConnection()
         // eslint-disable-next-line no-unused-vars
-        const user = await em.findOneOrFail(
-            'User',
-            { id: userId } as any,
-            { failHandler: () => { throw new NotFoundError('User not found') } },
-        )
+        await this.userRepository.getUserById(userId)
         // TODO: security issue!! userId is from query. So it could be eval input :(
         // TODO: try to simplify this statement as well!
         // eslint-disable-next-line max-len

@@ -74,11 +74,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
 
     getFootprintsOfFriendsAndUser = async (uid: string) => {
         const em = this.orm.forkEm()
-        const user = await em.findOneOrFail(
-            'User',
-                { uid } as any,
-                { failHandler: () => { throw new NotFoundError('User') } },
-        )
+        const user = await this.userRepository.getUserByUid(uid)
+        // TODO: outsource to friendshipRepository
         const friendships = await em.find(
             'Friendship',
             { $or: [{ invitor: user }, { invitee: user }] } as any,
