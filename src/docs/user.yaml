@@ -39,3 +39,13 @@ components:
           description: The imageURL of the avatar of the user
           example: https://example.com/image.png
           required: false
+        friendsCode:
+          type: string
+          description: The friends code of the user
+          example: 0zdhg
+          required: true
+        points:
+          type: number
+          description: The points of the user
+          example: 100
+          required: true
