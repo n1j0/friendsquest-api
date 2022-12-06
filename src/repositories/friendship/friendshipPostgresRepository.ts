@@ -19,27 +19,26 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         this.orm = orm
     }
 
-    getFriendships = async (userId: number | string) => {
+    getFriendshipsWithSpecifiedOptions = async (user: User, options: {} = {}) => {
         const em = this.orm.forkEm()
-        const user = await this.userRepository.getUserById(userId)
-        const friendships = await em.find(
+        return em.find(
             'Friendship',
             { $or: [{ invitor: user }, { invitee: user }] } as any,
+            options,
         )
-        return Promise.all(friendships.map(
-            async (friendship) => {
-                const friend = await this.userRepository.getUserById(
-                    friendship.invitor.id === user.id
-                        ? friendship.invitee.id : friendship.invitor.id,
-                )
-                return {
-                    ...friendship,
-                    invitor: friendship.invitor.id,
-                    invitee: friendship.invitee.id,
-                    friend,
-                }
-            },
-        ))
+    }
+
+    getFriendships = async (userId: number | string) => {
+        const user = await this.userRepository.getUserById(userId)
+        const friendships = await this.getFriendshipsWithSpecifiedOptions(user, { populate: [ 'invitor', 'invitee' ] })
+        return friendships.map(
+            (friendship: Friendship) => ({
+                ...friendship,
+                invitor: friendship.invitor.id,
+                invitee: friendship.invitee.id,
+                friend: friendship.invitor.id === user.id ? friendship.invitee : friendship.invitor,
+            }),
+        )
     }
 
     getFriendshipById = async (id: number | string) => {

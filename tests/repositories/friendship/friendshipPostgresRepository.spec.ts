@@ -43,7 +43,6 @@ describe('FriendshipPostgresRepository', () => {
 
         const friendships = await friendshipPostgresRepository.getFriendships(1)
 
-        expect(orm.forkEm).toHaveBeenCalled()
         expect(friendships).toStrictEqual([])
     })
 
