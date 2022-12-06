@@ -155,7 +155,7 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Footprint'
          *       403:
-         *         http://tempuri.org/problems/
+         *         $ref: '#/components/responses/Forbidden'
          */
         this.router.get('/:id', this.getFootprintByIdHandler)
     }
