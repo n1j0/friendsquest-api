@@ -60,9 +60,9 @@ export class FootprintRouter implements RouterInterface {
          *               items:
          *                 $ref: '#/components/schemas/Footprint'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.get('/all', this.getAllFootprintsHandler)
     }
@@ -114,9 +114,9 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/FootprintReaction'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.post('/:id/reactions', this.createFootprintReactionHandler)
     }
@@ -155,7 +155,7 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Footprint'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          */
         this.router.get('/:id', this.getFootprintByIdHandler)
     }
@@ -199,9 +199,9 @@ export class FootprintRouter implements RouterInterface {
          *               items:
          *                 $ref: '#/components/schemas/FootprintReaction'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
     }
@@ -260,11 +260,11 @@ export class FootprintRouter implements RouterInterface {
          *             schema:
          *               $ref: '#/components/schemas/Footprint'
          *       400:
-         *         description: Missing required fields
+         *         $ref: '#/components/responses/BadRequest'
          *       403:
-         *         description: Forbidden access or invalid token
+         *         $ref: '#/components/responses/Forbidden'
          *       500:
-         *         description: Error
+         *         $ref: '#/components/responses/InternalServerError'
          */
         this.router.post(
             '/',

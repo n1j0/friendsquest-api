@@ -11,7 +11,7 @@ export class ForbiddenError extends Error {
         return Mapper.mapError({
             detail: `${(ErrorString)}`,
             status: StatusCodes.FORBIDDEN,
-            type: `http://tempuri.org/${getReasonPhrase(403)}`,
+            type: `http://tempuri.org/${getReasonPhrase(403).replace(/\s+/g, '')}`,
         })
     }
 }

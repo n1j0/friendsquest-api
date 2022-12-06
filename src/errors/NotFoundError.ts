@@ -10,7 +10,7 @@ export class NotFoundError extends Error {
         return Mapper.mapError({
             detail: `${parameter} you are looking for does not exist.`,
             status: StatusCodes.NOT_FOUND,
-            type: `http://tempuri.org/${getReasonPhrase(404)}`,
+            type: `http://tempuri.org/${getReasonPhrase(404).replace(/\s+/g, '')}`,
         })
     }
 }

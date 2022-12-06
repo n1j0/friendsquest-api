@@ -9,7 +9,7 @@ export class ValueAlreadyExistsError extends Error {
         return Mapper.mapError({
             detail: `${(fieldName)} already taken.`,
             status: 400,
-            type: `http://tempuri.org/${getReasonPhrase(400)}`,
+            type: `http://tempuri.org/${getReasonPhrase(400).replace(/\s+/g, '')}`,
         })
     }
 }
