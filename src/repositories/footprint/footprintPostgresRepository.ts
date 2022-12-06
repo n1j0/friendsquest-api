@@ -1,7 +1,6 @@
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { ORM } from '../../orm.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
-import { MulterFiles } from '../../types/multer.js'
 import { Footprint } from '../../entities/footprint.js'
 import { FootprintService } from '../../services/footprintService.js'
 import { NewFootprint } from '../../types/footprint.js'
@@ -44,7 +43,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const em = this.orm.forkEm()
         const [ user, [ photoURL, audioURL ] ] = await Promise.all([
             this.userRepository.getUserByUid(uid),
-            this.footprintService.uploadFilesToFireStorage(files as MulterFiles['files']),
+            this.footprintService.uploadFilesToFireStorage(files),
         ])
         const footprint = new Footprint(
             title,
