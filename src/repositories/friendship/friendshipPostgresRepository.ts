@@ -78,8 +78,8 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
             status: FriendshipStatus.ACCEPTED,
         })
         /* eslint-disable-next-line no-unused-vars */
-        const [ _, invitor, invitee ] = await Promise.all([
-            em.persistAndFlush(friendship),
+        await em.persistAndFlush(friendship)
+        const [ invitor, invitee ] = await Promise.all([
             this.userRepository.addPoints(friendship.invitor.uid, Points.NEW_FRIENDSHIP),
             this.userRepository.addPoints(friendship.invitee.uid, Points.NEW_FRIENDSHIP),
         ])
