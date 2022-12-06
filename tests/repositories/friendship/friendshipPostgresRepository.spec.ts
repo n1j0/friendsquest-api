@@ -12,6 +12,7 @@ jest.mock('@mikro-orm/core', () => ({
     Property: jest.fn(),
     Entity: jest.fn(),
     ManyToOne: jest.fn(),
+    ManyToMany: jest.fn(),
     Enum: jest.fn(),
     types: {
         datetime: jest.fn(),
