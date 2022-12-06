@@ -45,11 +45,11 @@ components:
           example: 16.3738189
           required: true
         viewCount:
-          type: number
+          type: string
           description: The view count of the footprint
-          example: 50
+          example: '50'
           required: false
-          default: 0
+          default: '0'
         imageURL:
           type: string
           description: The image URL of the footprint
