@@ -8,17 +8,26 @@ import { NewFootprint } from '../../types/footprint.js'
 import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points.js'
+import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService
 
-    private userRepository: UserRepositoryInterface
+    private readonly userRepository: UserRepositoryInterface
+
+    private readonly friendshipRepository: FriendshipRepositoryInterface
 
     private readonly orm: ORM
 
-    constructor(footprintService: FootprintService, userRepository: UserRepositoryInterface, orm: ORM) {
+    constructor(
+        footprintService: FootprintService,
+        userRepository: UserRepositoryInterface,
+        friendshipRepository: FriendshipRepositoryInterface,
+        orm: ORM,
+    ) {
         this.footprintService = footprintService
         this.userRepository = userRepository
+        this.friendshipRepository = friendshipRepository
         this.orm = orm
     }
 
@@ -70,10 +79,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
     getFootprintsOfFriendsAndUser = async (uid: string) => {
         const em = this.orm.forkEm()
         const user = await this.userRepository.getUserByUid(uid)
-        // TODO: outsource to friendshipRepository
-        const friendships = await em.find(
-            'Friendship',
-            { $or: [{ invitor: user }, { invitee: user }] } as any,
+        const friendships = await this.friendshipRepository.getFriendshipsWithSpecifiedOptions(
+            user,
             { fields: [{ invitor: ['id'] }, { invitee: ['id'] }] },
         )
         const friends = friendships.map(

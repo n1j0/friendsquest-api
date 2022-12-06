@@ -8,8 +8,6 @@ import { LeaderboardPostgresRepository } from '../repositories/leaderboard/leade
 export class LeaderboardRouter implements RouterInterface {
     private readonly router: Router
 
-    private readonly leaderboardRepository: LeaderboardRepositoryInterface
-
     private readonly leaderboardController: LeaderboardController
 
     constructor(
@@ -19,7 +17,6 @@ export class LeaderboardRouter implements RouterInterface {
         leaderboardController: LeaderboardController = new LeaderboardController(leaderboardRepository),
     ) {
         this.router = router
-        this.leaderboardRepository = leaderboardRepository
         this.leaderboardController = leaderboardController
     }
 

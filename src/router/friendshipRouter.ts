@@ -26,7 +26,7 @@ export class FriendshipRouter implements RouterInterface {
         this.friendshipController = friendshipController
     }
 
-    getFriendshipsHandler = (request: Request, response: Response) => this.friendshipController.getFriendships(
+    getFriendshipsHandler = (request: Request, response: Response) => this.friendshipController.getFriendshipsByUid(
         { userId: String(request.query.userId) },
         response,
     )

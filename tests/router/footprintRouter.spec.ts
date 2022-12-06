@@ -10,6 +10,7 @@ import responseMock from '../helper/responseMock'
 import { MulterFiles } from '../../src/types/multer'
 import { UserService } from '../../src/services/userService'
 import { UserRepositoryInterface } from '../../src/repositories/user/userRepositoryInterface'
+import { FriendshipRepositoryInterface } from '../../src/repositories/friendship/friendshipRepositoryInterface'
 
 jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
     FootprintPostgresRepository: {},
@@ -26,6 +27,7 @@ describe('FootprintRouter', () => {
     let footprintRepository: FootprintRepositoryInterface
     let userService: UserService
     let userRepository: UserRepositoryInterface
+    let friendshipRepository: FriendshipRepositoryInterface
     let footprintController: FootprintController
     let footprintRouter: FootprintRouter
     let response: Response
@@ -37,6 +39,7 @@ describe('FootprintRouter', () => {
         footprintRepository = mock<FootprintPostgresRepository>()
         userService = mock<UserService>()
         userRepository = mock<UserRepositoryInterface>()
+        friendshipRepository = mock<FriendshipRepositoryInterface>()
         footprintController = mock<FootprintController>()
         footprintRouter = new FootprintRouter(
             router,
@@ -44,6 +47,7 @@ describe('FootprintRouter', () => {
             footprintService,
             userService,
             userRepository,
+            friendshipRepository,
             footprintRepository,
             footprintController,
         )

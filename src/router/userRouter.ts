@@ -10,10 +10,6 @@ import { UserService } from '../services/userService.js'
 export class UserRouter implements RouterInterface {
     private readonly router: Router
 
-    private readonly userService: UserService
-
-    private readonly userRepository: UserRepositoryInterface
-
     private readonly userController: UserController
 
     constructor(
@@ -24,8 +20,6 @@ export class UserRouter implements RouterInterface {
         userController: UserController = new UserController(userRepository),
     ) {
         this.router = router
-        this.userService = userService
-        this.userRepository = userRepository
         this.userController = userController
     }
 

@@ -27,12 +27,12 @@ export default class FriendshipController {
         ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
     }
 
-    getFriendships = async ({ userId }: { userId: string }, response: Response) => {
+    getFriendshipsByUid = async ({ userId }: { userId: string }, response: Response) => {
         if (!userId) {
             return this.idNotFoundError(response)
         }
         try {
-            return response.status(200).json(await this.friendshipRepository.getFriendships(userId))
+            return response.status(200).json(await this.friendshipRepository.getFriendshipsByUid(userId))
         } catch (error: any) {
             if (error instanceof NotFoundError) {
                 return this.friendshipNotFoundError(response)

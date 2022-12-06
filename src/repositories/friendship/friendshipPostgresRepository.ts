@@ -28,7 +28,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         )
     }
 
-    getFriendships = async (userId: number | string) => {
+    getFriendshipsByUid = async (userId: number | string) => {
         const user = await this.userRepository.getUserById(userId)
         const friendships = await this.getFriendshipsWithSpecifiedOptions(user, { populate: [ 'invitor', 'invitee' ] })
         return friendships.map(

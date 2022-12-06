@@ -41,7 +41,7 @@ describe('FriendshipPostgresRepository', () => {
             findOneOrFail: jest.fn(),
         }))
 
-        const friendships = await friendshipPostgresRepository.getFriendships(1)
+        const friendships = await friendshipPostgresRepository.getFriendshipsByUid(1)
 
         expect(friendships).toStrictEqual([])
     })
