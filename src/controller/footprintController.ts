@@ -21,6 +21,14 @@ export default class FootprintController {
         }
     }
 
+    getFootprintsOfFriendsAndUser = async ({ uid }: { uid: string }, response: Response) => {
+        try {
+            return response.status(200).json(await this.footprintRepository.getFootprintsOfFriendsAndUser(uid))
+        } catch (error: any) {
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
     getFootprintById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
