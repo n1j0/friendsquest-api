@@ -1,14 +1,14 @@
 import { Response } from 'express'
 import { User } from '../entities/user.js'
 import ErrorController from './errorController.js'
-import { NotFoundError } from '../errors/NotFoundError'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { ValueAlreadyExistsError } from '../errors/ValueAlreadyExistsError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
-import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError'
-import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError'
+import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError.js'
+import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
 
 export default class UserController {
     private userRepository: UserRepositoryInterface

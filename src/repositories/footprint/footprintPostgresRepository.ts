@@ -7,7 +7,7 @@ import { FootprintService } from '../../services/footprintService.js'
 import { NewFootprint } from '../../types/footprint.js'
 import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
-import Points from '../../constants/points'
+import Points from '../../constants/points.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService

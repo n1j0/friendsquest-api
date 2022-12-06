@@ -1,10 +1,10 @@
 import { wrap } from '@mikro-orm/core'
 import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
-import { NotFoundError } from '../../errors/NotFoundError'
+import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
-import Points from '../../constants/points'
+import Points from '../../constants/points.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService

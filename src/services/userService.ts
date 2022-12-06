@@ -1,4 +1,4 @@
-import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError'
+import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError.js'
 import { FRIENDS_CODE_LENGTH } from '../constants/index.js'
 import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
 

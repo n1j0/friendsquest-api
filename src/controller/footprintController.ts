@@ -3,7 +3,7 @@ import ErrorController from './errorController.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 
 export default class FootprintController {

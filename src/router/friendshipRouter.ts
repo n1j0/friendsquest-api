@@ -4,7 +4,7 @@ import { FriendshipPostgresRepository } from '../repositories/friendship/friends
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
-import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface'
+import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'

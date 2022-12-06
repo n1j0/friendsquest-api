@@ -3,11 +3,11 @@ import ErrorController from './errorController.js'
 import { FriendshipStatus } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
-import { FriendshipAlreadyExistsError } from '../errors/FriendshipAlreadyExistsError'
+import { FriendshipAlreadyExistsError } from '../errors/FriendshipAlreadyExistsError.js'
 
 export default class FriendshipController {
     private friendshipRepository: FriendshipRepositoryInterface

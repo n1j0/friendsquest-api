@@ -5,9 +5,9 @@ import { Friendship } from '../../entities/friendship.js'
 import { User } from '../../entities/user.js'
 import { FriendshipStatus } from '../../constants/index.js'
 import { FriendshipRepositoryInterface } from './friendshipRepositoryInterface.js'
-import { NotFoundError } from '../../errors/NotFoundError'
-import { UserRepositoryInterface } from '../user/userRepositoryInterface'
-import Points from '../../constants/points'
+import { NotFoundError } from '../../errors/NotFoundError.js'
+import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
+import Points from '../../constants/points.js'
 
 export class FriendshipPostgresRepository implements FriendshipRepositoryInterface {
     private readonly orm: ORM
