@@ -32,22 +32,18 @@ describe('FriendshipPostgresRepository', () => {
     })
 
     it('returns all friendships of given user id', async () => {
-        const execute = jest.fn().mockReturnValue('friendships')
-        const getConnection = jest.fn().mockImplementation(() => ({
-            execute,
-        }))
+        const find = jest.fn().mockResolvedValueOnce([])
+
         // @ts-ignore
         orm.forkEm.mockImplementation(() => ({
-            getConnection,
+            find,
             findOneOrFail: jest.fn(),
         }))
 
         const friendships = await friendshipPostgresRepository.getFriendships(1)
 
         expect(orm.forkEm).toHaveBeenCalled()
-        expect(getConnection).toHaveBeenCalled()
         // eslint-disable-next-line max-len
-        expect(execute).toHaveBeenCalledWith('SELECT f1.id as fs_id, f1.created_at as fs_created_at, f1.updated_at as fs_updated_at, f1.invitor_id as fs_invitor_id, f1.invitee_id as fs_invitee_id, f1.status as fs_status, f2.*  FROM (select "f0".* from "friendship" as "f0" where ("f0"."invitee_id" = 1 or "f0"."invitor_id" = 1)) f1 LEFT JOIN (SELECT *  FROM public.user WHERE id IN ( SELECT (CASE WHEN f.invitor_id != 1 THEN f.invitor_id ELSE f.invitee_id END) AS friend FROM (SELECT t.* FROM public.friendship t WHERE (t.invitor_id = 1 OR t.invitee_id = 1)) AS f)) as f2 ON (f1.invitee_id = f2.id OR f1.invitor_id = f2.id)')
         expect(friendships).toBe('friendships')
     })
 

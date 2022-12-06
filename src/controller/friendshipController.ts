@@ -27,35 +27,16 @@ export default class FriendshipController {
         ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
     }
 
-    // TODO: refactor. hard to read
-    private mapFriendshipsToObject = (friendships: any) => friendships.map((friendship: any) => ({
-        id: friendship.fs_id,
-        createdAt: friendship.fs_created_at,
-        updatedAt: friendship.fs_updated_at,
-        invitor: friendship.fs_invitor_id,
-        invitee: friendship.fs_invitee_id,
-        status: friendship.fs_status,
-        friend: {
-            id: friendship.id,
-            createdAt: friendship.created_at,
-            updatedAt: friendship.updated_at,
-            username: friendship.username,
-            email: friendship.email,
-            uid: friendship.uid,
-            imageURL: friendship.image_url,
-            friendsCode: friendship.friends_code,
-            points: friendship.points,
-        },
-    }))
-
     getFriendships = async ({ userId }: { userId: string }, response: Response) => {
         if (!userId) {
             return this.idNotFoundError(response)
         }
         try {
-            const friendships = await this.friendshipRepository.getFriendships(userId)
-            return response.status(200).json(this.mapFriendshipsToObject(friendships))
+            return response.status(200).json(await this.friendshipRepository.getFriendships(userId))
         } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return this.friendshipNotFoundError(response)
+            }
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
@@ -144,23 +125,25 @@ export default class FriendshipController {
         if (!id) {
             return this.idNotFoundError(response)
         }
-        const friendship = await this.friendshipRepository.getFriendshipById(id)
-
-        if (!friendship) {
-            return this.friendshipNotFoundError(response)
-        }
-
-        if (friendship.invitor.uid !== uid && friendship.invitee.uid !== uid) {
-            return ErrorController.sendError(
-                response,
-                ForbiddenError.getErrorDocument('You are not allowed to decline or delete this friendship.'),
-            )
-        }
-
         try {
+            const friendship = await this.friendshipRepository.getFriendshipById(id)
+
+            if (!friendship) {
+                return this.friendshipNotFoundError(response)
+            }
+
+            if (friendship.invitor.uid !== uid && friendship.invitee.uid !== uid) {
+                return ErrorController.sendError(
+                    response,
+                    ForbiddenError.getErrorDocument('You are not allowed to decline or delete this friendship.'),
+                )
+            }
             await this.friendshipRepository.declineOrDeleteExistingFriendship(friendship)
             return response.sendStatus(204)
         } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return this.friendshipNotFoundError(response)
+            }
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
