@@ -79,7 +79,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const friends = friendships.map(
             friendship => (friendship.invitor.id === user.id ? friendship.invitee.id : friendship.invitor.id),
         )
-        return em.find('Footprint', { createdBy: [ user, ...friends ] } as any)
+        return em.find('Footprint', { createdBy: [ user, ...friends ] } as any, { populate: ['createdBy'] } as any)
     }
 
     getFootprintById = async (uid: string, id: string | number) => {
