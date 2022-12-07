@@ -1,7 +1,7 @@
 import { User } from '../../entities/user.js'
 
 export interface UserRepositoryInterface {
-    checkUsernameAndMail(username: string, email: string): Promise<[number, number]>
+    checkUsernameAndMail(username: string, email: string): Promise<void>
     getUserById(id: number | string): Promise<User>
     getUserByUid(uid: number | string): Promise<User>
     getUserByFriendsCode(friendsCode: number | string): Promise<User>

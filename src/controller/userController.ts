@@ -66,18 +66,16 @@ export default class UserController {
 
         try {
             const user = new User(email, uid, username)
-            const [ numberOfSameUsername, numberOfSameMail ] = await this
-                .userRepository
-                .checkUsernameAndMail(username, email)
-            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
-                return ErrorController.sendError(
-                    response,
-                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
-                )
-            }
+            await this.userRepository.checkUsernameAndMail(username, email)
             return response.status(201).json(await this.userRepository.createUser(user))
         } catch (error: any) {
             switch (error.constructor) {
+            case ValueAlreadyExistsError: {
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument(error.message),
+                )
+            }
             case ForbiddenError: {
                 return ErrorController.sendError(response, ForbiddenError.getErrorDocument())
             }
@@ -101,21 +99,23 @@ export default class UserController {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
         try {
-            const [ numberOfSameUsername, numberOfSameMail ] = await this
-                .userRepository
-                .checkUsernameAndMail(username, email)
-            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
-                return ErrorController.sendError(
-                    response,
-                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
-                )
-            }
-
+            await this.userRepository.checkUsernameAndMail(username, email)
             return response.status(200).json(await this.userRepository.updateUser(uid, body))
         } catch (error: any) {
-            return error instanceof NotFoundError
-                ? this.userNotFoundError(response)
-                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            switch (error.constructor) {
+            case ValueAlreadyExistsError: {
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument(error.message),
+                )
+            }
+            case NotFoundError: {
+                return this.userNotFoundError(response)
+            }
+            default: {
+                return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            }
+            }
         }
     }
 
