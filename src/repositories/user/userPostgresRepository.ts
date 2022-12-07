@@ -5,6 +5,7 @@ import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
 import Points from '../../constants/points.js'
+import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
@@ -16,12 +17,15 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         this.orm = orm
     }
 
-    checkUsernameAndMail = async (username: string, email: string): Promise<[number, number]> => {
+    checkUsernameAndMail = async (username: string, email: string): Promise<void> => {
         const em = this.orm.forkEm()
-        return Promise.all([
-            em.count('User', { username }),
-            em.count('User', { email }),
+        const [ userByUsername, userByMail ] = await Promise.all([
+            em.find('User', { username }),
+            em.find('User', { email }),
         ])
+        if (userByUsername.length > 0 || userByMail.length > 0) {
+            throw new ValueAlreadyExistsError('Username or email already exists')
+        }
     }
 
     getUserById = async (id: number | string) => {

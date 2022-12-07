@@ -70,13 +70,14 @@ describe('FriendshipPostgresRepository', () => {
 
     describe('checkForExistingFriendship', () => {
         it.each([
-            [ 1, 0 ],
-            [ 0, 1 ],
-        ])('throws an error if friendship already exists', async (count1: number, count2: number) => {
-            const count = jest.fn().mockReturnValueOnce(count1).mockReturnValue(count2)
+            [ [''], [] ],
+            [ [], [''] ],
+            // @ts-ignore
+        ])('throws an error if friendship already exists', async (invitors: [], invitees: []) => {
+            const find = jest.fn().mockReturnValueOnce(invitors).mockReturnValue(invitees)
             // @ts-ignore
             orm.forkEm.mockImplementation(() => ({
-                count,
+                find,
             }))
             const promiseSpy = jest.spyOn(Promise, 'all')
 
@@ -92,8 +93,8 @@ describe('FriendshipPostgresRepository', () => {
                 .toThrow(FriendshipAlreadyExistsError)
             expect(orm.forkEm).toHaveBeenCalled()
             expect(promiseSpy).toHaveBeenCalled()
-            expect(count).toHaveBeenNthCalledWith(1, 'Friendship', { invitor: user1, invitee: user2 })
-            expect(count).toHaveBeenNthCalledWith(2, 'Friendship', { invitor: user2, invitee: user1 })
+            expect(find).toHaveBeenNthCalledWith(1, 'Friendship', { invitor: user1, invitee: user2 })
+            expect(find).toHaveBeenNthCalledWith(2, 'Friendship', { invitor: user2, invitee: user1 })
         })
     })
 
