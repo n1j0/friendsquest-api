@@ -1,7 +1,4 @@
-import {
-    ReasonPhrases,
-    getReasonPhrase,
-} from 'http-status-codes'
+import { getReasonPhrase, ReasonPhrases } from 'http-status-codes'
 import { ProblemDocument } from '../types/problemDocument'
 
 /* eslint-disable-next-line unicorn/no-static-only-class */
