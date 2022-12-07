@@ -146,8 +146,8 @@ describe('FootprintRouter', () => {
                     title,
                     latitude,
                     longitude,
-                    files,
                 },
+                files,
                 headers: {
                     uidHeader: uid,
                 },

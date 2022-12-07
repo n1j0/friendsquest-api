@@ -10,8 +10,8 @@ import { RouterInterface } from './routerInterface.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { UserService } from '../services/userService.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
-import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface'
-import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository'
+import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
+import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 
 export class FootprintRouter implements RouterInterface {
     readonly router: Router

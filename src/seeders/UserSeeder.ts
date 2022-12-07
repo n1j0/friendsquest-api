@@ -15,7 +15,6 @@ export class UserSeeder extends Seeder {
             uid: 'NFT7IF5F46eLuzKnjuLX4ZmWLTB3',
             username: 'lauraPan',
             friendsCode: '00001',
-            points: 500,
         } as RequiredEntityData<User>)
     }
 }
