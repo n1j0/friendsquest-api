@@ -19,6 +19,11 @@ export default class FriendshipController {
         this.userRepository = userRepository
     }
 
+    private userNotFoundError = (response: Response) => ErrorController.sendError(
+        response,
+        NotFoundError.getErrorDocument('The user'),
+    )
+
     private friendshipNotFoundError = (response: Response) => {
         ErrorController.sendError(response, NotFoundError.getErrorDocument('The friendship'))
     }
@@ -77,7 +82,7 @@ export default class FriendshipController {
             return response.status(200).json(friendshipWithFriendData)
         } catch (error: any) {
             return error instanceof NotFoundError
-                ? this.friendshipNotFoundError(response)
+                ? this.userNotFoundError(response)
                 : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
