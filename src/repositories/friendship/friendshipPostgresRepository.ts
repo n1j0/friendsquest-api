@@ -56,10 +56,10 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
     checkForExistingFriendship = async (invitor: User, invitee: User) => {
         const em = this.orm.forkEm()
         const [ invitorFriendship, inviteeFriendship ] = await Promise.all([
-            em.count('Friendship', { invitor, invitee } as any),
-            em.count('Friendship', { invitee: invitor, invitor: invitee } as any),
+            em.find('Friendship', { invitor, invitee } as any),
+            em.find('Friendship', { invitee: invitor, invitor: invitee } as any),
         ])
-        if (invitorFriendship > 0 || inviteeFriendship > 0) {
+        if (invitorFriendship.length > 0 || inviteeFriendship.length > 0) {
             throw new FriendshipAlreadyExistsError()
         }
     }
