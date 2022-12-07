@@ -5,7 +5,7 @@ import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
 import Points from '../../constants/points.js'
-import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError'
+import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
