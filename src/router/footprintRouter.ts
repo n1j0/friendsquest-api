@@ -224,7 +224,7 @@ export class FootprintRouter implements RouterInterface {
             title: request.body.title,
             latitude: request.body.latitude,
             longitude: request.body.longitude,
-            files: request.body.files as MulterFiles['files'],
+            files: request.files as MulterFiles['files'],
             uid: request.headers[AUTH_HEADER_UID] as string,
         },
         response,
