@@ -8,6 +8,7 @@ const jestSetup: JestConfigWithTsJest = {
         '^(\\.{1,2}/.*)\\.js$': '$1',
         '^@mikro-orm/*$': '<rootDir>/node_modules/@mikro-orm/$1',
     },
+    moduleFileExtensions: [ 'js', 'ts' ],
     testMatch: ['<rootDir>/tests/**/?(*.)+(spec|test).[jt]s'],
     transform: {
         '^.+\\.m?[tj]sx?$': [
@@ -17,6 +18,13 @@ const jestSetup: JestConfigWithTsJest = {
             },
         ],
     },
+    collectCoverage: false,
+    collectCoverageFrom: [
+        '<rootDir>/src/**/*.{js,ts}',
+        '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
+    ],
+    setupFiles: ['<rootDir>/jest.setup.ts'],
+    restoreMocks: true,
 }
 
 export default jestSetup

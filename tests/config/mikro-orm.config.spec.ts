@@ -1,5 +1,7 @@
 import mikroOrmConfig from '../../src/config/mikro-orm.config'
 
+// @see <rootDir>/jest.setup.ts
+
 describe('MikroORM config', () => {
     it('sets the correct entity ts path', () => {
         expect(mikroOrmConfig.entitiesTs).toHaveLength(1)
@@ -31,9 +33,19 @@ describe('MikroORM config', () => {
             fileName: expect.any(Function),
         }
         expect(mikroOrmConfig.seeder).toStrictEqual(seeder)
+        // @ts-ignore
+        expect(mikroOrmConfig.seeder.fileName('test')).toBe('test')
     })
 
     it('sets postgresql as the database type', () => {
         expect(mikroOrmConfig.type).toBe('postgresql')
+    })
+
+    it('sets correct database connection information', () => {
+        expect(mikroOrmConfig.user).toBe('user')
+        expect(mikroOrmConfig.password).toBe('password')
+        expect(mikroOrmConfig.dbName).toBe('dbName')
+        expect(mikroOrmConfig.host).toBe('111.222.111')
+        expect(mikroOrmConfig.port).toBe(3000)
     })
 })

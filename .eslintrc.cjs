@@ -67,6 +67,7 @@ module.exports = {
         ],
         'unicorn/no-array-for-each': 0,
         'class-methods-use-this': 0,
+        'sonarjs/no-duplicate-string': 0,
     },
     overrides: [
         {
@@ -96,6 +97,12 @@ module.exports = {
                 'max-len': 0,
                 'dot-notation': 0,
                 'sonarjs/no-duplicate-string': 0,
+            },
+        },
+        {
+            files: ['src/repositories/**/*Interface.*'],
+            rules: {
+                'no-unused-vars': 0,
             },
         },
     ],

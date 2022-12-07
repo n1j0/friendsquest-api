@@ -3,14 +3,18 @@ components:
     Friendship:
       type: object
       properties:
+        id:
+          type: integer
+          description: The id of the friendship
+          example: 1
         invitor:
           type: object
           description: The user who sent the friendship request
-          example: { id: 1, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: john@doe.com, username: JohnDoe, uid: 39FDDRsAsZNPmocG4ZIgcnwO5BF2, imageURL: https://example.com/image.png }
+          $ref: '#/components/schemas/User'
         invitee:
           type: object
           description: The user who received the friendship request
-          example: { id: 2, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: laura@doe.com, username: LauraDoe, uid: NFT7IF5F46eLuzKnjuLX4ZmWLTB3, imageURL: https://example.com/image.png }
+          $ref: '#/components/schemas/User'
         status:
           type: string
           description: The status of the friendship
@@ -21,6 +25,10 @@ components:
     ExportFriendship:
       type: object
       properties:
+        id:
+          type: integer
+          description: The id of the friendship
+          example: 1
         invitor:
           type: integer
           description: The id of the user who sent the friendship request
@@ -37,6 +45,4 @@ components:
             - invited
             - accepted
         friend:
-          type: object
-          description: The user who is the friend of the invitor or invitee
-          example: { id: 1, createdAt: 2020-12-01T12:00:00.000Z, updatedAt: 2020-12-01T12:00:00.000Z, email: john@doe.com, username: JohnDoe, uid: 39FDDRsAsZNPmocG4ZIgcnwO5BF2, imageURL: https://example.com/image.png }
+          $ref: '#/components/schemas/User'

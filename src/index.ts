@@ -1,10 +1,16 @@
 import { config } from 'dotenv'
+import express from 'express'
 import Application from './application.js'
+import { ORM } from './orm.js'
 
-if (process.env.NODE_ENV !== 'production') {
-    config()
+config()
+
+try {
+    const orm = await ORM.init()
+    const server = express()
+    const application = new Application(orm, server)
+    await application.migrate()
+    application.init()
+} catch (error: any) {
+    console.error(error)
 }
-
-const application = new Application()
-await application.connect()
-application.init()

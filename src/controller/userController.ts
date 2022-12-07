@@ -1,122 +1,135 @@
-import { Request, Response } from 'express'
-import { wrap } from '@mikro-orm/core'
-import { nanoid } from 'nanoid'
-import { $app } from '../$app.js'
+import { Response } from 'express'
 import { User } from '../entities/user.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
 import ErrorController from './errorController.js'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
+import { ForbiddenError } from '../errors/ForbiddenError.js'
+import { ValueAlreadyExistsError } from '../errors/ValueAlreadyExistsError.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
+import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError.js'
+import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
 
 export default class UserController {
-    private userNotFoundError = (response: Response) => ErrorController.sendError(response, 404, 'User not found')
+    private userRepository: UserRepositoryInterface
 
-    private checkUsernameAndMail = async (request: Request) => {
-        const [ username, email ] = await Promise.all([
-            $app.userRepository.count({ username: request.body.username }),
-            $app.userRepository.count({ email: request.body.email }),
-        ])
-        return {
-            username,
-            email,
-        }
+    constructor(userRepository: UserRepositoryInterface) {
+        this.userRepository = userRepository
     }
 
-    public isAllowedToEditUser = async (uid: string, request: Request) => {
-        try {
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', request.params.id as any)
-            return user.uid === uid
-        } catch {
-            return false
-        }
-    }
+    private userNotFoundError = (response: Response) => ErrorController.sendError(
+        response,
+        NotFoundError.getErrorDocument('The user'),
+    )
 
-    public getAllUsers = async (response: Response) => response.status(200).json(await $app.userRepository.findAll())
+    getAllUsers = async (response: Response) => response.status(200).json(await this.userRepository.getAllUsers())
 
-    public getUserById = async (request: Request, response: Response) => {
-        const { id } = request.params
+    getUserById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
-            return response.status(500).json({ message: 'Missing id' })
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { id } as any)
-        if (user) {
-            return response.status(200).json(user)
-        }
-        return this.userNotFoundError(response)
-    }
-
-    public getUserByUid = async (request: Request, response: Response) => {
-        const { uid } = request.params
-        if (!uid) {
-            return response.status(500).json({ message: 'Missing uid' })
-        }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { uid } as any)
-        if (user) {
-            return response.status(200).json(user)
-        }
-        return this.userNotFoundError(response)
-    }
-
-    public createUser = async (request: Request, response: Response) => {
-        if (!request.body.email) {
-            return ErrorController.sendError(response, 403, 'Email is missing')
-        }
-
         try {
-            // eslint-disable-next-line security/detect-object-injection
-            const user = new User(request.body.email, request.headers[AUTH_HEADER_UID] as string, request.body.username)
-            const { username, email } = await this.checkUsernameAndMail(request)
-            if (email !== 0 || username !== 0) {
-                return response.status(400).json({ message: 'Email or Username already taken' })
-            }
-            const em = $app.em.fork()
-            // TODO: Check if friendsCode already exists
-            let friendsCode = nanoid(5)
-            const codeInUse = await em.findOne('User', { friendsCode } as any)
-            if (codeInUse) {
-                friendsCode = nanoid(5)
-            }
-            user.friendsCode = friendsCode
-            await em.persistAndFlush(user)
-            return response.status(201).json(user)
+            const user = await this.userRepository.getUserById(id)
+            return response.status(200).json(user)
         } catch (error: any) {
-            return ErrorController.sendError(response, 403, error)
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
-    public updateUser = async (request: Request, response: Response) => {
+    getUserByUid = async ({ uid }: { uid: number | string }, response: Response) => {
+        if (!uid) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('UID'))
+        }
         try {
-            const { username, email } = await this.checkUsernameAndMail(request)
-            if (email !== 0 || username !== 0) {
-                return ErrorController.sendError(response, 400, 'Email or Username already taken')
-            }
-
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', request.params.id as any)
-            wrap(user).assign(request.body)
-            await em.persistAndFlush(user)
+            const user = await this.userRepository.getUserByUid(uid)
             return response.status(200).json(user)
-        } catch {
-            return this.userNotFoundError(response)
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
-    public deleteUser = async (request: Request, response: Response) => {
-        const { id } = request.params
-        if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+    createUser = async (
+        { email, username, uid }: { email: string, username: string, uid: string },
+        response: Response,
+    ) => {
+        if (!email) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Email'))
         }
-        const em = $app.em.fork()
-        const user = await em.findOne('User', { id } as any)
-        if (user) {
-            try {
-                await em.removeAndFlush(user)
-                return response.status(204).json()
-            } catch (error: any) {
-                return ErrorController.sendError(response, 500, error)
+
+        if (!username) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Username'))
+        }
+
+        try {
+            const user = new User(email, uid, username)
+            const [ numberOfSameUsername, numberOfSameMail ] = await this
+                .userRepository
+                .checkUsernameAndMail(username, email)
+            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
+                )
+            }
+            return response.status(201).json(await this.userRepository.createUser(user))
+        } catch (error: any) {
+            switch (error.constructor) {
+            case ForbiddenError: {
+                return ErrorController.sendError(response, ForbiddenError.getErrorDocument())
+            }
+            case NegativeNumbersNotAllowedError: {
+                return ErrorController.sendError(response, NegativeNumbersNotAllowedError.getErrorDocument())
+            }
+            case MaximumFriendsCodeLimitExceededError: {
+                return ErrorController.sendError(response, MaximumFriendsCodeLimitExceededError.getErrorDocument())
+            }
+            default: {
+                return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            }
             }
         }
-        return this.userNotFoundError(response)
+    }
+
+    updateUser = async (
+        { email, username, uid, body }: { email: string, username: string, uid: string, body: any },
+        response: Response,
+    ) => {
+        // TODO: what if just one attribute has changed?
+        // right now this would probably throw an error "Email or Username already taken"
+        try {
+            const [ numberOfSameUsername, numberOfSameMail ] = await this
+                .userRepository
+                .checkUsernameAndMail(username, email)
+            if (numberOfSameUsername !== 0 || numberOfSameMail !== 0) {
+                return ErrorController.sendError(
+                    response,
+                    ValueAlreadyExistsError.getErrorDocument('Email or Username'),
+                )
+            }
+
+            return response.status(200).json(await this.userRepository.updateUser(uid, body))
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
+    deleteUser = async ({ uid }: { uid: string }, response: Response) => {
+        if (!uid) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Uid'))
+        }
+        try {
+            await this.userRepository.deleteUser(uid)
+            return response.status(204).json()
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
     }
 }

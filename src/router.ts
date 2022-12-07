@@ -1,52 +1,76 @@
-import express from 'express'
+import { Application, ErrorRequestHandler, NextFunction, Request, Response, Router as ExpressRouter } from 'express'
 import swaggerUi from 'swagger-ui-express'
-import { EntityManager, MikroORM, RequestContext } from '@mikro-orm/core'
-import { PostgreSqlDriver } from '@mikro-orm/postgresql'
+import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
+import * as Sentry from '@sentry/node'
 import { openapiSpecification } from './docs/swagger.js'
-import { usersRoutes } from './routes/user.js'
-import { footprintRoutes } from './routes/footprint.js'
-import { friendshipRoutes } from './routes/friendship.js'
-import { $app } from './$app.js'
-import { firebaseRoutes } from './routes/_firebaseAuth.js'
+import { firebaseRoutes } from './router/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
+import { ORM } from './orm.js'
+import { Route } from './types/routes'
+import ErrorController from './controller/errorController.js'
+import { NotFoundError } from './errors/NotFoundError.js'
+import { InternalServerError } from './errors/InternalServerError.js'
 
-export default class Router {
-    private server: express.Application
+export class Router {
+    private server: Application
 
-    private readonly em: EntityManager<PostgreSqlDriver>
+    private readonly orm: ORM
 
-    constructor(server: express.Application, orm: MikroORM<PostgreSqlDriver>) {
+    constructor(server: Application, orm: ORM) {
         this.server = server
-        this.em = orm.em
+        this.orm = orm
     }
 
-    public initRoutes = () => {
+    createRequestContext = (_request: Request, _response: Response, next: NextFunction) => {
+        RequestContext.create(this.orm.orm.em, next)
+    }
+
+    custom404 = (_request: Request, response: Response) => {
+        ErrorController.sendError(response, NotFoundError.getErrorDocument())
+    }
+
+    custom500 = (error: ErrorRequestHandler, _request: Request, response: Response) => {
+        console.error(error)
+        ErrorController.sendError(response, InternalServerError.getErrorDocument('Internal Server Error'))
+    }
+
+    initRoutes = (
+        port: number,
+        routes: Route[],
+        authMiddleware = firebaseAuthMiddleware,
+        auth = getAuth(),
+    ) => {
         // TODO: remove this when ready for production
         this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-        console.log(`📖 Docs generated: http://localhost:${$app.port}/docs`)
+        console.log(`📖 Docs generated: http://localhost:${port}/docs`)
 
-        this.server.use((_request: express.Request, _response: express.Response, next: express.NextFunction) => {
-            RequestContext.create(this.em, next)
-        })
+        this.server.use(this.createRequestContext)
 
         this.server.use(actuator())
 
-        this.server.use('/users', firebaseAuthMiddleware(getAuth()), usersRoutes)
-        this.server.use('/footprints', firebaseAuthMiddleware(getAuth()), footprintRoutes)
-        this.server.use('/friendships', firebaseAuthMiddleware(getAuth()), friendshipRoutes)
+        routes.forEach((route) => {
+            this.server.use(
+                route.path,
+                authMiddleware(auth),
+                // eslint-disable-next-line new-cap
+                new route.routerClass(ExpressRouter(), this.orm).createAndReturnRoutes(),
+            )
+        })
+
         // TODO: remove this when ready for production
         this.server.use('/firebase', firebaseRoutes)
 
+        this.server.use(Sentry.Handlers.errorHandler({
+            shouldHandleError() {
+                return true
+            },
+        }))
+
         // custom 404
-        this.server.use((_request: express.Request, response: express.Response) => {
-            response.status(404).send("Sorry can't find that!")
-        })
+        this.server.use(this.custom404)
         // custom 500
-        this.server.use((error: express.ErrorRequestHandler, _request: express.Request, response: express.Response) => {
-            console.error(error)
-            response.status(500).send('Something broke!')
-        })
+        this.server.use(this.custom500)
     }
 }

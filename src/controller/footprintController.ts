@@ -1,156 +1,109 @@
-import { Express, Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
-import { $app } from '../$app.js'
-import { FootprintReaction } from '../entities/footprintReaction.js'
-import { Footprint } from '../entities/footprint.js'
-import { AUTH_HEADER_UID } from '../constants/index.js'
+import { Response } from 'express'
 import ErrorController from './errorController.js'
-import { fullPath } from '../services/footprintService.js'
-
-interface MulterFiles extends Express.Request {
-    files: {
-        image: Express.Multer.File[]
-        audio: Express.Multer.File[]
-    }
-}
-
-const createPersistentDownloadUrl = (
-    bucket: string,
-    pathToFile: string,
-    downloadToken: string,
-    // eslint-disable-next-line max-len
-) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
-
-async function uploadFilesToFirestorage(files: MulterFiles['files']) {
-    const bucket = $app.storage.bucket('gs://friends-quest.appspot.com/')
-    const images: Express.Multer.File[] = files.image
-    const audios: Express.Multer.File[] = files.audio
-    const concatFiles = [ ...images, ...audios ]
-    const promises: Promise<void>[] = []
-
-    const downloadURLs = concatFiles.map((value: Express.Multer.File) => {
-        const fileName = uuidv4()
-        const bucketFile = bucket.file(fullPath(value, fileName))
-        const downloadToken = uuidv4()
-
-        promises.push(bucketFile.save(value.buffer, {
-            metadata: {
-                contentType: value.mimetype,
-                downloadTokens: downloadToken,
-            },
-        }))
-
-        return createPersistentDownloadUrl(bucket.name, fullPath(value, fileName), downloadToken)
-    })
-
-    await Promise.all(promises)
-
-    return downloadURLs
-}
+import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
+import { NewFootprint } from '../types/footprint'
+import { NotFoundError } from '../errors/NotFoundError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { InternalServerError } from '../errors/InternalServerError.js'
 
 export default class FootprintController {
-    public getAllFootprints = async (response: Response) => {
+    private footprintRepository: FootprintRepositoryInterface
+
+    constructor(footprintRepository: FootprintRepositoryInterface) {
+        this.footprintRepository = footprintRepository
+    }
+
+    getAllFootprints = async (response: Response) => {
         try {
-            const em = $app.em.fork()
-            const footprints = await em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
-            return response.status(200).json(footprints)
+            return response.status(200).json(await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
-    // TODO: should getFootprint include the reactions?
-    // TODO: every time this is called the viewCount needs to be increased
-    public getFootprintById = async (request: Request, response: Response) => {
+    getFootprintsOfFriendsAndUser = async ({ uid }: { uid: string }, response: Response) => {
         try {
-            const em = $app.em.fork()
-            const footprint = await em.findOne('Footprint', { id: request.params.id } as any)
-            if (footprint) {
-                return response.status(200).json(footprint)
-            }
-            return ErrorController.sendError(response, 404, 'Footprint not found')
+            return response.status(200).json(await this.footprintRepository.getFootprintsOfFriendsAndUser(uid))
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
-    public getFootprintReactions = async (request: Request, response: Response) => {
-        const footprintId = request.params.id
-        if (!footprintId) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
-        }
-        try {
-            const em = $app.em.fork()
-            const footprints = await em.find(
-                'FootprintReaction',
-                { footprint: { id: footprintId } } as any,
-                { populate: ['createdBy'] } as any,
-            )
-            return response.status(200).json(footprints)
-        } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
-        }
-    }
-
-    public createFootprintReaction = async (request: Request, response: Response) => {
-        const message = request.body.message.trim()
-        if (!message) {
-            return ErrorController.sendError(response, 500, 'Message is missing')
-        }
-        const { id } = request.params
+    getFootprintById = async ({ uid, id }: { uid: string, id: number | string }, response: Response) => {
         if (!id) {
-            return ErrorController.sendError(response, 500, 'ID is missing')
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
+        }
+        try {
+            const footprint = await this.footprintRepository.getFootprintById(uid, id)
+            return response.status(200).json(footprint)
+        } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
+            }
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
+    getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
+        if (!id) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
+        }
+        try {
+            return response.status(200).json(await this.footprintRepository.getFootprintReactions(id))
+        } catch (error: any) {
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
+    createFootprintReaction = async (
+        { id, message, uid }: { id: number | string, message: string, uid: string },
+        response: Response,
+    ) => {
+        if (!message) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Message'))
+        }
+        if (!id) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
 
         try {
-            const em = $app.em.fork()
-            const footprint = await em.findOneOrFail('Footprint', { id } as any)
-            const user = await em.findOneOrFail('User', {
-                // eslint-disable-next-line security/detect-object-injection
-                uid: request.headers[AUTH_HEADER_UID] as string,
-            } as any)
-            const reaction = new FootprintReaction(user, message, footprint)
-            await em.persistAndFlush(reaction)
-            const reactionForExport = {
+            const reaction = await this.footprintRepository.createFootprintReaction({
+                id,
+                message: message.trim(),
+                uid,
+            })
+            const reactionWithFootprintId = {
                 ...reaction,
                 footprint: reaction.footprint.id,
             }
-            return response.status(201).json(reactionForExport)
+            return response.status(201).json(reactionWithFootprintId)
         } catch (error: any) {
-            return ErrorController.sendError(response, 403, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
-    public createFootprint = async (request: Request, response: Response) => {
-        if (!request.body.title && !request.body.latitude
-            && !request.body.longitude && !request.body.createdBy && !request.body.files) {
-            return ErrorController.sendError(response, 400, 'Missing required fields')
+    createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
+        if (!title || !latitude || !longitude || !files) {
+            // TODO get error message for multiple fields
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required fields'))
         }
 
         try {
-            const em = $app.em.fork()
-            const user = await em.findOneOrFail('User', {
-                // eslint-disable-next-line security/detect-object-injection
-                uid: request.headers[AUTH_HEADER_UID] as string,
-            } as any)
-            const [ photoURL, audioURL ] = await uploadFilesToFirestorage(request.files as MulterFiles['files'])
-            const footprint = new Footprint(
-                request.body.title,
-                user,
-                request.body.latitude,
-                request.body.longitude,
-                photoURL,
-                audioURL,
-            )
-            await em.persistAndFlush(footprint)
-            const footprintForExport = {
+            const footprint = await this.footprintRepository.createFootprint({
+                title,
+                latitude,
+                longitude,
+                files,
+                uid,
+            })
+            const footprintWithCoordinatesAsNumbers = {
                 ...footprint,
                 longitude: Number(footprint.longitude),
                 latitude: Number(footprint.latitude),
             }
-            return response.status(201).json(footprintForExport)
+            return response.status(201).json(footprintWithCoordinatesAsNumbers)
         } catch (error: any) {
-            return ErrorController.sendError(response, 500, error)
+            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 }

@@ -11,6 +11,7 @@
     "skipLibCheck": true,
     "outDir": "./.out",
     "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": [
       "node",
       "express",
@@ -20,8 +21,7 @@
       "multer",
       "express-actuator",
       "jest",
-      "compression",
-      "nanoid"
+      "compression"
     ]
   },
   "include": [
