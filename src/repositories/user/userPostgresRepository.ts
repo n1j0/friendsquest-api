@@ -64,9 +64,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         const em = this.orm.forkEm()
         await em.persistAndFlush(user)
         const userInDatabase = await this.getUserByUid(user.uid)
-        // TODO: don't forget to handle the errors "numberToBase36String" can throw
-        userInDatabase.friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
-        wrap(user).assign(userInDatabase)
+        const friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
+        wrap(user).assign({
+            friendsCode,
+        })
         await em.persistAndFlush(user)
         return user
     }
