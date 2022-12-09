@@ -44,25 +44,25 @@ describe('FootprintService', () => {
     })
 
     it.each([
-        [ 'image', 'image/jpeg', 'fooImage', 'images/fooImage.jpeg' ],
-        [ 'image', 'image/png', 'barImage', 'images/barImage.png' ],
-        [ 'image', 'image/jpg', 'sampleImage', 'images/sampleImage.jpg' ],
-        [ 'audio', 'audio/mpeg', 'fooAudio', 'audios/fooAudio.mpeg' ],
-        [ 'audio', 'audio/mp3', 'barAudio', 'audios/barAudio.mp3' ],
-        [ 'audio', 'audio/aac', 'sampleAudio', 'audios/sampleAudio.aac' ],
-        [ 'video', 'video/mp4', 'fooVideo', 'videos/fooVideo.mp4' ],
-        [ 'video', 'image/jpeg', 'invalidMimeType', '' ],
-        [ 'audio', 'application/json', 'invalidMimeType', '' ],
+        [ 'image', 'image/jpeg', 'fooImage', 'hsjf', 'images/hsjf/fooImage.jpeg' ],
+        [ 'image', 'image/png', 'barImage', '67dh', 'images/67dh/barImage.png' ],
+        [ 'image', 'image/jpg', 'sampleImage', 'dfg45', 'images/dfg45/sampleImage.jpg' ],
+        [ 'audio', 'audio/mpeg', 'fooAudio', 'sfdgk', 'audios/sfdgk/fooAudio.mpeg' ],
+        [ 'audio', 'audio/mp3', 'barAudio', '45z', 'audios/45z/barAudio.mp3' ],
+        [ 'audio', 'audio/aac', 'sampleAudio', 'sadfgh45', 'audios/sadfgh45/sampleAudio.aac' ],
+        [ 'video', 'video/mp4', 'fooVideo', 'fdsag', 'videos/fdsag/fooVideo.mp4' ],
+        [ 'video', 'image/jpeg', '34qt', 'invalidMimeType', '' ],
+        [ 'audio', 'application/json', 'f8i', 'invalidMimeType', '' ],
     ])(
         'generates full path for %s with mimetype %s and name %s',
-        (fieldname: string, mimetype: string, filename: string, path: string) => {
+        (fieldname: string, mimetype: string, filename: string, uid: string, path: string) => {
             const file: Express.Multer.File = generateFile(fieldname, mimetype)
-            expect(footprintService.fullPath(file, filename)).toBe(path)
+            expect(footprintService.fullPath(file, filename, uid)).toBe(path)
         },
     )
 
     it('returns empty array if no files are given for upload', async () => {
-        const result = await footprintService.uploadFilesToFireStorage({ audio: [], image: [] })
+        const result = await footprintService.uploadFilesToFireStorage({ audio: [], image: [] }, '')
         expect(result).toStrictEqual([])
     })
 
@@ -72,7 +72,7 @@ describe('FootprintService', () => {
 
         const audio: Express.Multer.File = generateFile('audio', 'audio/mp3')
         const image: Express.Multer.File = generateFile('image', 'image/jpg')
-        const result = await footprintService.uploadFilesToFireStorage({ audio: [audio], image: [image] })
+        const result = await footprintService.uploadFilesToFireStorage({ audio: [audio], image: [image] }, '')
 
         expect(storage.bucket).toHaveBeenCalledWith('gs://friends-quest.appspot.com/')
         expect(fullPath).toHaveBeenCalledTimes(2)

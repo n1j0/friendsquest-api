@@ -1,7 +1,5 @@
 import { mock } from 'jest-mock-extended'
-import {
-    ReasonPhrases,
-} from 'http-status-codes'
+import { ReasonPhrases } from 'http-status-codes'
 import ErrorController from '../../src/controller/errorController'
 import responseMock from '../helper/responseMock'
 import { ProblemDocument } from '../../src/types/problemDocument'
