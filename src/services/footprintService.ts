@@ -11,17 +11,18 @@ export class FootprintService {
         this.storage = storage
     }
 
-    fullPath = (value: Express.Multer.File, fileName: string): string => {
+    fullPath = (value: Express.Multer.File, fileName: string, uid: string): string => {
+        const path = `/${uid}/${fileName}.${value.mimetype.split('/')[1]}`
         if ((value.mimetype === 'image/jpeg' || value.mimetype === 'image/png' || value.mimetype === 'image/jpg')
             && value.fieldname === 'image') {
-            return `images/${fileName}.${value.mimetype.split('/')[1]}`
+            return `images${path}`
         }
         if ((value.mimetype === 'audio/mpeg' || value.mimetype === 'audio/mp3' || value.mimetype === 'audio/aac'
             || value.mimetype === 'audio/wav') && value.fieldname === 'audio') {
-            return `audios/${fileName}.${value.mimetype.split('/')[1]}`
+            return `audios${path}`
         }
         if (value.mimetype === 'video/mp4' && value.fieldname === 'video') {
-            return `videos/${fileName}.${value.mimetype.split('/')[1]}`
+            return `videos${path}`
         }
         return ''
     }
@@ -33,7 +34,7 @@ export class FootprintService {
         // eslint-disable-next-line max-len
     ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
-    uploadFilesToFireStorage = async (files: MulterFiles['files']) => {
+    uploadFilesToFireStorage = async (files: MulterFiles['files'], uid: string) => {
         const bucket = this.storage.bucket('gs://friends-quest.appspot.com/')
         const images: Express.Multer.File[] = files.image
         const audios: Express.Multer.File[] = files.audio
@@ -42,7 +43,7 @@ export class FootprintService {
 
         const downloadURLs = allFiles.map((value: Express.Multer.File) => {
             const fileName = uuidv4()
-            const fullPath = this.fullPath(value, fileName)
+            const fullPath = this.fullPath(value, fileName, uid)
             const bucketFile = bucket.file(fullPath)
             const downloadToken = uuidv4()
 

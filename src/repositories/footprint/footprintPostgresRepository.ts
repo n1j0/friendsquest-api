@@ -43,7 +43,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const em = this.orm.forkEm()
         const [ user, [ photoURL, audioURL ] ] = await Promise.all([
             this.userRepository.getUserByUid(uid),
-            this.footprintService.uploadFilesToFireStorage(files),
+            this.footprintService.uploadFilesToFireStorage(files, uid),
         ])
         const footprint = new Footprint(
             title,
@@ -94,6 +94,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.findFootprintById(id),
             this.userRepository.getUserByUid(uid),
         ])
+        // TODO: only foreign users should be added
         footprint.users.add(user)
         try {
             await em.persistAndFlush(footprint)
