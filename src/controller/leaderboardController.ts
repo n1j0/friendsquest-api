@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { LeaderboardRepositoryInterface } from '../repositories/leaderboard/leaderboardRepositoryInterface.js'
-import ResponseController from './responseController'
+import ResponseController from './responseController.js'
 
 export class LeaderboardController {
     private readonly leaderboardRepository: LeaderboardRepositoryInterface
