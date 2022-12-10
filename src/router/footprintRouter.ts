@@ -222,6 +222,7 @@ export class FootprintRouter implements RouterInterface {
     createFootprintHandler = (request: Request, response: Response) => this.footprintController.createFootprint(
         {
             title: request.body.title,
+            // TODO add description
             latitude: request.body.latitude,
             longitude: request.body.longitude,
             files: request.files as MulterFiles['files'],

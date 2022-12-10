@@ -8,6 +8,7 @@ import { NotFoundError } from '../errors/NotFoundError.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import { FriendshipAlreadyExistsError } from '../errors/FriendshipAlreadyExistsError.js'
+import ResponseController from './responseController.js'
 
 export default class FriendshipController {
     private friendshipRepository: FriendshipRepositoryInterface
@@ -37,7 +38,11 @@ export default class FriendshipController {
             return this.idNotFoundError(response)
         }
         try {
-            return response.status(200).json(await this.friendshipRepository.getFriendshipsByUid(userId))
+            return ResponseController.sendResponse(
+                response,
+                200,
+                await this.friendshipRepository.getFriendshipsByUid(userId),
+            )
         } catch (error: any) {
             if (error instanceof NotFoundError) {
                 return this.friendshipNotFoundError(response)
@@ -79,7 +84,7 @@ export default class FriendshipController {
                 status: friendship.status,
                 friend: { ...invitee },
             }
-            return response.status(200).json(friendshipWithFriendData)
+            return ResponseController.sendResponse(response, 200, friendshipWithFriendData)
         } catch (error: any) {
             return error instanceof NotFoundError
                 ? this.userNotFoundError(response)
@@ -109,13 +114,19 @@ export default class FriendshipController {
             }
 
             try {
-                const { invitor, invitee } = await this.friendshipRepository.acceptFriendship(friendship)
+                const { invitor, invitee, points } = await this.friendshipRepository.acceptFriendship(friendship)
                 const friendshipWithUpdatedUserPoints = {
                     ...friendship,
                     invitor,
                     invitee,
                 }
-                return response.status(200).json(friendshipWithUpdatedUserPoints)
+
+                return ResponseController.sendResponse(
+                    response,
+                    200,
+                    friendshipWithUpdatedUserPoints,
+                    { amount: points, total: invitee.points },
+                )
             } catch (error: any) {
                 return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
             }

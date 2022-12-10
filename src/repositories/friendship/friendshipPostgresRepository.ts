@@ -82,7 +82,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
             this.userRepository.addPoints(friendship.invitor.uid, Points.NEW_FRIENDSHIP),
             this.userRepository.addPoints(friendship.invitee.uid, Points.NEW_FRIENDSHIP),
         ])
-        return { invitor, invitee }
+        return { invitor, invitee, points: Points.NEW_FRIENDSHIP }
     }
 
     declineOrDeleteExistingFriendship = async (friendship: Friendship) => {

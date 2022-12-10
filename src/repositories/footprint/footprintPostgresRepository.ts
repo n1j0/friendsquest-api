@@ -54,8 +54,12 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             audioURL,
         )
         await em.persistAndFlush(footprint)
-        await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
-        return footprint
+        const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
+        return {
+            footprint,
+            points: Points.FOOTPRINT_CREATED,
+            userPoints: userWithUpdatedPoints.points,
+        }
     }
 
     createFootprintReaction = async ({ id, message, uid }: { id: number | string, message: string, uid: string }) => {
@@ -66,8 +70,12 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         ])
         const reaction = new FootprintReaction(user, message, footprint)
         await em.persistAndFlush(reaction)
-        await this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION)
-        return reaction
+        const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION)
+        return {
+            reaction,
+            points: Points.FOOTPRINT_REACTION,
+            userPoints: userWithUpdatedPoints.points,
+        }
     }
 
     getAllFootprints = async () => {
@@ -94,14 +102,31 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.findFootprintById(id),
             this.userRepository.getUserByUid(uid),
         ])
-        // TODO: only foreign users should be added
-        footprint.users.add(user)
+        if (!footprint.users.isInitialized()) {
+            await footprint.users.init()
+        }
+        let myFootprint = true
+        if (footprint.createdBy.id !== user.id) {
+            myFootprint = false
+            footprint.users.add(user)
+        }
+        if (myFootprint) {
+            return {
+                footprint,
+            }
+        }
         try {
             await em.persistAndFlush(footprint)
-            await this.userRepository.addPoints(uid, Points.FOOTPRINT_VIEWED)
-            return this.findFootprintById(id)
+            const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_VIEWED)
+            return {
+                footprint: await this.findFootprintById(id),
+                points: Points.FOOTPRINT_VIEWED,
+                userPoints: userWithUpdatedPoints.points,
+            }
         } catch {
-            return footprint
+            return {
+                footprint,
+            }
         }
     }
 

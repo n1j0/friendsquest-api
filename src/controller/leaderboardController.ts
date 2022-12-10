@@ -1,5 +1,6 @@
 import { Response } from 'express'
 import { LeaderboardRepositoryInterface } from '../repositories/leaderboard/leaderboardRepositoryInterface.js'
+import ResponseController from './responseController'
 
 export class LeaderboardController {
     private readonly leaderboardRepository: LeaderboardRepositoryInterface
@@ -8,7 +9,9 @@ export class LeaderboardController {
         this.leaderboardRepository = leaderboardRepository
     }
 
-    getTop100 = async (response: Response) => response
-        .status(200)
-        .json(await this.leaderboardRepository.getTop100())
+    getTop100 = async (response: Response) => ResponseController.sendResponse(
+        response,
+        200,
+        await this.leaderboardRepository.getTop100(),
+    )
 }

@@ -5,6 +5,7 @@ import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
+import ResponseController from './responseController.js'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
@@ -15,7 +16,7 @@ export default class FootprintController {
 
     getAllFootprints = async (response: Response) => {
         try {
-            return response.status(200).json(await this.footprintRepository.getAllFootprints())
+            return ResponseController.sendResponse(response, 200, await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
@@ -23,7 +24,11 @@ export default class FootprintController {
 
     getFootprintsOfFriendsAndUser = async ({ uid }: { uid: string }, response: Response) => {
         try {
-            return response.status(200).json(await this.footprintRepository.getFootprintsOfFriendsAndUser(uid))
+            return ResponseController.sendResponse(
+                response,
+                200,
+                await this.footprintRepository.getFootprintsOfFriendsAndUser(uid),
+            )
         } catch (error: any) {
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
@@ -34,8 +39,8 @@ export default class FootprintController {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
-            const footprint = await this.footprintRepository.getFootprintById(uid, id)
-            return response.status(200).json(footprint)
+            const { footprint, points, userPoints } = await this.footprintRepository.getFootprintById(uid, id)
+            return ResponseController.sendResponse(response, 200, footprint, { amount: points, total: userPoints })
         } catch (error: any) {
             if (error instanceof NotFoundError) {
                 return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
@@ -49,7 +54,11 @@ export default class FootprintController {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
-            return response.status(200).json(await this.footprintRepository.getFootprintReactions(id))
+            return ResponseController.sendResponse(
+                response,
+                200,
+                await this.footprintRepository.getFootprintReactions(id),
+            )
         } catch (error: any) {
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
@@ -67,7 +76,7 @@ export default class FootprintController {
         }
 
         try {
-            const reaction = await this.footprintRepository.createFootprintReaction({
+            const { reaction, points, userPoints } = await this.footprintRepository.createFootprintReaction({
                 id,
                 message: message.trim(),
                 uid,
@@ -76,7 +85,12 @@ export default class FootprintController {
                 ...reaction,
                 footprint: reaction.footprint.id,
             }
-            return response.status(201).json(reactionWithFootprintId)
+            return ResponseController.sendResponse(
+                response,
+                201,
+                reactionWithFootprintId,
+                { amount: points, total: userPoints },
+            )
         } catch (error: any) {
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }
@@ -89,7 +103,7 @@ export default class FootprintController {
         }
 
         try {
-            const footprint = await this.footprintRepository.createFootprint({
+            const { footprint, points, userPoints } = await this.footprintRepository.createFootprint({
                 title,
                 latitude,
                 longitude,
@@ -101,7 +115,12 @@ export default class FootprintController {
                 longitude: Number(footprint.longitude),
                 latitude: Number(footprint.latitude),
             }
-            return response.status(201).json(footprintWithCoordinatesAsNumbers)
+            return ResponseController.sendResponse(
+                response,
+                201,
+                footprintWithCoordinatesAsNumbers,
+                { amount: points, total: userPoints },
+            )
         } catch (error: any) {
             return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
         }

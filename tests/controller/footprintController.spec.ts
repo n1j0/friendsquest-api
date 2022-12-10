@@ -1,24 +1,29 @@
 import { mock } from 'jest-mock-extended'
+import { Response } from 'express'
 import { FootprintRepositoryInterface } from '../../src/repositories/footprint/footprintRepositoryInterface'
 import FootprintController from '../../src/controller/footprintController'
 import responseMock from '../helper/responseMock'
 import ErrorController from '../../src/controller/errorController'
+import ResponseController from '../../src/controller/responseController'
 import { NewFootprint } from '../../src/types/footprint'
 import { NotFoundError } from '../../src/errors/NotFoundError'
 import { InternalServerError } from '../../src/errors/InternalServerError'
 import { AttributeIsMissingError } from '../../src/errors/AttributeIsMissingError'
 
-const response = responseMock
-
 describe('FootprintController', () => {
     let footprintController: FootprintController
     let footprintRepository: FootprintRepositoryInterface
     let sendErrorSpy: jest.SpyInstance
+    let sendResponseSpy: jest.SpyInstance
+    let response: Response
 
     beforeEach(() => {
+        jest.clearAllMocks()
+        response = responseMock
         footprintRepository = mock<FootprintRepositoryInterface>()
         footprintController = new FootprintController(footprintRepository)
         sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
+        sendResponseSpy = jest.spyOn(ResponseController, 'sendResponse')
     })
 
     describe('getAllFootprints', () => {
@@ -28,8 +33,7 @@ describe('FootprintController', () => {
             footprintRepository.getAllFootprints.mockReturnValue(result)
             await footprintController.getAllFootprints(response)
             expect(footprintRepository.getAllFootprints).toHaveBeenCalled()
-            expect(response.status).toHaveBeenCalledWith(200)
-            expect(response.json).toHaveBeenCalledWith(result)
+            expect(sendResponseSpy).toHaveBeenCalledWith(response, 200, result)
         })
 
         it('sends an error if something goes wrong', async () => {
@@ -48,12 +52,17 @@ describe('FootprintController', () => {
             const id = 1
             const uid = 'abc'
             const result = 'sample'
+            const points = 200
+            const userPoints = 500
             // @ts-ignore
-            footprintRepository.getFootprintById.mockReturnValue(result)
+            footprintRepository.getFootprintById.mockReturnValue({
+                footprint: result,
+                points,
+                userPoints,
+            })
             await footprintController.getFootprintById({ uid, id }, response)
             expect(footprintRepository.getFootprintById).toHaveBeenCalledWith(uid, id)
-            expect(response.status).toHaveBeenCalledWith(200)
-            expect(response.json).toHaveBeenCalledWith(result)
+            expect(sendResponseSpy).toHaveBeenCalledWith(response, 200, result, { amount: points, total: userPoints })
         })
 
         it('sends an error if something goes wrong', async () => {
@@ -92,8 +101,7 @@ describe('FootprintController', () => {
             footprintRepository.getFootprintReactions.mockReturnValue(reaction)
             await footprintController.getFootprintReactions({ id }, response)
             expect(footprintRepository.getFootprintReactions).toHaveBeenCalledWith(id)
-            expect(response.status).toHaveBeenCalledWith(200)
-            expect(response.json).toHaveBeenCalledWith(reaction)
+            expect(sendResponseSpy).toHaveBeenCalledWith(response, 200, reaction)
         })
 
         it('sends an error if something goes wrong', async () => {
@@ -124,13 +132,14 @@ describe('FootprintController', () => {
                     id: footprintId,
                 },
             }
+            const points = 10
+            const userPoints = 345
             const result = { ...reaction, footprint: footprintId }
             // @ts-ignore
-            footprintRepository.createFootprintReaction.mockReturnValue(reaction)
+            footprintRepository.createFootprintReaction.mockReturnValue({ reaction, points, userPoints })
             await footprintController.createFootprintReaction({ id, message, uid }, response)
             expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith({ id, message, uid })
-            expect(response.status).toHaveBeenCalledWith(201)
-            expect(response.json).toHaveBeenCalledWith(result)
+            expect(sendResponseSpy).toHaveBeenCalledWith(response, 201, result, { amount: points, total: userPoints })
         })
 
         it('trims the message of a new reaction', async () => {
@@ -183,12 +192,13 @@ describe('FootprintController', () => {
         }
         it('creates footprint and returns footprint with coordinates as numbers in response', async () => {
             const result = { ...footprint, latitude: 1, longitude: 2 }
+            const points = 11
+            const userPoints = 3546
             // @ts-ignore
-            footprintRepository.createFootprint.mockReturnValue(footprint)
+            footprintRepository.createFootprint.mockReturnValue({ footprint, points, userPoints })
             await footprintController.createFootprint(footprint, response)
             expect(footprintRepository.createFootprint).toHaveBeenCalledWith(footprint)
-            expect(response.status).toHaveBeenCalledWith(201)
-            expect(response.json).toHaveBeenCalledWith(result)
+            expect(sendResponseSpy).toHaveBeenCalledWith(response, 201, result, { amount: points, total: userPoints })
         })
 
         it('sends an error if something goes wrong', async () => {
