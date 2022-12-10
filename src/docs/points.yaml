@@ -1,0 +1,15 @@
+components:
+  schemas:
+    Points:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: The amount of points
+          example: 100
+          required: false
+        total:
+          type: number
+          description: The total amount of a user's points
+          example: 2500
+          required: false

@@ -9,6 +9,7 @@ import { ValueAlreadyExistsError } from '../errors/ValueAlreadyExistsError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllowedError.js'
 import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
+import ResponseController from './responseController.js'
 
 export default class UserController {
     private userRepository: UserRepositoryInterface
@@ -22,15 +23,18 @@ export default class UserController {
         NotFoundError.getErrorDocument('The user'),
     )
 
-    getAllUsers = async (response: Response) => response.status(200).json(await this.userRepository.getAllUsers())
+    getAllUsers = async (response: Response) => ResponseController.sendResponse(
+        response,
+        200,
+        await this.userRepository.getAllUsers(),
+    )
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
         if (!id) {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
         }
         try {
-            const user = await this.userRepository.getUserById(id)
-            return response.status(200).json(user)
+            return ResponseController.sendResponse(response, 200, await this.userRepository.getUserById(id))
         } catch (error: any) {
             return error instanceof NotFoundError
                 ? this.userNotFoundError(response)
@@ -43,8 +47,7 @@ export default class UserController {
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('UID'))
         }
         try {
-            const user = await this.userRepository.getUserByUid(uid)
-            return response.status(200).json(user)
+            return ResponseController.sendResponse(response, 200, await this.userRepository.getUserByUid(uid))
         } catch (error: any) {
             return error instanceof NotFoundError
                 ? this.userNotFoundError(response)
@@ -65,9 +68,12 @@ export default class UserController {
         }
 
         try {
-            const user = new User(email, uid, username)
             await this.userRepository.checkUsernameAndMail(username, email)
-            return response.status(201).json(await this.userRepository.createUser(user))
+            return ResponseController.sendResponse(
+                response,
+                201,
+                await this.userRepository.createUser(new User(email, uid, username)),
+            )
         } catch (error: any) {
             switch (error.constructor) {
             case ValueAlreadyExistsError: {
@@ -100,7 +106,8 @@ export default class UserController {
         // right now this would probably throw an error "Email or Username already taken"
         try {
             await this.userRepository.checkUsernameAndMail(username, email)
-            return response.status(200).json(await this.userRepository.updateUser(uid, body))
+            const { user, points } = await this.userRepository.updateUser(uid, body)
+            return ResponseController.sendResponse(response, 200, user, { amount: points, total: user.points })
         } catch (error: any) {
             switch (error.constructor) {
             case ValueAlreadyExistsError: {
@@ -125,7 +132,7 @@ export default class UserController {
         }
         try {
             await this.userRepository.deleteUser(uid)
-            return response.status(204).json()
+            return response.sendStatus(204)
         } catch (error: any) {
             return error instanceof NotFoundError
                 ? this.userNotFoundError(response)

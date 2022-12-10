@@ -46,9 +46,15 @@ export class UserRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               type: array
-         *               items:
-         *                 $ref: '#/components/schemas/User'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   type: array
+         *                   items:
+         *                     $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
@@ -87,7 +93,13 @@ export class UserRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/User'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:
@@ -128,7 +140,13 @@ export class UserRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/User'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:
@@ -190,6 +208,16 @@ export class UserRouter implements RouterInterface {
          *     responses:
          *       201:
          *         description: Returns the created user
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       400:
          *         $ref: '#/components/responses/BadRequest'
          *       403:
@@ -254,7 +282,12 @@ export class UserRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/User'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   $ref: '#/components/schemas/Points'
          *       400:
          *         $ref: '#/components/responses/BadRequest'
          *       404:
@@ -282,18 +315,13 @@ export class UserRouter implements RouterInterface {
          *     parameters:
          *       - in: header
          *         name: X-Auth
-         *         schema:
-         *           type: string
          *         required: true
          *         description: Authorization header
+         *         schema:
+         *           type: string
          *     responses:
          *       204:
-         *         description: Returns the deleted user
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               ref: '#/components/schemas/User'
+         *         description: Ok
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:

@@ -80,7 +80,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
             points: user.points + Points.PROFILE_EDITED,
         })
         await em.persistAndFlush(user)
-        return user
+        return { user, points: Points.PROFILE_EDITED }
     }
 
     deleteUser = async (uid: string) => {
