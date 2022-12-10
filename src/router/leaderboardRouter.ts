@@ -42,6 +42,18 @@ export class LeaderboardRouter implements RouterInterface {
          *    responses:
          *      200:
          *        description: Returns the leaderboard (top 100 users)
+         *        content:
+         *          application/json:
+         *            schema:
+         *              type: object
+         *              properties:
+         *                data:
+         *                  type: array
+         *                  items:
+         *                    $ref: '#/components/schemas/User'
+         *                points:
+         *                  type: object
+         *                  default: {}
          */
         this.router.get('/', this.getTop100Handler)
     }
