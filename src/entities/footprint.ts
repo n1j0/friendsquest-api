@@ -21,7 +21,7 @@ export class Footprint extends BaseEntity {
     @Property({ type: types.double })
     public longitude!: string
 
-    @Formula(() => '(SELECT COUNT(*) FROM "user_footprints")')
+    @Formula(() => '(SELECT COUNT(*) FROM "user_footprints" WHERE footprint_id = id)')
     @Property()
     public viewCount?: number = 0
 
