@@ -9,6 +9,7 @@ import { NotFoundError } from '../../errors/NotFoundError.js'
 import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points.js'
 import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
+import { FriendshipStatus } from '../../constants/index.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService
@@ -84,6 +85,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const user = await this.userRepository.getUserByUid(uid)
         const friendships = await this.friendshipRepository.getFriendshipsWithSpecifiedOptions(
             user,
+            { status: FriendshipStatus.ACCEPTED },
             { fields: [{ invitor: ['id'] }, { invitee: ['id'] }] },
         )
         const friends = friendships.map(
