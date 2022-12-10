@@ -1,3 +1,4 @@
+import { wrap } from '@mikro-orm/core'
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { ORM } from '../../orm.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
@@ -39,7 +40,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         )
     }
 
-    createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint) => {
+    createFootprint = async ({ title, description, latitude, longitude, files, uid }: NewFootprint) => {
         const em = this.orm.forkEm()
         const [ user, [ photoURL, audioURL ] ] = await Promise.all([
             this.userRepository.getUserByUid(uid),
@@ -53,6 +54,9 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             photoURL,
             audioURL,
         )
+        if (description) {
+            wrap(footprint).assign({ description })
+        }
         await em.persistAndFlush(footprint)
         await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
         return footprint

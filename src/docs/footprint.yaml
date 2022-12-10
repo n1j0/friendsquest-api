@@ -70,6 +70,11 @@ components:
           description: The title of the footprint
           example: My first footprint
           required: true
+        description:
+          type: string
+          description: The description of the footprint
+          example: This is my first footprint description
+          required: false
         latitude:
           type: integer
           format: double

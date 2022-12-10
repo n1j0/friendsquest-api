@@ -82,7 +82,10 @@ export default class FootprintController {
         }
     }
 
-    createFootprint = async ({ title, latitude, longitude, files, uid }: NewFootprint, response: Response) => {
+    createFootprint = async (
+        { title, description, latitude, longitude, files, uid }: NewFootprint,
+        response: Response,
+    ) => {
         if (!title || !latitude || !longitude || !files) {
             // TODO get error message for multiple fields
             return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required fields'))
@@ -91,6 +94,7 @@ export default class FootprintController {
         try {
             const footprint = await this.footprintRepository.createFootprint({
                 title,
+                description,
                 latitude,
                 longitude,
                 files,

@@ -3,7 +3,7 @@ import { FootprintReaction } from '../../entities/footprintReaction.js'
 import { NewFootprint } from '../../types/footprint.js'
 
 export interface FootprintRepositoryInterface {
-    createFootprint({ title, latitude, longitude, files, uid }: NewFootprint): Promise<Footprint>
+    createFootprint({ title, description, latitude, longitude, files, uid }: NewFootprint): Promise<Footprint>
     createFootprintReaction(
         { id, message, uid }: { id: number | string, message: string, uid: string },
     ): Promise<FootprintReaction>
