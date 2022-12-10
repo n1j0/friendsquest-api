@@ -59,9 +59,15 @@ export class FriendshipRouter implements RouterInterface {
          *        content:
          *          application/json:
          *            schema:
-         *              type: array
-         *              items:
-         *               $ref: '#/components/schemas/ExportFriendship'
+         *              type: object
+         *              properties:
+         *                data:
+         *                  type: array
+         *                  items:
+         *                    $ref: '#/components/schemas/ExportFriendship'
+         *                points:
+         *                  type: object
+         *                  default: {}
          *      403:
          *        $ref: '#/components/responses/Forbidden'
          *      404:
@@ -108,7 +114,13 @@ export class FriendshipRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/ExportFriendship'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/ExportFriendship'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:
@@ -152,7 +164,12 @@ export class FriendshipRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Friendship'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/Friendship'
+         *                 points:
+         *                   $ref: '#/components/schemas/Points'
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       404:

@@ -66,9 +66,15 @@ export class FootprintRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               type: array
-         *               items:
-         *                 $ref: '#/components/schemas/Footprint'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   type: array
+         *                   items:
+         *                     $ref: '#/components/schemas/Footprint'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       500:
@@ -117,12 +123,17 @@ export class FootprintRouter implements RouterInterface {
          *           schema:
          *             $ref: '#/components/schemas/NewFootprintReaction'
          *     responses:
-         *       204:
+         *       201:
          *         description: Returns the created reaction
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/FootprintReaction'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/FootprintReaction'
+         *                 points:
+         *                   $ref: '#/components/schemas/Points'
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       500:
@@ -166,7 +177,12 @@ export class FootprintRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Footprint'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/Footprint'
+         *                 points:
+         *                   $ref: '#/components/schemas/Points'
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
@@ -208,9 +224,15 @@ export class FootprintRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               type: array
-         *               items:
-         *                 $ref: '#/components/schemas/FootprintReaction'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   type: array
+         *                   items:
+         *                     $ref: '#/components/schemas/FootprintReaction'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       500:
@@ -272,7 +294,12 @@ export class FootprintRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Footprint'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/Footprint'
+         *                 points:
+         *                   $ref: '#/components/schemas/Points'
          *       400:
          *         $ref: '#/components/responses/BadRequest'
          *       403:
@@ -319,9 +346,15 @@ export class FootprintRouter implements RouterInterface {
          *         content:
          *           application/json:
          *             schema:
-         *               type: array
-         *               items:
-         *                 $ref: '#/components/schemas/Footprint'
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   type: array
+         *                   items:
+         *                     $ref: '#/components/schemas/Footprint'
+         *                 points:
+         *                   type: object
+         *                   default: {}
          *       403:
          *         description: Forbidden access or invalid token
          *       500:
