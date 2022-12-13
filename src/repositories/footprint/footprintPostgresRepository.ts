@@ -37,7 +37,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         return em.findOneOrFail(
             'Footprint',
             { id } as any,
-            { failHandler: () => { throw new NotFoundError() } },
+            { failHandler: () => { throw new NotFoundError() },
+                populate: ['createdBy'] } as any,
         )
     }
 
