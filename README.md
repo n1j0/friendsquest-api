@@ -137,6 +137,9 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 $ npm run orm:restart
 ```
 
+## Architecture
+![Architecture](./documentation/architecture.jpeg)
+
 ## Test Strategy
 The backend includes an ORM system (Mikro-ORM). This consists of so-called entities and controllers. The controllers contain the business logic. 
 
