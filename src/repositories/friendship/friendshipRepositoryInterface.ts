@@ -5,8 +5,8 @@ import { User } from '../../entities/user.js'
 export interface FriendshipRepositoryInterface {
     getFriendshipsWithSpecifiedOptions(
         user: User,
-        filters: {} | undefined,
-        options: FindOptions<any> | undefined,
+        filters?: {},
+        options?: FindOptions<any>,
     ): Promise<Friendship[]>
     getFriendshipsByUid(userId: number | string): Promise<any>
     getFriendshipById(id: number | string): Promise<Friendship>
