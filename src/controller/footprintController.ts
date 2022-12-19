@@ -119,6 +119,7 @@ export default class FootprintController {
                 longitude: Number(footprint.longitude),
                 latitude: Number(footprint.latitude),
             }
+            // @TODO utils
             return ResponseController.sendResponse(
                 response,
                 201,
