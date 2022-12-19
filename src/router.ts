@@ -4,8 +4,7 @@ import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
 import * as Sentry from '@sentry/node'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { openapiSpecification } from './docs/swagger.js'
 import { firebaseRoutes } from './router/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
@@ -14,7 +13,10 @@ import { Route } from './types/routes'
 import ErrorController from './controller/errorController.js'
 import { NotFoundError } from './errors/NotFoundError.js'
 import { InternalServerError } from './errors/InternalServerError.js'
+// @ts-ignore
 import { DatabaseRouter } from './admin/database.js'
+// @ts-ignore
+import * as currentPath from './admin/currentPath.cjs'
 
 export class Router {
     private server: Application
@@ -66,7 +68,7 @@ export class Router {
         this.server.use('/firebase', firebaseRoutes)
 
         this.server.set('view engine', 'ejs')
-        this.server.set('views', join(dirname(fileURLToPath(import.meta.url)), './admin/views'))
+        this.server.set('views', join(currentPath.default, './views'))
         this.server.use('/admin', new DatabaseRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
 
         this.server.use(Sentry.Handlers.errorHandler({

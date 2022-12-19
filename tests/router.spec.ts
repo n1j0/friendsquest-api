@@ -27,7 +27,9 @@ jest.mock('../src/router/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',
 }))
 
-describe.skip('Router', () => {
+jest.mock('../src/admin/currentPath.cjs')
+
+describe('Router', () => {
     let router: Router
     let server: Application
     let orm: ORM
