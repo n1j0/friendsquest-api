@@ -111,6 +111,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
                 await footprint.users.init()
             }
             const hasVisited = footprint.users.getIdentifiers('id').includes(user.id)
+                || footprint.createdBy.id === user.id
             return { ...footprint, hasVisited }
         }))
     }
