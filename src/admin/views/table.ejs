@@ -1,0 +1,44 @@
+<title><%= title %></title>
+
+<h1><%= table %></h1>
+
+<div>
+    <% if (entities.length > 0) { %>
+        <table>
+            <thead>
+            <tr>
+                <% Object.keys(entities[0]).forEach(key =>{ %>
+                    <th><%= key %></th>
+                <% }) %>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% entities.forEach(entity => {
+                const id = entity.id
+            %>
+            <tr>
+                <% Object.values(entity).forEach(value => {
+                    if (typeof value === 'object' && !!value) {
+                        value = JSON.stringify(value)
+                    }
+                %>
+                <td><%= value %></td>
+                <% }) %>
+                <td>
+                    <form action="/admin/tables/delete" method="get">
+                        <input type="hidden" value="<%= table %>" name="table">
+                        <% if (table.includes('_')) { %>
+                            <input type="hidden" value="<%= JSON.stringify(entity) %>" name="entity">
+                        <% } else { %>
+                            <input type="hidden" value="<%= id %>" name="id">
+                        <% } %>
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>

@@ -86,7 +86,32 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     deleteUser = async (uid: string) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        return em.removeAndFlush(user)
+        if (!user.footprints.isInitialized()) {
+            await user.footprints.init()
+        }
+        user.footprints.removeAll()
+        // we can't include repos here due to circular dependency injection in the router
+        const [ friendships, footprints ] = await Promise.all([
+            em.find('Friendship', { $or: [{ invitor: user }, { invitee: user }] }),
+            em.find('Footprint', { createdBy: user } as any),
+        ])
+        const reactions = await em.find(
+            'FootprintReaction',
+            { $or: [{ createdBy: user }, { footprint: [...footprints] }] },
+        )
+        await Promise.all(footprints.map(async (footprint) => {
+            if (!footprint.users.isInitialized()) {
+                await footprint.users.init()
+            }
+            footprint.users.removeAll()
+            em.persist(footprint)
+        }))
+        em.persist(user)
+        em.remove(friendships)
+        em.remove(reactions)
+        em.remove(footprints)
+        em.remove(user)
+        return em.flush()
     }
 
     addPoints = async (uid: string, points: number) => {

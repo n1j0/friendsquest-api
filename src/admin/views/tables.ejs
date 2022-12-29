@@ -1,0 +1,26 @@
+<title><%= title %></title>
+
+<h1>Tables</h1>
+
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th>Table Name</th>
+            <th>Record Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% tables.forEach(table => { %>
+            <tr>
+                <td><%= table.name %></td>
+                <td>
+                    <a href="/admin/tables/get/<%= table.className %>">
+                        <%= table.className %>
+                    </a>
+                </td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+</div>
