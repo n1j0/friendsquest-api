@@ -62,6 +62,11 @@ components:
           example: 'https://example.com/audio.mp3'
           format: uri
           required: true
+        users:
+          type: array
+          description: The users who have seen the footprint
+          items:
+            $ref: '#/components/schemas/User'
     NewFootprint:
       type: object
       properties:
@@ -87,3 +92,14 @@ components:
           description: The longitude of the footprint
           example: 13.0864566
           required: true
+    FootprintWithFlag:
+      allOf:
+        - $ref: '#/components/schemas/Footprint'
+        - type: object
+          properties:
+            hasVisited:
+              type: boolean
+              default: false
+              description: Whether the user has visited the footprint
+              example: true
+

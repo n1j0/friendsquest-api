@@ -351,7 +351,7 @@ export class FootprintRouter implements RouterInterface {
          *                 data:
          *                   type: array
          *                   items:
-         *                     $ref: '#/components/schemas/Footprint'
+         *                     $ref: '#/components/schemas/FootprintWithFlag'
          *                 points:
          *                   type: object
          *                   default: {}
