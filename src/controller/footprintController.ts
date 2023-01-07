@@ -35,9 +35,6 @@ export default class FootprintController {
     }
 
     getFootprintById = async ({ uid, id }: { uid: string, id: number | string }, response: Response) => {
-        if (!id) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
-        }
         try {
             const { footprint, points, userPoints } = await this.footprintRepository.getFootprintById(uid, id)
             return ResponseController.sendResponse(response, 200, footprint, { amount: points, total: userPoints })
@@ -50,9 +47,6 @@ export default class FootprintController {
     }
 
     getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
-        if (!id) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
-        }
         try {
             return ResponseController.sendResponse(
                 response,
@@ -68,17 +62,10 @@ export default class FootprintController {
         { id, message, uid }: { id: number | string, message: string, uid: string },
         response: Response,
     ) => {
-        if (!message) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Message'))
-        }
-        if (!id) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
-        }
-
         try {
             const { reaction, points, userPoints } = await this.footprintRepository.createFootprintReaction({
                 id,
-                message: message.trim(),
+                message,
                 uid,
             })
             const reactionWithFootprintId = {
@@ -100,9 +87,9 @@ export default class FootprintController {
         { title, description, latitude, longitude, files, uid }: NewFootprint,
         response: Response,
     ) => {
-        if (!title || !latitude || !longitude || !files) {
-            // TODO get error message for multiple fields
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required fields'))
+        if (!files) {
+            // move to middleware
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required files'))
         }
 
         try {

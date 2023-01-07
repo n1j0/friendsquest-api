@@ -2,7 +2,6 @@ import { Response } from 'express'
 import { User } from '../entities/user.js'
 import ErrorController from './errorController.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { ValueAlreadyExistsError } from '../errors/ValueAlreadyExistsError.js'
@@ -30,9 +29,6 @@ export default class UserController {
     )
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
-        if (!id) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
-        }
         try {
             return ResponseController.sendResponse(response, 200, await this.userRepository.getUserById(id))
         } catch (error: any) {
@@ -43,9 +39,6 @@ export default class UserController {
     }
 
     getUserByUid = async ({ uid }: { uid: number | string }, response: Response) => {
-        if (!uid) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('UID'))
-        }
         try {
             return ResponseController.sendResponse(response, 200, await this.userRepository.getUserByUid(uid))
         } catch (error: any) {
@@ -56,10 +49,6 @@ export default class UserController {
     }
 
     getUserByFriendsCode = async ({ fc }: { fc: number | string }, response: Response) => {
-        console.log(fc)
-        if (!fc) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('FriendsCode'))
-        }
         try {
             return ResponseController.sendResponse(response, 200, await this.userRepository.getUserByFriendsCode(fc))
         } catch (error: any) {
@@ -73,14 +62,6 @@ export default class UserController {
         { email, username, uid }: { email: string, username: string, uid: string },
         response: Response,
     ) => {
-        if (!email) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Email'))
-        }
-
-        if (!username) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Username'))
-        }
-
         try {
             await this.userRepository.checkUsernameAndMail(username, email)
             return ResponseController.sendResponse(
@@ -141,9 +122,6 @@ export default class UserController {
     }
 
     deleteUser = async ({ uid }: { uid: string }, response: Response) => {
-        if (!uid) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Uid'))
-        }
         try {
             await this.userRepository.deleteUser(uid)
             return response.sendStatus(204)

@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { param, body } from 'express-validator'
 import FootprintController from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
@@ -12,6 +13,9 @@ import { UserService } from '../services/userService.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 
 export class FootprintRouter implements RouterInterface {
     readonly router: Router
@@ -113,7 +117,7 @@ export class FootprintRouter implements RouterInterface {
          *       - in: path
          *         name: id
          *         schema:
-         *           type: string
+         *           type: integer
          *         required: true
          *         description: Numeric ID of the footprint the reaction is for
          *     requestBody:
@@ -134,12 +138,51 @@ export class FootprintRouter implements RouterInterface {
          *                   $ref: '#/components/schemas/FootprintReaction'
          *                 points:
          *                   $ref: '#/components/schemas/Points'
+         *       400:
+         *         $ref: '#/components/responses/BadRequest'
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       500:
          *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.post('/:id/reactions', this.createFootprintReactionHandler)
+        this.router.post(
+            '/:id/reactions',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+                body('message')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Message is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Message must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createFootprintReactionHandler,
+        )
     }
 
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
@@ -186,7 +229,28 @@ export class FootprintRouter implements RouterInterface {
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
-        this.router.get('/:id', this.getFootprintByIdHandler)
+        this.router.get(
+            '/:id',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getFootprintByIdHandler,
+        )
     }
 
     getFootprintReactionsHandler = (
@@ -238,7 +302,28 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
+        this.router.get(
+            '/:id/reactions',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getFootprintReactionsHandler,
+        )
     }
 
     createFootprintHandler = (request: Request, response: Response) => this.footprintController.createFootprint(
@@ -310,9 +395,77 @@ export class FootprintRouter implements RouterInterface {
         this.router.post(
             '/',
             this.footprintService.uploadMiddleware.fields(
-                [{ name: 'image', maxCount: 1 },
-                    { name: 'audio', maxCount: 1 }],
+                [
+                    { name: 'image', maxCount: 1 },
+                    { name: 'audio', maxCount: 1 },
+                ],
             ),
+            [
+                body('title')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Title is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Title must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('description')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Description is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Description must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('latitude')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Latitude is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isNumeric()
+                    .withMessage(
+                        {
+                            message: 'Latitude must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+                body('longitude')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Longitude is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isNumeric()
+                    .withMessage(
+                        {
+                            message: 'Longitude must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+                // TODO: Add validation for files
+            ],
+            errorHandler,
             this.createFootprintHandler,
         )
     }
