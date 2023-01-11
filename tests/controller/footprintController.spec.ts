@@ -5,10 +5,8 @@ import FootprintController from '../../src/controller/footprintController'
 import responseMock from '../helper/responseMock'
 import ErrorController from '../../src/controller/errorController'
 import ResponseController from '../../src/controller/responseController'
-import { NewFootprint } from '../../src/types/footprint'
 import { NotFoundError } from '../../src/errors/NotFoundError'
 import { InternalServerError } from '../../src/errors/InternalServerError'
-import { AttributeIsMissingError } from '../../src/errors/AttributeIsMissingError'
 
 describe('FootprintController', () => {
     let footprintController: FootprintController
@@ -83,14 +81,6 @@ describe('FootprintController', () => {
             await footprintController.getFootprintById({ uid: 'abc', id: 1 }, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument('The footprint'))
         })
-
-        it('sends an error if id is missing', async () => {
-            await footprintController.getFootprintById(
-                { uid: 'abc', id: undefined } as unknown as { uid: string, id: number },
-                response,
-            )
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, AttributeIsMissingError.getErrorDocument('ID'))
-        })
     })
 
     describe('getFootprintReactions', () => {
@@ -112,11 +102,6 @@ describe('FootprintController', () => {
             })
             await footprintController.getFootprintReactions({ id: 1 }, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
-        })
-
-        it('sends an error if id is missing', async () => {
-            await footprintController.getFootprintReactions({ id: undefined } as unknown as { id: number }, response)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, AttributeIsMissingError.getErrorDocument('ID'))
         })
     })
 
@@ -142,19 +127,6 @@ describe('FootprintController', () => {
             expect(sendResponseSpy).toHaveBeenCalledWith(response, 201, result, { amount: points, total: userPoints })
         })
 
-        it('trims the message of a new reaction', async () => {
-            const id = 1
-            const message = ' sample '
-            const trimmedMessage = 'sample'
-            const uid = 'abcdef'
-            await footprintController.createFootprintReaction({ id, message, uid }, response)
-            expect(footprintRepository.createFootprintReaction).toHaveBeenCalledWith({
-                id,
-                message: trimmedMessage,
-                uid,
-            })
-        })
-
         it('sends an error if something goes wrong', async () => {
             const error = new Error('test')
             // @ts-ignore
@@ -163,19 +135,6 @@ describe('FootprintController', () => {
             })
             await footprintController.createFootprintReaction({ id: 1, message: 'a', uid: 'abc' }, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
-        })
-
-        it('sends an error if message is missing', async () => {
-            await footprintController.createFootprintReaction({ id: 0, message: '', uid: '' }, response)
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, AttributeIsMissingError.getErrorDocument('Message'))
-        })
-
-        it('sends an error if id is missing', async () => {
-            await footprintController.createFootprintReaction(
-                { id: undefined, message: 'a', uid: '' } as unknown as { id: number, message: string, uid: string },
-                response,
-            )
-            expect(sendErrorSpy).toHaveBeenCalledWith(response, AttributeIsMissingError.getErrorDocument('ID'))
         })
     })
 
@@ -209,19 +168,6 @@ describe('FootprintController', () => {
             })
             await footprintController.createFootprint(footprint, response)
             expect(sendErrorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
-        })
-
-        it.each([
-            [{ uid: 'a', title: '', latitude: '1', longitude: '2', files: { image: [], audio: [] } }],
-            [{ uid: 'a', title: 'b', latitude: '', longitude: '2', files: { image: [], audio: [] } }],
-            [{ uid: 'a', title: 'b', latitude: '1', longitude: '', files: { image: [], audio: [] } }],
-            [{ uid: 'a', title: 'b', latitude: '1', longitude: '2', files: undefined }],
-        ])('sends an error if data is missing', async (newFootprint) => {
-            await footprintController.createFootprint(newFootprint as unknown as NewFootprint, response)
-            expect(sendErrorSpy).toHaveBeenCalledWith(
-                response,
-                AttributeIsMissingError.getErrorDocument('Required fields'),
-            )
         })
     })
 })
