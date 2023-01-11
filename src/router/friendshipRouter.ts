@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { param, body } from 'express-validator'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
@@ -8,6 +9,9 @@ import { UserRepositoryInterface } from '../repositories/user/userRepositoryInte
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 
 export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
@@ -73,7 +77,28 @@ export class FriendshipRouter implements RouterInterface {
          *      404:
          *        $ref: '#/components/responses/NotFound'
          */
-        this.router.get('/', this.getFriendshipsHandler)
+        this.router.get(
+            '/',
+            [
+                param('userId')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'UserID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'UserID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getFriendshipsHandler,
+        )
     }
 
     createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
@@ -126,7 +151,22 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.post('/', this.createFriendshipHandler)
+        this.router.post(
+            '/',
+            [
+                body('friendsCode')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'FriendsCode is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createFriendshipHandler,
+        )
     }
 
     acceptFriendshipHandler = (request: Request, response: Response) => this.friendshipController.acceptFriendship(
@@ -175,7 +215,28 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.patch('/:id', this.acceptFriendshipHandler)
+        this.router.patch(
+            '/:id',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.acceptFriendshipHandler,
+        )
     }
 
     declineOrDeleteFriendshipHandler = (
@@ -218,7 +279,28 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete('/:id', this.declineOrDeleteFriendshipHandler)
+        this.router.delete(
+            '/:id',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.declineOrDeleteFriendshipHandler,
+        )
     }
 
     createAndReturnRoutes = () => {

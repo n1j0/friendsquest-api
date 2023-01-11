@@ -2,7 +2,7 @@ import { getReasonPhrase, StatusCodes } from 'http-status-codes'
 import { Mapper } from './ProblemDocument.js'
 import { ProblemDocument } from '../types/problemDocument'
 
-export class AttributeIsMissingError extends Error {
+export class AttributeInvalidError extends Error {
     static getErrorDocument(message: string): ProblemDocument {
         return Mapper.mapError({
             detail: `${(message)}.`,

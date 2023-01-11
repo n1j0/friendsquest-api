@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { param, body } from 'express-validator'
 import UserController from '../controller/userController.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -6,6 +7,9 @@ import { UserRepositoryInterface } from '../repositories/user/userRepositoryInte
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 
 export class UserRouter implements RouterInterface {
     private readonly router: Router
@@ -105,7 +109,28 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get('/:id', this.getUserByIdHandler)
+        this.router.get(
+            '/:id',
+            [
+                param('id')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'ID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isInt()
+                    .withMessage(
+                        {
+                            message: 'ID must be a number',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getUserByIdHandler,
+        )
     }
 
     getUserByUidHandler = (request: Request, response: Response) => this.userController.getUserByUid(
@@ -157,7 +182,28 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get('/uid/:uid', this.getUserByUidHandler)
+        this.router.get(
+            '/uid/:uid',
+            [
+                param('uid')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'UID is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'UID must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getUserByUidHandler,
+        )
     }
 
     generateGetUserByFriendsCodeRoute = () => {
@@ -199,7 +245,28 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get('/fc/:fc', this.getUserByFriendsCodeHandler)
+        this.router.get(
+            '/fc/:fc',
+            [
+                param('fc')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Friends code is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'FriendsCode must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    ),
+            ],
+            errorHandler,
+            this.getUserByFriendsCodeHandler,
+        )
     }
 
     createUserHandler = (request: Request, response: Response) => this.userController.createUser(
@@ -270,7 +337,45 @@ export class UserRouter implements RouterInterface {
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
-        this.router.post('/', this.createUserHandler)
+        this.router.post(
+            '/',
+            [
+                body('email')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Email is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isEmail()
+                    .withMessage(
+                        {
+                            message: 'Email is invalid',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('username')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Username is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Username must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createUserHandler,
+        )
     }
 
     updateUserHandler = (request: Request, response: Response) => this.userController.updateUser(
@@ -342,6 +447,27 @@ export class UserRouter implements RouterInterface {
          */
         this.router.patch(
             '/',
+            [
+                body('email')
+                    .isEmail()
+                    .withMessage(
+                        {
+                            message: 'Email is invalid',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('username')
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Username must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
             this.updateUserHandler,
         )
     }

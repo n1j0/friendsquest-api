@@ -3,7 +3,6 @@ import ErrorController from './errorController.js'
 import { FriendshipStatus } from '../constants/index.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
@@ -29,14 +28,7 @@ export default class FriendshipController {
         ErrorController.sendError(response, NotFoundError.getErrorDocument('The friendship'))
     }
 
-    private idNotFoundError = (response: Response) => {
-        ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('ID'))
-    }
-
     getFriendshipsByUid = async ({ userId }: { userId: string }, response: Response) => {
-        if (!userId) {
-            return this.idNotFoundError(response)
-        }
         try {
             return ResponseController.sendResponse(
                 response,
@@ -52,9 +44,6 @@ export default class FriendshipController {
     }
 
     createFriendship = async ({ friendsCode, uid }: { friendsCode: string, uid: string }, response: Response) => {
-        if (!friendsCode) {
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('FriendsCode'))
-        }
         try {
             const [ invitor, invitee ] = await Promise.all([
                 this.userRepository.getUserByUid(uid),
@@ -93,9 +82,6 @@ export default class FriendshipController {
     }
 
     acceptFriendship = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
-        if (!id) {
-            return this.idNotFoundError(response)
-        }
         try {
             const friendship = await this.friendshipRepository.getFriendshipById(id)
 
@@ -138,9 +124,6 @@ export default class FriendshipController {
     }
 
     declineOrDeleteFriendship = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
-        if (!id) {
-            return this.idNotFoundError(response)
-        }
         try {
             const friendship = await this.friendshipRepository.getFriendshipById(id)
 
