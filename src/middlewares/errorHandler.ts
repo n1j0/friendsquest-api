@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { validationResult } from 'express-validator'
-import ErrorController from '../controller/errorController'
+import ErrorController from '../controller/errorController.js'
 
 // eslint-disable-next-line consistent-return
 export function errorHandler(request: Request, response: Response, next: NextFunction) {
