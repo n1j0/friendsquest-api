@@ -55,6 +55,20 @@ export default class UserController {
         }
     }
 
+    getUserByFriendsCode = async ({ fc }: { fc: number | string }, response: Response) => {
+        console.log(fc)
+        if (!fc) {
+            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('FriendsCode'))
+        }
+        try {
+            return ResponseController.sendResponse(response, 200, await this.userRepository.getUserByFriendsCode(fc))
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
     createUser = async (
         { email, username, uid }: { email: string, username: string, uid: string },
         response: Response,

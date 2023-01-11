@@ -113,6 +113,11 @@ export class UserRouter implements RouterInterface {
         response,
     )
 
+    getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
+        { fc: request.params.fc },
+        response,
+    )
+
     generateGetUserByUidRoute = () => {
         /**
          * @openapi
@@ -153,6 +158,48 @@ export class UserRouter implements RouterInterface {
          *         $ref: '#/components/responses/NotFound'
          */
         this.router.get('/uid/:uid', this.getUserByUidHandler)
+    }
+
+    generateGetUserByFriendsCodeRoute = () => {
+        /**
+         * @openapi
+         * /users/fc/{fc}:
+         *   get:
+         *     summary: Get a user by friends code
+         *     tags:
+         *       - User
+         *     parameters:
+         *       - in: header
+         *         name: X-Auth
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Authorization header
+         *       - in: path
+         *         name: fc
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Friends code of the user to get
+         *     responses:
+         *       200:
+         *         description: Returns a user by friends code
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.get('/fc/:fc', this.getUserByFriendsCodeHandler)
     }
 
     createUserHandler = (request: Request, response: Response) => this.userController.createUser(
@@ -337,6 +384,7 @@ export class UserRouter implements RouterInterface {
         this.generateAllUsersRoute()
         this.generateGetUserByIdRoute()
         this.generateGetUserByUidRoute()
+        this.generateGetUserByFriendsCodeRoute()
         this.generateCreateUserRoute()
         this.generateUpdateUserRoute()
         this.generateDeleteUserRoute()

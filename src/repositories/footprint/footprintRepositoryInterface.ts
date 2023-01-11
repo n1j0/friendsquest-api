@@ -7,7 +7,7 @@ export interface FootprintRepositoryInterface {
         : Promise<{ footprint: Footprint, points: number, userPoints: number }>
     createFootprintReaction(
         { id, message, uid }: { id: number | string, message: string, uid: string },
-    ): Promise<{ reaction: FootprintReaction, points: number, userPoints: number }>
+    ): Promise<{ reaction: FootprintReaction, points?: number, userPoints?: number }>
     getAllFootprints(): Promise<object[]>
     getFootprintsOfFriendsAndUser(uid: string): Promise<object[]>
     getFootprintById(
