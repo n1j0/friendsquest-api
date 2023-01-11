@@ -168,17 +168,32 @@ describe('FootprintRouter', () => {
 
         it('generates generateCreateFootprintReaction route', () => {
             footprintRouter.generateCreateFootprintReactionRoute()
-            expect(router.post).toHaveBeenCalledWith('/:id/reactions', footprintRouter.createFootprintReactionHandler)
+            expect(router.post).toHaveBeenCalledWith(
+                '/:id/reactions',
+                expect.any(Array),
+                expect.any(Function),
+                footprintRouter.createFootprintReactionHandler,
+            )
         })
 
         it('generates generateGetFootprintById route', () => {
             footprintRouter.generateGetFootprintByIdRoute()
-            expect(router.get).toHaveBeenCalledWith('/:id', footprintRouter.getFootprintByIdHandler)
+            expect(router.get).toHaveBeenCalledWith(
+                '/:id',
+                expect.any(Array),
+                expect.any(Function),
+                footprintRouter.getFootprintByIdHandler,
+            )
         })
 
         it('generates generateGetFootprintReactions route', () => {
             footprintRouter.generateGetFootprintReactionsRoute()
-            expect(router.get).toHaveBeenCalledWith('/:id/reactions', footprintRouter.getFootprintReactionsHandler)
+            expect(router.get).toHaveBeenCalledWith(
+                '/:id/reactions',
+                expect.any(Array),
+                expect.any(Function),
+                footprintRouter.getFootprintReactionsHandler,
+            )
         })
 
         it('generates generateCreateFootprint route', () => {
@@ -189,6 +204,8 @@ describe('FootprintRouter', () => {
             expect(router.post).toHaveBeenCalledWith(
                 '/',
                 fields,
+                expect.any(Array),
+                expect.any(Function),
                 footprintRouter.createFootprintHandler,
             )
             expect(footprintService.uploadMiddleware.fields).toHaveBeenCalledWith([
