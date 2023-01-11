@@ -3,7 +3,6 @@ import ErrorController from './errorController.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
-import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import ResponseController from './responseController.js'
 
@@ -87,11 +86,6 @@ export default class FootprintController {
         { title, description, latitude, longitude, files, uid }: NewFootprint,
         response: Response,
     ) => {
-        if (!files) {
-            // move to middleware
-            return ErrorController.sendError(response, AttributeIsMissingError.getErrorDocument('Required files'))
-        }
-
         try {
             const { footprint, points, userPoints } = await this.footprintRepository.createFootprint({
                 title,

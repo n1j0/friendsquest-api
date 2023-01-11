@@ -463,7 +463,6 @@ export class FootprintRouter implements RouterInterface {
                             type: AttributeInvalidError,
                         },
                     ),
-                // TODO: Add validation for files
             ],
             errorHandler,
             this.createFootprintHandler,
