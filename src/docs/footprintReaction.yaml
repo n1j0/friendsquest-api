@@ -21,17 +21,18 @@ components:
           type: number
           description: The id of the user who created the footprint reaction
           example: 1
-          required: true
         footprint:
           type: number
           description: The id of the footprint
           example: 1
-          required: true
         message:
           type: string
           description: The message of the footprint reaction
           example: This is a great footprint
-          required: true
+      required:
+        - createdBy
+        - footprint
+        - message
     NewFootprintReaction:
       type: object
       properties:
@@ -39,4 +40,5 @@ components:
           type: string
           description: The message of the footprint
           example: This is a great footprint
-          required: true
+      required:
+        - message

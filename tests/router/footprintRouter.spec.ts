@@ -180,7 +180,6 @@ describe('FootprintRouter', () => {
             footprintRouter.generateGetFootprintByIdRoute()
             expect(router.get).toHaveBeenCalledWith(
                 '/:id',
-                expect.any(Array),
                 expect.any(Function),
                 footprintRouter.getFootprintByIdHandler,
             )
@@ -190,7 +189,6 @@ describe('FootprintRouter', () => {
             footprintRouter.generateGetFootprintReactionsRoute()
             expect(router.get).toHaveBeenCalledWith(
                 '/:id/reactions',
-                expect.any(Array),
                 expect.any(Function),
                 footprintRouter.getFootprintReactionsHandler,
             )

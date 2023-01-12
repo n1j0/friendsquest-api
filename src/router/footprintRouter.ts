@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { param, body } from 'express-validator'
+import { body } from 'express-validator'
 import FootprintController from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
@@ -148,21 +148,6 @@ export class FootprintRouter implements RouterInterface {
         this.router.post(
             '/:id/reactions',
             [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
                 body('message')
                     .notEmpty()
                     .withMessage(
@@ -231,23 +216,6 @@ export class FootprintRouter implements RouterInterface {
          */
         this.router.get(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFootprintByIdHandler,
         )
@@ -304,23 +272,6 @@ export class FootprintRouter implements RouterInterface {
          */
         this.router.get(
             '/:id/reactions',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFootprintReactionsHandler,
         )
@@ -364,12 +315,13 @@ export class FootprintRouter implements RouterInterface {
          *                 type: string
          *                 format: binary
          *                 description: The photo of the footprint
-         *                 required: false
          *               audio:
          *                 type: string
          *                 format: binary
          *                 description: The audio of the footprint
-         *                 required: false
+         *             required:
+         *               - image
+         *               - audio
          *         multipart/json:
          *           schema:
          *             $ref: '#/components/schemas/NewFootprint'
@@ -440,13 +392,6 @@ export class FootprintRouter implements RouterInterface {
                             message: 'Latitude is required',
                             type: AttributeIsMissingError,
                         },
-                    )
-                    .isNumeric()
-                    .withMessage(
-                        {
-                            message: 'Latitude must be a number',
-                            type: AttributeInvalidError,
-                        },
                     ),
                 body('longitude')
                     .notEmpty()
@@ -454,13 +399,6 @@ export class FootprintRouter implements RouterInterface {
                         {
                             message: 'Longitude is required',
                             type: AttributeIsMissingError,
-                        },
-                    )
-                    .isNumeric()
-                    .withMessage(
-                        {
-                            message: 'Longitude must be a number',
-                            type: AttributeInvalidError,
                         },
                     ),
             ],

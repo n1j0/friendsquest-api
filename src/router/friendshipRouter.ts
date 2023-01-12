@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { param, body } from 'express-validator'
+import { body } from 'express-validator'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
@@ -10,7 +10,6 @@ import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
-import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 
 export class FriendshipRouter implements RouterInterface {
@@ -46,15 +45,15 @@ export class FriendshipRouter implements RouterInterface {
          *    parameters:
          *      - in: header
          *        name: X-Auth
+         *        required: true
          *        schema:
          *          type: string
-         *          required: true
          *          description: Authorization header
          *      - in: query
          *        name: userId
+         *        required: true
          *        schema:
          *          type: integer
-         *          required: true
          *          description: Numeric ID of the user to get the friendships of
          *          example: 1
          *    responses:
@@ -79,23 +78,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.get(
             '/',
-            [
-                param('userId')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'UserID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'UserID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFriendshipsHandler,
         )
@@ -117,9 +99,9 @@ export class FriendshipRouter implements RouterInterface {
          *     parameters:
          *       - in: header
          *         name: X-Auth
+         *         required: true
          *         schema:
          *           type: string
-         *           required: true
          *           description: Authorization header
          *     requestBody:
          *       required: true
@@ -130,9 +112,10 @@ export class FriendshipRouter implements RouterInterface {
          *             properties:
          *               friendsCode:
          *                 type: string
-         *                 required: true
          *                 description: Friends code of the user to create a friendship with
          *                 example: 0rIxc
+         *             required:
+         *               - friendsCode
          *     responses:
          *       200:
          *         description: Returns the created friendship
@@ -188,15 +171,15 @@ export class FriendshipRouter implements RouterInterface {
          *     parameters:
          *       - in: header
          *         name: X-Auth
+         *         required: true
          *         schema:
          *           type: string
-         *           required: true
          *           description: Authorization header
          *       - in: path
          *         name: id
+         *         required: true
          *         schema:
          *           type: integer
-         *           required: true
          *           description: Numeric ID of the friendship to accept
          *     responses:
          *       200:
@@ -217,23 +200,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.patch(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.acceptFriendshipHandler,
         )
@@ -261,15 +227,15 @@ export class FriendshipRouter implements RouterInterface {
          *     parameters:
          *       - in: header
          *         name: X-Auth
+         *         required: true
          *         schema:
          *           type: string
-         *           required: true
          *           description: Authorization header
          *       - in: path
          *         name: id
+         *         required: true
          *         schema:
          *           type: integer
-         *           required: true
          *           description: Numeric ID of the friendship to delete
          *     responses:
          *       204:
@@ -281,23 +247,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.delete(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.declineOrDeleteFriendshipHandler,
         )
