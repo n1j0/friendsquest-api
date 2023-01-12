@@ -22,30 +22,29 @@ components:
           format: email
           description: The email of the user
           example: john@doe.com
-          required: true
         username:
           type: string
           description: The username of the user
           example: JohnDoe
-          required: false
         uid:
           type: string
           format: uuid
           description: The uid of the user
           example: 39FDDRsAsZNPmocG4ZIgcnwO5BF2
-          required: true
         imageURL:
           type: string
           description: The imageURL of the avatar of the user
           example: https://example.com/image.png
-          required: false
         friendsCode:
           type: string
           description: The friends code of the user
           example: 0zdhg
-          required: true
         points:
           type: number
           description: The points of the user
           example: 100
-          required: true
+      required:
+        - email
+        - uid
+        - friendsCode
+        - points

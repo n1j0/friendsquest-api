@@ -35,9 +35,9 @@ export class LeaderboardRouter implements RouterInterface {
          *    parameters:
          *      - in: header
          *        name: X-Auth
+         *        required: true
          *        schema:
          *          type: string
-         *          required: true
          *          description: Authorization header
          *    responses:
          *      200:

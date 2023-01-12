@@ -13,9 +13,9 @@ const router = express.Router()
  *     parameters:
  *       - in: header
  *         name: userid
+ *         required: true
  *         schema:
  *           type: string
- *           required: true
  *           description: Number of the test user (1 or 2)
  *     responses:
  *       200:

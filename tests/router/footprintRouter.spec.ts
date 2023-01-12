@@ -170,6 +170,7 @@ describe('FootprintRouter', () => {
             footprintRouter.generateCreateFootprintReactionRoute()
             expect(router.post).toHaveBeenCalledWith(
                 '/:id/reactions',
+                expect.any(Function),
                 expect.any(Array),
                 expect.any(Function),
                 footprintRouter.createFootprintReactionHandler,

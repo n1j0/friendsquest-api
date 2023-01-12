@@ -21,12 +21,10 @@ components:
           type: string
           description: The title of the footprint
           example: My first footprint
-          required: true
         description:
           type: string
           description: The description of the footprint
           example: This is my first footprint
-          required: false
         createdBy:
           type: object
           description: The user who created the footprint
@@ -37,13 +35,11 @@ components:
           format: double
           description: The latitude of the footprint
           example: 48.2081743
-          required: true
         longitude:
           type: number
           format: double
           description: The longitude of the footprint
           example: 16.3738189
-          required: true
         viewCount:
           type: string
           description: The view count of the footprint
@@ -55,18 +51,23 @@ components:
           description: The image URL of the footprint
           example: 'https://example.com/image.png'
           format: uri
-          required: true
         audioURL:
           type: string
           description: The audio URL of the footprint
           example: 'https://example.com/audio.mp3'
           format: uri
-          required: true
         users:
           type: array
           description: The users who have seen the footprint
           items:
             $ref: '#/components/schemas/User'
+      required:
+        - title
+        - createdBy
+        - latitude
+        - longitude
+        - imageURL
+        - audioURL
     NewFootprint:
       type: object
       properties:
@@ -74,24 +75,24 @@ components:
           type: string
           description: The title of the footprint
           example: My first footprint
-          required: true
         description:
           type: string
           description: The description of the footprint
           example: This is my first footprint description
-          required: false
         latitude:
           type: integer
           format: double
           description: The latitude of the footprint
           example: 47.723738
-          required: true
         longitude:
           type: integer
           format: double
           description: The longitude of the footprint
           example: 13.0864566
-          required: true
+      required:
+        - title
+        - latitude
+        - longitude
     FootprintWithFlag:
       allOf:
         - $ref: '#/components/schemas/Footprint'

@@ -119,13 +119,6 @@ export class UserRouter implements RouterInterface {
                             message: 'ID is required',
                             type: AttributeIsMissingError,
                         },
-                    )
-                    .isInt()
-                    .withMessage(
-                        {
-                            message: 'ID must be a number',
-                            type: AttributeInvalidError,
-                        },
                     ),
             ],
             errorHandler,
@@ -192,13 +185,6 @@ export class UserRouter implements RouterInterface {
                             message: 'UID is required',
                             type: AttributeIsMissingError,
                         },
-                    )
-                    .isString()
-                    .withMessage(
-                        {
-                            message: 'UID must be a string',
-                            type: AttributeInvalidError,
-                        },
                     ),
             ],
             errorHandler,
@@ -255,13 +241,6 @@ export class UserRouter implements RouterInterface {
                             message: 'Friends code is required',
                             type: AttributeIsMissingError,
                         },
-                    )
-                    .isString()
-                    .withMessage(
-                        {
-                            message: 'FriendsCode must be a string',
-                            type: AttributeInvalidError,
-                        },
                     ),
             ],
             errorHandler,
@@ -303,11 +282,12 @@ export class UserRouter implements RouterInterface {
          *               email:
          *                 type: string
          *                 description: The email of the user
-         *                 required: true
          *               username:
          *                 type: string
          *                 description: The username of the user
-         *                 required: true
+         *             required:
+         *               - email
+         *               - username
          *           examples:
          *             normal:
          *               summary: Example for valid creation of user
@@ -413,11 +393,12 @@ export class UserRouter implements RouterInterface {
          *               email:
          *                 type: string
          *                 description: The email of the user
-         *                 required: true
          *               username:
          *                 type: string
          *                 description: The username of the user
-         *                 required: false
+         *             required:
+         *               - email
+         *               - username
          *           examples:
          *             normal:
          *               summary: Example for valid change of one user
