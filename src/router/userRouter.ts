@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { param, body } from 'express-validator'
+import { body } from 'express-validator'
 import UserController from '../controller/userController.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -111,16 +111,6 @@ export class UserRouter implements RouterInterface {
          */
         this.router.get(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getUserByIdHandler,
         )
@@ -177,16 +167,6 @@ export class UserRouter implements RouterInterface {
          */
         this.router.get(
             '/uid/:uid',
-            [
-                param('uid')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'UID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getUserByUidHandler,
         )
@@ -233,16 +213,6 @@ export class UserRouter implements RouterInterface {
          */
         this.router.get(
             '/fc/:fc',
-            [
-                param('fc')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'Friends code is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getUserByFriendsCodeHandler,
         )

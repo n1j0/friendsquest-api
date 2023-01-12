@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { param, body } from 'express-validator'
+import { body } from 'express-validator'
 import FootprintController from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
@@ -147,19 +147,7 @@ export class FootprintRouter implements RouterInterface {
          */
         this.router.post(
             '/:id/reactions',
-            (request: any, response: any, next: any) => {
-                console.log(request.params)
-                next()
-            },
             [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
                 body('message')
                     .notEmpty()
                     .withMessage(
@@ -228,16 +216,6 @@ export class FootprintRouter implements RouterInterface {
          */
         this.router.get(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFootprintByIdHandler,
         )
@@ -294,16 +272,6 @@ export class FootprintRouter implements RouterInterface {
          */
         this.router.get(
             '/:id/reactions',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFootprintReactionsHandler,
         )

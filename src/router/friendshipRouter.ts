@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express'
-import { param, body } from 'express-validator'
+import { body } from 'express-validator'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
@@ -78,16 +78,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.get(
             '/',
-            [
-                param('userId')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'UserID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.getFriendshipsHandler,
         )
@@ -210,16 +200,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.patch(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.acceptFriendshipHandler,
         )
@@ -267,16 +247,6 @@ export class FriendshipRouter implements RouterInterface {
          */
         this.router.delete(
             '/:id',
-            [
-                param('id')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'ID is required',
-                            type: AttributeIsMissingError,
-                        },
-                    ),
-            ],
             errorHandler,
             this.declineOrDeleteFriendshipHandler,
         )
