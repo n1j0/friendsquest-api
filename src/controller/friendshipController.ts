@@ -47,7 +47,7 @@ export default class FriendshipController {
         try {
             const [ invitor, invitee ] = await Promise.all([
                 this.userRepository.getUserByUid(uid),
-                this.userRepository.getUserByFriendsCode(friendsCode),
+                this.userRepository.getUserByFriendsCode(friendsCode.toUpperCase()),
             ])
 
             if (invitor.friendsCode === invitee.friendsCode) {
