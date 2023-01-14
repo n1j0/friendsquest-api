@@ -74,7 +74,7 @@ describe('FootprintService', () => {
         const image: Express.Multer.File = generateFile('image', 'image/jpg')
         const result = await footprintService.uploadFilesToFireStorage({ audio: [audio], image: [image] }, '')
 
-        expect(storage.bucket).toHaveBeenCalledWith('gs://friends-quest.appspot.com/')
+        expect(storage.bucket).toHaveBeenCalled()
         expect(fullPath).toHaveBeenCalledTimes(2)
         expect(result).toHaveProperty('length', 2)
     })

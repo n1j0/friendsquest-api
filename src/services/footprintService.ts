@@ -35,7 +35,7 @@ export class FootprintService {
     ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
     uploadFilesToFireStorage = async (files: MulterFiles['files'], uid: string) => {
-        const bucket = this.storage.bucket('gs://friends-quest.appspot.com/')
+        const bucket = this.storage.bucket()
         const images: Express.Multer.File[] = files.image
         const audios: Express.Multer.File[] = files.audio
         const allFiles = [ ...images, ...audios ]
