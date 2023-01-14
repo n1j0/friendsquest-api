@@ -17,6 +17,7 @@ import { InternalServerError } from './errors/InternalServerError.js'
 import { DatabaseRouter } from './admin/database.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
+import { basicAuth } from './admin/middlewares/basicAuth.js'
 
 export class Router {
     private server: Application
@@ -69,7 +70,7 @@ export class Router {
 
         this.server.set('view engine', 'ejs')
         this.server.set('views', join(currentPath.default, './views'))
-        this.server.use('/admin', new DatabaseRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
+        this.server.use('/admin', basicAuth(), new DatabaseRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
 
         this.server.use(Sentry.Handlers.errorHandler({
             shouldHandleError() {
