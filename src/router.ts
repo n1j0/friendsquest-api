@@ -1,11 +1,9 @@
 import { Application, ErrorRequestHandler, NextFunction, Request, Response, Router as ExpressRouter } from 'express'
-import swaggerUi from 'swagger-ui-express'
 import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
 import actuator from 'express-actuator'
 import * as Sentry from '@sentry/node'
 import { join } from 'node:path'
-import { openapiSpecification } from './docs/swagger.js'
 import { firebaseRoutes } from './router/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
 import { ORM } from './orm.js'
@@ -14,7 +12,7 @@ import ErrorController from './controller/errorController.js'
 import { NotFoundError } from './errors/NotFoundError.js'
 import { InternalServerError } from './errors/InternalServerError.js'
 // @ts-ignore
-import { DatabaseRouter } from './admin/database.js'
+import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
@@ -43,15 +41,10 @@ export class Router {
     }
 
     initRoutes = (
-        port: number,
         routes: Route[],
         authMiddleware = firebaseAuthMiddleware,
         auth = getAuth(),
     ) => {
-        // TODO: remove this when ready for production
-        this.server.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
-        console.log(`📖 Docs generated: http://localhost:${port}/docs`)
-
         this.server.use(this.createRequestContext)
 
         this.server.use(actuator())
@@ -70,7 +63,7 @@ export class Router {
 
         this.server.set('view engine', 'ejs')
         this.server.set('views', join(currentPath.default, './views'))
-        this.server.use('/admin', basicAuth(), new DatabaseRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
+        this.server.use('/admin', basicAuth(), new AdminRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
 
         this.server.use(Sentry.Handlers.errorHandler({
             shouldHandleError() {

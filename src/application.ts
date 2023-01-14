@@ -68,7 +68,7 @@ export default class Application {
 
         this.server.disable('x-powered-by')
 
-        this.router.initRoutes(this.port, routes)
+        this.router.initRoutes(routes)
 
         try {
             this.server.listen(this.port)

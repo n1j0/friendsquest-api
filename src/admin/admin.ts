@@ -1,7 +1,9 @@
 import { Request, Response, Router } from 'express'
+import swaggerUi from 'swagger-ui-express'
 import { ORM } from '../orm.js'
+import { openapiSpecification } from '../docs/swagger.js'
 
-export class DatabaseRouter {
+export class AdminRouter {
     private readonly router: Router
 
     private readonly orm: ORM
@@ -16,6 +18,9 @@ export class DatabaseRouter {
             '/',
             (_request: Request, response: Response) => response.render('index', { title: 'Admin Panel' }),
         )
+
+        this.router.use('/docs', swaggerUi.serve)
+        this.router.get('/docs', swaggerUi.setup(openapiSpecification))
 
         this.router.get(
             '/tables',

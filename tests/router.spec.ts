@@ -11,8 +11,8 @@ import { NotFoundError } from '../src/errors/NotFoundError'
 import { InternalServerError } from '../src/errors/InternalServerError'
 
 jest.mock('swagger-ui-express', () => ({
-    serve: 'serve',
-    setup: () => 'setup',
+    serve: jest.fn().mockReturnValue('serve'),
+    setup: jest.fn().mockImplementation(() => jest.fn()),
 }))
 
 jest.mock('express-actuator', () => jest.fn().mockReturnValue('actuator'))
@@ -42,7 +42,7 @@ describe('Router', () => {
             server = mock<Application>()
             orm = mock<ORM>()
             router = new Router(server, orm)
-            router.initRoutes(1234, [], jest.fn(), {} as unknown as Auth)
+            router.initRoutes([], jest.fn(), {} as unknown as Auth)
             sendErrorSpy = jest.spyOn(ErrorController, 'sendError')
         })
 
@@ -68,30 +68,26 @@ describe('Router', () => {
             )
         })
 
-        it('generates "docs" route', () => {
-            expect(server.use).toHaveBeenNthCalledWith(1, '/docs', 'serve', 'setup')
-        })
-
         it('sets orm request context', () => {
-            expect(server.use).toHaveBeenNthCalledWith(2, router.createRequestContext)
+            expect(server.use).toHaveBeenNthCalledWith(1, router.createRequestContext)
         })
 
         it('calls "actuator"', () => {
-            expect(server.use).toHaveBeenNthCalledWith(3, 'actuator')
+            expect(server.use).toHaveBeenNthCalledWith(2, 'actuator')
         })
 
         it('generates "firebase" route', () => {
-            expect(server.use).toHaveBeenNthCalledWith(4, '/firebase', 'firebaseRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'firebaseRoutes')
         })
 
         it.todo('sets sentry middleware')
 
         it('sets custom 404 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(7, router.custom404)
+            expect(server.use).toHaveBeenNthCalledWith(6, router.custom404)
         })
 
         it('sets custom 500 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(8, router.custom500)
+            expect(server.use).toHaveBeenNthCalledWith(7, router.custom500)
         })
     })
 
@@ -117,10 +113,10 @@ describe('Router', () => {
                     routerClass,
                 },
             ]
-            router.initRoutes(1234, routes, authMiddleware, auth as unknown as Auth)
+            router.initRoutes(routes, authMiddleware, auth as unknown as Auth)
             expect(authMiddleware).toHaveBeenCalledTimes(2)
             expect(authMiddleware).toHaveBeenCalledWith(auth)
-            expect(server.use).toHaveBeenNthCalledWith(4, routes[0].path, 'authMiddleware', 'someRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(3, routes[0].path, 'authMiddleware', 'someRoutes')
         })
     })
 })
