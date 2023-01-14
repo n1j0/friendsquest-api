@@ -1,5 +1,7 @@
 import { Request, Response, Router } from 'express'
 import swaggerUi from 'swagger-ui-express'
+import { getAuth } from 'firebase-admin/auth'
+import { getStorage } from 'firebase-admin/storage'
 import { ORM } from '../orm.js'
 import { openapiSpecification } from '../docs/swagger.js'
 
@@ -72,6 +74,15 @@ export class AdminRouter {
                     const repositoryItem = await repository.findOne(id)
                     if (repositoryItem) {
                         await repository.removeAndFlush(repositoryItem)
+                        if (table === 'User') {
+                            const { uid } = repositoryItem as { uid: string }
+                            const bucket = getStorage().bucket()
+                            await Promise.all([
+                                bucket.deleteFiles({ prefix: `audios/${uid}/` }),
+                                bucket.deleteFiles({ prefix: `images/${uid}/` }),
+                            ])
+                            await getAuth().deleteUser(uid)
+                        }
                     }
                     entities = await repository.findAll()
                 }
