@@ -10,7 +10,7 @@ import { UserService } from '../services/userService.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
 import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
-import { DeletionService } from '../services/deletionService'
+import { DeletionService } from '../services/deletionService.js'
 
 export class UserRouter implements RouterInterface {
     private readonly router: Router
