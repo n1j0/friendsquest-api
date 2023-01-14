@@ -24,7 +24,10 @@ export default class Application {
         this.server = server
         this.router = new Router(this.server, this.orm)
         this.port = Number.parseInt(process.env.PORT as string, 10)
-        initializeApp({ credential: cert(serviceAccountConfig) })
+        initializeApp({
+            credential: cert(serviceAccountConfig),
+            storageBucket: 'gs://friends-quest.appspot.com/',
+        })
         this.initSentry()
     }
 

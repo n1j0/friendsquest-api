@@ -16,6 +16,7 @@ import { FriendshipPostgresRepository } from '../repositories/friendship/friends
 import { errorHandler } from '../middlewares/errorHandler.js'
 import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService.js'
 
 export class FootprintRouter implements RouterInterface {
     readonly router: Router
@@ -29,7 +30,8 @@ export class FootprintRouter implements RouterInterface {
         orm: ORM,
         footprintService: FootprintService = new FootprintService(),
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
             footprintService,

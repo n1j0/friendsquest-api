@@ -11,6 +11,7 @@ import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService.js'
 
 export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
@@ -21,7 +22,8 @@ export class FriendshipRouter implements RouterInterface {
         router: Router,
         orm: ORM,
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         friendshipController: FriendshipController = new FriendshipController(friendshipRepository, userRepository),
     ) {

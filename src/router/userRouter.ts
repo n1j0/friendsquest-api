@@ -10,6 +10,7 @@ import { UserService } from '../services/userService.js'
 import { errorHandler } from '../middlewares/errorHandler.js'
 import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
 import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService'
 
 export class UserRouter implements RouterInterface {
     private readonly router: Router
@@ -20,7 +21,8 @@ export class UserRouter implements RouterInterface {
         router: Router,
         orm: ORM,
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         userController: UserController = new UserController(userRepository),
     ) {
         this.router = router

@@ -6,14 +6,18 @@ import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
 import Points from '../../constants/points.js'
 import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError.js'
+import { DeletionService } from '../../services/deletionService.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
 
+    private readonly deletionService: DeletionService
+
     private readonly orm: ORM
 
-    constructor(userService: UserService, orm: ORM) {
+    constructor(userService: UserService, deletionService: DeletionService, orm: ORM) {
         this.userService = userService
+        this.deletionService = deletionService
         this.orm = orm
     }
 
@@ -111,7 +115,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         em.remove(reactions)
         em.remove(footprints)
         em.remove(user)
-        return em.flush()
+        await Promise.all([
+            em.flush(),
+            this.deletionService.deleteFiles(uid),
+        ])
+        return this.deletionService.deleteUser(uid)
     }
 
     addPoints = async (uid: string, points: number) => {
