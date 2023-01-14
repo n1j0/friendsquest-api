@@ -1,6 +1,15 @@
-<title><%= title %></title>
+<%- include("partials/head.ejs", { title: title }) %>
 
-<h1>Hello</h1>
+<div class="container is-max-desktop">
+    <h1 class="is-size-1">Admin Panel</h1>
 
-<a href="/admin/docs">Docs</a>
-<a href="/admin/tables">Database</a>
+    <aside class="menu">
+        <p class="menu-label">
+            General
+        </p>
+        <ul class="menu-list">
+            <li><a href="/admin/docs" target="_blank">Docs</a></li>
+            <li><a href="/admin/tables">Database</a></li>
+        </ul>
+    </aside>
+</div>
