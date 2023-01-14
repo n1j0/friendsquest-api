@@ -372,13 +372,6 @@ export class FootprintRouter implements RouterInterface {
                     )
                     .trim(),
                 body('description')
-                    .notEmpty()
-                    .withMessage(
-                        {
-                            message: 'Description is required',
-                            type: AttributeIsMissingError,
-                        },
-                    )
                     .isString()
                     .withMessage(
                         {
