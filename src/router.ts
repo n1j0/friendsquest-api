@@ -8,7 +8,7 @@ import { firebaseRoutes } from './router/_firebaseAuth.js'
 import { firebaseAuthMiddleware } from './middlewares/firebaseAuth.js'
 import { ORM } from './orm.js'
 import { Route } from './types/routes'
-import ErrorController from './controller/errorController.js'
+import ResponseSender from './helper/responseSender.js'
 import { NotFoundError } from './errors/NotFoundError.js'
 import { InternalServerError } from './errors/InternalServerError.js'
 // @ts-ignore
@@ -32,12 +32,12 @@ export class Router {
     }
 
     custom404 = (_request: Request, response: Response) => {
-        ErrorController.sendError(response, NotFoundError.getErrorDocument())
+        ResponseSender.error(response, NotFoundError.getErrorDocument())
     }
 
     custom500 = (error: ErrorRequestHandler, _request: Request, response: Response) => {
         console.error(error)
-        ErrorController.sendError(response, InternalServerError.getErrorDocument('Internal Server Error'))
+        ResponseSender.error(response, InternalServerError.getErrorDocument('Internal Server Error'))
     }
 
     initRoutes = (

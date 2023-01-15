@@ -1,10 +1,9 @@
 import { Response } from 'express'
-import ErrorController from './errorController.js'
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
-import ResponseController from './responseController.js'
+import ResponseSender from '../helper/responseSender.js'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
@@ -15,45 +14,45 @@ export default class FootprintController {
 
     getAllFootprints = async (response: Response) => {
         try {
-            return ResponseController.sendResponse(response, 200, await this.footprintRepository.getAllFootprints())
+            return ResponseSender.result(response, 200, await this.footprintRepository.getAllFootprints())
         } catch (error: any) {
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getFootprintsOfFriendsAndUser = async ({ uid }: { uid: string }, response: Response) => {
         try {
-            return ResponseController.sendResponse(
+            return ResponseSender.result(
                 response,
                 200,
                 await this.footprintRepository.getFootprintsOfFriendsAndUser(uid),
             )
         } catch (error: any) {
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getFootprintById = async ({ uid, id }: { uid: string, id: number | string }, response: Response) => {
         try {
             const { footprint, points, userPoints } = await this.footprintRepository.getFootprintById(uid, id)
-            return ResponseController.sendResponse(response, 200, footprint, { amount: points, total: userPoints })
+            return ResponseSender.result(response, 200, footprint, { amount: points, total: userPoints })
         } catch (error: any) {
             if (error instanceof NotFoundError) {
-                return ErrorController.sendError(response, NotFoundError.getErrorDocument('The footprint'))
+                return ResponseSender.error(response, NotFoundError.getErrorDocument('The footprint'))
             }
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
     getFootprintReactions = async ({ id }: { id: number | string }, response: Response) => {
         try {
-            return ResponseController.sendResponse(
+            return ResponseSender.result(
                 response,
                 200,
                 await this.footprintRepository.getFootprintReactions(id),
             )
         } catch (error: any) {
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
@@ -71,14 +70,14 @@ export default class FootprintController {
                 ...reaction,
                 footprint: reaction.footprint.id,
             }
-            return ResponseController.sendResponse(
+            return ResponseSender.result(
                 response,
                 201,
                 reactionWithFootprintId,
                 { amount: points, total: userPoints },
             )
         } catch (error: any) {
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 
@@ -100,15 +99,15 @@ export default class FootprintController {
                 longitude: Number(footprint.longitude),
                 latitude: Number(footprint.latitude),
             }
-            // @TODO utils
-            return ResponseController.sendResponse(
+
+            return ResponseSender.result(
                 response,
                 201,
                 footprintWithCoordinatesAsNumbers,
                 { amount: points, total: userPoints },
             )
         } catch (error: any) {
-            return ErrorController.sendError(response, InternalServerError.getErrorDocument(error.message))
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
 }
