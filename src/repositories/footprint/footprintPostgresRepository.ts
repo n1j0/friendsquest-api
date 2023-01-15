@@ -32,7 +32,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         this.orm = orm
     }
 
-    private findFootprintById = async (id: number | string) => {
+    private findFootprintById = async (id: number | string): Promise<Footprint> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'Footprint',
@@ -75,7 +75,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
         ])
         const reaction = new FootprintReaction(user, message, footprint)
-        const reactions = await em.find('FootprintReaction', { footprint: { id } } as any)
+        const reactions: FootprintReaction[] = await em.find('FootprintReaction', { footprint: { id } } as any)
         await em.persistAndFlush(reaction)
         if (reactions) {
             if (footprint.createdBy.id === user.id) {
@@ -114,7 +114,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const friends = friendships.map(
             friendship => (friendship.invitor.id === user.id ? friendship.invitee.id : friendship.invitor.id),
         )
-        const footprints = await em.find(
+        const footprints: Footprint[] = await em.find(
             'Footprint',
             { createdBy: [ user, ...friends ] } as any,
             { populate: ['createdBy'] } as any,
