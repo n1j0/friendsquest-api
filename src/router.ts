@@ -58,8 +58,7 @@ export class Router {
             )
         })
 
-        // TODO: remove this when ready for production
-        this.server.use('/firebase', firebaseRoutes)
+        this.server.use('/firebase', basicAuth(), firebaseRoutes)
 
         this.server.set('view engine', 'ejs')
         this.server.set('views', join(currentPath.default, './views'))

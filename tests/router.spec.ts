@@ -27,6 +27,10 @@ jest.mock('../src/router/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',
 }))
 
+jest.mock('../src/admin/middlewares/basicAuth.js', () => ({
+    basicAuth: () => 'basicAuth',
+}))
+
 jest.mock('../src/admin/currentPath.cjs')
 
 describe('Router', () => {
@@ -77,7 +81,7 @@ describe('Router', () => {
         })
 
         it('generates "firebase" route', () => {
-            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'firebaseRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'basicAuth', 'firebaseRoutes')
         })
 
         it.todo('sets sentry middleware')
