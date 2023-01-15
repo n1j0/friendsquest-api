@@ -39,13 +39,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Returns all users
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns persons
@@ -81,12 +74,6 @@ export class UserRouter implements RouterInterface {
          *     tags:
          *       - User
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -123,11 +110,6 @@ export class UserRouter implements RouterInterface {
         response,
     )
 
-    getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
-        { fc: request.params.fc },
-        response,
-    )
-
     generateGetUserByUidRoute = () => {
         /**
          * @openapi
@@ -137,12 +119,6 @@ export class UserRouter implements RouterInterface {
          *     tags:
          *       - User
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: uid
          *         schema:
@@ -174,6 +150,11 @@ export class UserRouter implements RouterInterface {
         )
     }
 
+    getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
+        { fc: request.params.fc },
+        response,
+    )
+
     generateGetUserByFriendsCodeRoute = () => {
         /**
          * @openapi
@@ -183,12 +164,6 @@ export class UserRouter implements RouterInterface {
          *     tags:
          *       - User
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: fc
          *         schema:
@@ -237,13 +212,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Create a new user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -348,13 +316,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Update a user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -438,13 +399,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Delete a user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         required: true
-         *         description: Authorization header
-         *         schema:
-         *           type: string
          *     responses:
          *       204:
          *         description: Ok

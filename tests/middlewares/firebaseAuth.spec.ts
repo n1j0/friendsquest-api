@@ -1,7 +1,7 @@
 import { Auth } from 'firebase-admin/auth'
 import { Request, Response } from 'express'
 import { firebaseAuthMiddleware } from '../../src/middlewares/firebaseAuth'
-import responseMock from '../helper/responseMock'
+import responseMock from '../test-helper/responseMock'
 
 describe('FirebaseAuth', () => {
     let response: Response

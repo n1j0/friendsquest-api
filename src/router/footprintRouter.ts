@@ -59,13 +59,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Returns all footprints
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns footprints
@@ -110,12 +103,6 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -189,12 +176,6 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -240,12 +221,6 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -299,13 +274,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Create a footprint
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -418,13 +386,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Returns footprints from friends and the user itself
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns footprints
