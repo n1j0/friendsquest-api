@@ -45,12 +45,6 @@ export class FriendshipRouter implements RouterInterface {
          *    tags:
          *      - Friendship
          *    parameters:
-         *      - in: header
-         *        name: X-Auth
-         *        required: true
-         *        schema:
-         *          type: string
-         *          description: Authorization header
          *      - in: query
          *        name: userId
          *        required: true
@@ -98,13 +92,6 @@ export class FriendshipRouter implements RouterInterface {
          *     summary: Create a friendship
          *     tags:
          *       - Friendship
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         required: true
-         *         schema:
-         *           type: string
-         *           description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -171,12 +158,6 @@ export class FriendshipRouter implements RouterInterface {
          *     tags:
          *       - Friendship
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         required: true
-         *         schema:
-         *           type: string
-         *           description: Authorization header
          *       - in: path
          *         name: id
          *         required: true
@@ -227,12 +208,6 @@ export class FriendshipRouter implements RouterInterface {
          *     tags:
          *       - Friendship
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         required: true
-         *         schema:
-         *           type: string
-         *           description: Authorization header
          *       - in: path
          *         name: id
          *         required: true

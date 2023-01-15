@@ -21,8 +21,15 @@ export class AdminRouter {
             (_request: Request, response: Response) => response.render('index', { title: 'Admin Panel' }),
         )
 
+        const options = {
+            swaggerOptions: {
+                persistAuthorization: true,
+                tryItOutEnabled: true,
+            },
+        }
+
         this.router.use('/docs', swaggerUi.serve)
-        this.router.get('/docs', swaggerUi.setup(openapiSpecification))
+        this.router.get('/docs', swaggerUi.setup(openapiSpecification, options))
 
         this.router.get(
             '/tables',
