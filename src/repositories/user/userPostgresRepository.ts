@@ -98,19 +98,20 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         // we can't include repos here due to circular dependency injection in the router
         const [ friendships, footprints ] = await Promise.all([
             em.find('Friendship', { $or: [{ invitor: user }, { invitee: user }] }),
-            em.find('Footprint', { createdBy: user } as any) as Promise<Footprint[]>,
+            em.find(
+                'Footprint',
+                { createdBy: user } as any,
+                { populate: ['users'] } as any,
+            ) as Promise<Footprint[]>,
         ])
         const reactions = await em.find(
             'FootprintReaction',
             { $or: [{ createdBy: user }, { footprint: [...footprints] }] },
         )
-        await Promise.all(footprints.map(async (footprint) => {
-            if (!footprint.users.isInitialized()) {
-                await footprint.users.init()
-            }
+        footprints.forEach((footprint) => {
             footprint.users.removeAll()
             em.persist(footprint)
-        }))
+        })
         em.persist(user)
         em.remove(friendships)
         em.remove(reactions)
