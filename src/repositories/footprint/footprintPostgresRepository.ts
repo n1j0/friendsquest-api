@@ -117,17 +117,14 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const footprints: Footprint[] = await em.find(
             'Footprint',
             { createdBy: [ user, ...friends ] } as any,
-            { populate: ['createdBy'] } as any,
+            { populate: [ 'createdBy', 'users' ] } as any,
         )
 
-        return Promise.all(footprints.map(async (footprint) => {
-            if (!footprint.users.isInitialized()) {
-                await footprint.users.init()
-            }
+        return footprints.map((footprint) => {
             const hasVisited = footprint.users.getIdentifiers('id').includes(user.id)
                 || footprint.createdBy.id === user.id
             return { ...footprint, hasVisited }
-        }))
+        })
     }
 
     getFootprintById = async (uid: string, id: string | number) => {
