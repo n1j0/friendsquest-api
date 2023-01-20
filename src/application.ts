@@ -42,6 +42,7 @@ export default class Application {
             ],
 
             tracesSampleRate: 1,
+            release: `friendsquest-api@${process.env.npm_package_version}`,
         })
     }
 
