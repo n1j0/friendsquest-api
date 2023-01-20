@@ -48,6 +48,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
             this.footprintService.uploadFilesToFireStorage(files, uid),
         ])
+        const temperatureData = await this
+            .footprintService
+            .getTemperature(latitude, longitude) as unknown as { main: { temp: number } }
+        const temperature = temperatureData?.main?.temp || undefined
         const footprint = new Footprint(
             title,
             user,
@@ -55,6 +59,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             longitude,
             photoURL,
             audioURL,
+            temperature,
         )
         if (description) {
             wrap(footprint).assign({ description })

@@ -3,6 +3,8 @@ import { Readable } from 'node:stream'
 import { Storage } from 'firebase-admin/storage'
 import { FootprintService } from '../../src/services/footprintService'
 
+jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
+
 const storage: { bucket: jest.Mock, storageClient: string, appInternal: string } = {
     appInternal: '',
     storageClient: '',

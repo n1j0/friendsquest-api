@@ -39,6 +39,10 @@ components:
           format: double
           description: The longitude of the footprint
           example: 16.3738189
+        temperature:
+          type: number
+          description: The temperature of the footprint
+          example: -3
         viewCount:
           type: string
           description: The view count of the footprint
@@ -59,6 +63,11 @@ components:
           description: The users who have seen the footprint
           items:
             $ref: '#/components/schemas/User'
+        reactions:
+          type: array
+          description: The reactions of the footprint
+          items:
+            $ref: '#/components/schemas/FootprintReaction'
       required:
         - title
         - createdBy
