@@ -21,6 +21,8 @@ jest.mock('../../src/constants/index.js', () => ({
     AUTH_HEADER_UID: 'uidHeader',
 }))
 
+jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
+
 describe('FootprintRouter', () => {
     let router: Router
     let orm: ORM

@@ -333,6 +333,15 @@
           "nullable": false,
           "mappedType": "double"
         },
+        "temperature": {
+          "name": "temperature",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
         "image_url": {
           "name": "image_url",
           "type": "varchar(255)",
