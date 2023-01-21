@@ -26,7 +26,7 @@ export default class Application {
         this.port = Number.parseInt(process.env.PORT as string, 10)
         initializeApp({
             credential: cert(serviceAccountConfig),
-            storageBucket: 'gs://friends-quest.appspot.com/',
+            storageBucket: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/`,
         })
         this.initSentry()
     }
