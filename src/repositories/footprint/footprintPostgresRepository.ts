@@ -10,6 +10,7 @@ import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points.js'
 import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
 import { FriendshipStatus } from '../../constants/index.js'
+import { ForbiddenError } from '../../errors/ForbiddenError'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService
@@ -101,6 +102,22 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             points: Points.FOOTPRINT_REACTION,
             userPoints: userWithUpdatedPoints.points,
         }
+    }
+
+    deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }) => {
+        const em = this.orm.forkEm()
+        const reaction: FootprintReaction = await em.findOneOrFail(
+            'FootprintReaction',
+            { id } as any,
+            {
+                populate: ['createdBy'],
+                failHandler: () => { throw new NotFoundError() },
+            } as any,
+        )
+        if (reaction.createdBy.uid !== uid) {
+            throw new ForbiddenError()
+        }
+        return em.removeAndFlush(reaction)
     }
 
     getAllFootprints = async () => {

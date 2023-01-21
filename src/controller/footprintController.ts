@@ -4,6 +4,7 @@ import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import ResponseSender from '../helper/responseSender.js'
+import { ForbiddenError } from '../errors/ForbiddenError'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
@@ -77,6 +78,22 @@ export default class FootprintController {
                 { amount: points, total: userPoints },
             )
         } catch (error: any) {
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
+    deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
+        try {
+            await this.footprintRepository.deleteFootprintReaction({ id, uid })
+            return response.sendStatus(204)
+        } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return ResponseSender.error(response, NotFoundError.getErrorDocument('The reaction'))
+            }
+            if (error instanceof ForbiddenError) {
+                // eslint-disable-next-line max-len
+                return ResponseSender.error(response, ForbiddenError.getErrorDocument('You cannot delete reactions of others'))
+            }
             return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }

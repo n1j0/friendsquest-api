@@ -159,6 +159,46 @@ export class FootprintRouter implements RouterInterface {
         )
     }
 
+    deleteFootprintReactionHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.deleteFootprintReaction(
+        {
+            id: request.params.id,
+            uid: request.headers[AUTH_HEADER_UID] as string,
+        },
+        response,
+    )
+
+    generateDeleteFootprintReactionRoute = () => {
+        /**
+         * @openapi
+         * /footprints/reactions/{id}:
+         *   delete:
+         *     summary: Delete a reaction
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: integer
+         *         required: true
+         *         description: Numeric ID of the reaction to delete
+         *     responses:
+         *       204:
+         *         description: Ok
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.delete(
+            '/reactions/:id',
+            this.deleteFootprintReactionHandler,
+        )
+    }
+
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
         {
             id: request.params.id,
@@ -413,6 +453,7 @@ export class FootprintRouter implements RouterInterface {
         this.generateGetAllFootprintsRoute()
         this.generateGetFootprintsOfFriendsAndUserRoute()
         this.generateCreateFootprintReactionRoute()
+        this.generateDeleteFootprintReactionRoute()
         this.generateGetFootprintByIdRoute()
         this.generateGetFootprintReactionsRoute()
         this.generateCreateFootprintRoute()
