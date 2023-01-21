@@ -11,9 +11,12 @@ import Points from '../../constants/points.js'
 import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
 import { FriendshipStatus } from '../../constants/index.js'
 import { ForbiddenError } from '../../errors/ForbiddenError'
+import { DeletionService } from '../../services/deletionService.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService
+
+    private readonly deletionService: DeletionService
 
     private readonly userRepository: UserRepositoryInterface
 
@@ -23,11 +26,13 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
 
     constructor(
         footprintService: FootprintService,
+        deletionService: DeletionService,
         userRepository: UserRepositoryInterface,
         friendshipRepository: FriendshipRepositoryInterface,
         orm: ORM,
     ) {
         this.footprintService = footprintService
+        this.deletionService = deletionService
         this.userRepository = userRepository
         this.friendshipRepository = friendshipRepository
         this.orm = orm
@@ -115,7 +120,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             { footprint },
         )
         em.remove(reactions)
-        return em.removeAndFlush(footprint)
+        return Promise.all([
+            this.deletionService.deleteFilesOfOneFootprint(footprint.audioURL, footprint.imageURL),
+            em.removeAndFlush(footprint),
+        ])
     }
 
     deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }) => {

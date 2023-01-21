@@ -35,6 +35,7 @@ export class FootprintRouter implements RouterInterface {
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
             footprintService,
+            deletionService,
             userRepository,
             friendshipRepository,
             orm,
