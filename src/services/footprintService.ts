@@ -53,6 +53,7 @@ export class FootprintService {
                     contentType: value.mimetype,
                     downloadTokens: downloadToken,
                 },
+                gzip: true,
             }))
 
             return this.createPersistentDownloadUrl(bucket.name, fullPath, downloadToken)
