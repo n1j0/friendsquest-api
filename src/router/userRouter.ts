@@ -98,11 +98,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/:id',
-            errorHandler,
-            this.getUserByIdHandler,
-        )
+        this.router.get('/:id', this.getUserByIdHandler)
     }
 
     getUserByUidHandler = (request: Request, response: Response) => this.userController.getUserByUid(
@@ -143,11 +139,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/uid/:uid',
-            errorHandler,
-            this.getUserByUidHandler,
-        )
+        this.router.get('/uid/:uid', this.getUserByUidHandler)
     }
 
     getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
@@ -188,11 +180,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/fc/:fc',
-            errorHandler,
-            this.getUserByFriendsCodeHandler,
-        )
+        this.router.get('/fc/:fc', this.getUserByFriendsCodeHandler)
     }
 
     createUserHandler = (request: Request, response: Response) => this.userController.createUser(
@@ -407,10 +395,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/',
-            this.deleteUserHandler,
-        )
+        this.router.delete('/', this.deleteUserHandler)
     }
 
     createAndReturnRoutes = () => {

@@ -231,10 +231,7 @@ export class FootprintRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/reactions/:id',
-            this.deleteFootprintReactionHandler,
-        )
+        this.router.delete('/reactions/:id', this.deleteFootprintReactionHandler)
     }
 
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
@@ -275,11 +272,7 @@ export class FootprintRouter implements RouterInterface {
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
-        this.router.get(
-            '/:id',
-            errorHandler,
-            this.getFootprintByIdHandler,
-        )
+        this.router.get('/:id', this.getFootprintByIdHandler)
     }
 
     getFootprintReactionsHandler = (
@@ -325,11 +318,7 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.get(
-            '/:id/reactions',
-            errorHandler,
-            this.getFootprintReactionsHandler,
-        )
+        this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
     }
 
     createFootprintHandler = (request: Request, response: Response) => this.footprintController.createFootprint(

@@ -72,11 +72,7 @@ export class FriendshipRouter implements RouterInterface {
          *      404:
          *        $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/',
-            errorHandler,
-            this.getFriendshipsHandler,
-        )
+        this.router.get('/', this.getFriendshipsHandler)
     }
 
     createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
@@ -181,11 +177,7 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.patch(
-            '/:id',
-            errorHandler,
-            this.acceptFriendshipHandler,
-        )
+        this.router.patch('/:id', this.acceptFriendshipHandler)
     }
 
     declineOrDeleteFriendshipHandler = (
@@ -222,11 +214,7 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/:id',
-            errorHandler,
-            this.declineOrDeleteFriendshipHandler,
-        )
+        this.router.delete('/:id', this.declineOrDeleteFriendshipHandler)
     }
 
     createAndReturnRoutes = () => {
