@@ -44,7 +44,7 @@ describe('Application', () => {
         it('initializes the firebase admin app', () => {
             expect(initializeApp).toHaveBeenCalledWith({
                 credential: 'cert',
-                storageBucket: 'gs://friends-quest.appspot.com/',
+                storageBucket: 'gs://storage_bucket/',
             })
         })
 
