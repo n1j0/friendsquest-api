@@ -55,13 +55,10 @@ export const firebaseAuthMiddleware = (
 
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
-            // eslint-disable-next-line security/detect-object-injection
-            if (request.headers[authHeaderKey]) {
-                // eslint-disable-next-line security/detect-object-injection
-                const authHeader = request.headers[authHeaderKey] as string
+            if (request.headers[String(authHeaderKey)]) {
+                const authHeader = request.headers[String(authHeaderKey)] as string
                 const decodedToken = await firebaseAuth.verifyIdToken(authHeader, checkRevoked)
-                // eslint-disable-next-line security/detect-object-injection
-                request.headers[attachUserTo] = decodedToken.uid
+                request.headers[String(attachUserTo)] = decodedToken.uid
                 return next()
             }
             return authFailed(response, 401, 'MISSING OR MALFORMED AUTH')

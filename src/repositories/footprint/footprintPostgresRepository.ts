@@ -10,7 +10,7 @@ import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points.js'
 import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
 import { FriendshipStatus } from '../../constants/index.js'
-import { ForbiddenError } from '../../errors/ForbiddenError'
+import { ForbiddenError } from '../../errors/ForbiddenError.js'
 import { DeletionService } from '../../services/deletionService.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {

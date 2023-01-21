@@ -4,7 +4,7 @@ import { NewFootprint } from '../types/footprint'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import ResponseSender from '../helper/responseSender.js'
-import { ForbiddenError } from '../errors/ForbiddenError'
+import { ForbiddenError } from '../errors/ForbiddenError.js'
 
 export default class FootprintController {
     private footprintRepository: FootprintRepositoryInterface

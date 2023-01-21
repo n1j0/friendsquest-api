@@ -76,7 +76,7 @@ export class FriendshipRouter implements RouterInterface {
     }
 
     createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
-        { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
+        { friendsCode: request.body.friendsCode, uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -140,7 +140,7 @@ export class FriendshipRouter implements RouterInterface {
     acceptFriendshipHandler = (request: Request, response: Response) => this.friendshipController.acceptFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -186,7 +186,7 @@ export class FriendshipRouter implements RouterInterface {
     ) => this.friendshipController.declineOrDeleteFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )

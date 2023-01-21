@@ -90,7 +90,7 @@ export class FootprintRouter implements RouterInterface {
         {
             id: request.params.id,
             message: request.body.message,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -166,7 +166,7 @@ export class FootprintRouter implements RouterInterface {
     ) => this.footprintController.deleteFootprint(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -203,7 +203,7 @@ export class FootprintRouter implements RouterInterface {
     ) => this.footprintController.deleteFootprintReaction(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -237,7 +237,7 @@ export class FootprintRouter implements RouterInterface {
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -328,7 +328,7 @@ export class FootprintRouter implements RouterInterface {
             latitude: request.body.latitude,
             longitude: request.body.longitude,
             files: request.files as MulterFiles['files'],
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -441,7 +441,7 @@ export class FootprintRouter implements RouterInterface {
         request: Request,
         response: Response,
     ) => this.footprintController.getFootprintsOfFriendsAndUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 

@@ -187,7 +187,7 @@ export class UserRouter implements RouterInterface {
         {
             email: request.body.email,
             username: request.body.username,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -291,7 +291,7 @@ export class UserRouter implements RouterInterface {
             email: request.body.email,
             username: request.body.username,
             body: request.body,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -375,7 +375,7 @@ export class UserRouter implements RouterInterface {
     }
 
     deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
