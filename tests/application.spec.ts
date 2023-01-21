@@ -44,6 +44,7 @@ describe('Application', () => {
         it('initializes the firebase admin app', () => {
             expect(initializeApp).toHaveBeenCalledWith({
                 credential: 'cert',
+                storageBucket: 'gs://storage_bucket/',
             })
         })
 
@@ -103,7 +104,7 @@ describe('Application', () => {
         })
 
         it('initializes the routes', () => {
-            expect(app.router.initRoutes).toHaveBeenCalledWith(1234, [])
+            expect(app.router.initRoutes).toHaveBeenCalledWith([])
         })
 
         it('starts the server', () => {

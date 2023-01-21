@@ -6,11 +6,12 @@ import { FootprintRepositoryInterface } from '../../src/repositories/footprint/f
 import FootprintController from '../../src/controller/footprintController'
 import { FootprintPostgresRepository } from '../../src/repositories/footprint/footprintPostgresRepository'
 import { FootprintRouter } from '../../src/router/footprintRouter'
-import responseMock from '../helper/responseMock'
+import responseMock from '../test-helper/responseMock'
 import { MulterFiles } from '../../src/types/multer'
 import { UserService } from '../../src/services/userService'
 import { UserRepositoryInterface } from '../../src/repositories/user/userRepositoryInterface'
 import { FriendshipRepositoryInterface } from '../../src/repositories/friendship/friendshipRepositoryInterface'
+import { DeletionService } from '../../src/services/deletionService'
 
 jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
     FootprintPostgresRepository: {},
@@ -20,12 +21,15 @@ jest.mock('../../src/constants/index.js', () => ({
     AUTH_HEADER_UID: 'uidHeader',
 }))
 
+jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
+
 describe('FootprintRouter', () => {
     let router: Router
     let orm: ORM
     let footprintService: FootprintService
     let footprintRepository: FootprintRepositoryInterface
     let userService: UserService
+    let deletionService: DeletionService
     let userRepository: UserRepositoryInterface
     let friendshipRepository: FriendshipRepositoryInterface
     let footprintController: FootprintController
@@ -38,6 +42,7 @@ describe('FootprintRouter', () => {
         footprintService = mockDeep<FootprintService>()
         footprintRepository = mock<FootprintPostgresRepository>()
         userService = mock<UserService>()
+        deletionService = mock<DeletionService>()
         userRepository = mock<UserRepositoryInterface>()
         friendshipRepository = mock<FriendshipRepositoryInterface>()
         footprintController = mock<FootprintController>()
@@ -46,6 +51,7 @@ describe('FootprintRouter', () => {
             orm,
             footprintService,
             userService,
+            deletionService,
             userRepository,
             friendshipRepository,
             footprintRepository,
@@ -168,17 +174,28 @@ describe('FootprintRouter', () => {
 
         it('generates generateCreateFootprintReaction route', () => {
             footprintRouter.generateCreateFootprintReactionRoute()
-            expect(router.post).toHaveBeenCalledWith('/:id/reactions', footprintRouter.createFootprintReactionHandler)
+            expect(router.post).toHaveBeenCalledWith(
+                '/:id/reactions',
+                expect.any(Array),
+                expect.any(Function),
+                footprintRouter.createFootprintReactionHandler,
+            )
         })
 
         it('generates generateGetFootprintById route', () => {
             footprintRouter.generateGetFootprintByIdRoute()
-            expect(router.get).toHaveBeenCalledWith('/:id', footprintRouter.getFootprintByIdHandler)
+            expect(router.get).toHaveBeenCalledWith(
+                '/:id',
+                footprintRouter.getFootprintByIdHandler,
+            )
         })
 
         it('generates generateGetFootprintReactions route', () => {
             footprintRouter.generateGetFootprintReactionsRoute()
-            expect(router.get).toHaveBeenCalledWith('/:id/reactions', footprintRouter.getFootprintReactionsHandler)
+            expect(router.get).toHaveBeenCalledWith(
+                '/:id/reactions',
+                footprintRouter.getFootprintReactionsHandler,
+            )
         })
 
         it('generates generateCreateFootprint route', () => {
@@ -189,6 +206,8 @@ describe('FootprintRouter', () => {
             expect(router.post).toHaveBeenCalledWith(
                 '/',
                 fields,
+                expect.any(Array),
+                expect.any(Function),
                 footprintRouter.createFootprintHandler,
             )
             expect(footprintService.uploadMiddleware.fields).toHaveBeenCalledWith([

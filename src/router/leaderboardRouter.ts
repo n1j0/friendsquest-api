@@ -32,13 +32,6 @@ export class LeaderboardRouter implements RouterInterface {
          *    summary: Get the leaderboard
          *    tags:
          *      - Leaderboard
-         *    parameters:
-         *      - in: header
-         *        name: X-Auth
-         *        schema:
-         *          type: string
-         *          required: true
-         *          description: Authorization header
          *    responses:
          *      200:
          *        description: Returns the leaderboard (top 100 users)

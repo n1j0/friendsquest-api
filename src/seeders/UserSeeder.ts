@@ -4,9 +4,9 @@ import { User } from '../entities/user.js'
 
 export class UserSeeder extends Seeder {
     async run(em: EntityManager, context: Dictionary): Promise<void> {
-        context['39FDDRsAsZNPmocG4ZIgcnwO5BF2'] = em.create(User, {
+        context['smHKdjP1VEP11HZUMUmD7h5DnY82'] = em.create(User, {
             email: 'test@test.at',
-            uid: '39FDDRsAsZNPmocG4ZIgcnwO5BF2',
+            uid: 'smHKdjP1VEP11HZUMUmD7h5DnY82',
             username: 'peterPan',
             friendsCode: '00000',
         } as RequiredEntityData<User>)

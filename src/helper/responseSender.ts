@@ -1,8 +1,9 @@
 import { Response } from 'express'
+import { ProblemDocument } from '../types/problemDocument'
 import { Points } from '../types/points'
 
-export default class ResponseController {
-    public static sendResponse = (
+export default class ResponseSender {
+    public static result = (
         response: Response,
         code: number,
         data: any,
@@ -19,5 +20,10 @@ export default class ResponseController {
             data,
             points,
         })
+    }
+
+    public static error = (response: Response, error: ProblemDocument) => {
+        response.setHeader('Content-Type', 'application/problem+json')
+        return response.status(error.status).json(error)
     }
 }

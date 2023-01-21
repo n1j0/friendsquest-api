@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { body } from 'express-validator'
 import FootprintController from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
@@ -12,6 +13,10 @@ import { UserService } from '../services/userService.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { FriendshipRepositoryInterface } from '../repositories/friendship/friendshipRepositoryInterface.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService.js'
 
 export class FootprintRouter implements RouterInterface {
     readonly router: Router
@@ -25,10 +30,12 @@ export class FootprintRouter implements RouterInterface {
         orm: ORM,
         footprintService: FootprintService = new FootprintService(),
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
             footprintService,
+            deletionService,
             userRepository,
             friendshipRepository,
             orm,
@@ -53,13 +60,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Returns all footprints
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns footprints
@@ -90,7 +90,7 @@ export class FootprintRouter implements RouterInterface {
         {
             id: request.params.id,
             message: request.body.message,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -104,16 +104,10 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
-         *           type: string
+         *           type: integer
          *         required: true
          *         description: Numeric ID of the footprint the reaction is for
          *     requestBody:
@@ -134,18 +128,116 @@ export class FootprintRouter implements RouterInterface {
          *                   $ref: '#/components/schemas/FootprintReaction'
          *                 points:
          *                   $ref: '#/components/schemas/Points'
+         *       400:
+         *         $ref: '#/components/responses/BadRequest'
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          *       500:
          *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.post('/:id/reactions', this.createFootprintReactionHandler)
+        this.router.post(
+            '/:id/reactions',
+            [
+                body('message')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Message is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Message must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createFootprintReactionHandler,
+        )
+    }
+
+    deleteFootprintHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.deleteFootprint(
+        {
+            id: request.params.id,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
+        },
+        response,
+    )
+
+    generateDeleteFootprintRoute = () => {
+        /**
+         * @openapi
+         * /footprints/{id}:
+         *   delete:
+         *     summary: Delete a footprint
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: integer
+         *         required: true
+         *         description: Numeric ID of the footprint to delete
+         *     responses:
+         *       204:
+         *         description: Ok
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.delete('/:id', this.deleteFootprintHandler)
+    }
+
+    deleteFootprintReactionHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.deleteFootprintReaction(
+        {
+            id: request.params.id,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
+        },
+        response,
+    )
+
+    generateDeleteFootprintReactionRoute = () => {
+        /**
+         * @openapi
+         * /footprints/reactions/{id}:
+         *   delete:
+         *     summary: Delete a reaction
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: integer
+         *         required: true
+         *         description: Numeric ID of the reaction to delete
+         *     responses:
+         *       204:
+         *         description: Ok
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.delete('/reactions/:id', this.deleteFootprintReactionHandler)
     }
 
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -159,12 +251,6 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -206,12 +292,6 @@ export class FootprintRouter implements RouterInterface {
          *     tags:
          *       - Footprint
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -248,7 +328,7 @@ export class FootprintRouter implements RouterInterface {
             latitude: request.body.latitude,
             longitude: request.body.longitude,
             files: request.files as MulterFiles['files'],
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -261,13 +341,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Create a footprint
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -279,12 +352,13 @@ export class FootprintRouter implements RouterInterface {
          *                 type: string
          *                 format: binary
          *                 description: The photo of the footprint
-         *                 required: false
          *               audio:
          *                 type: string
          *                 format: binary
          *                 description: The audio of the footprint
-         *                 required: false
+         *             required:
+         *               - image
+         *               - audio
          *         multipart/json:
          *           schema:
          *             $ref: '#/components/schemas/NewFootprint'
@@ -310,9 +384,55 @@ export class FootprintRouter implements RouterInterface {
         this.router.post(
             '/',
             this.footprintService.uploadMiddleware.fields(
-                [{ name: 'image', maxCount: 1 },
-                    { name: 'audio', maxCount: 1 }],
+                [
+                    { name: 'image', maxCount: 1 },
+                    { name: 'audio', maxCount: 1 },
+                ],
             ),
+            [
+                body('title')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Title is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Title must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('description')
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Description must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('latitude')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Latitude is required',
+                            type: AttributeIsMissingError,
+                        },
+                    ),
+                body('longitude')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Longitude is required',
+                            type: AttributeIsMissingError,
+                        },
+                    ),
+            ],
+            errorHandler,
             this.createFootprintHandler,
         )
     }
@@ -321,7 +441,7 @@ export class FootprintRouter implements RouterInterface {
         request: Request,
         response: Response,
     ) => this.footprintController.getFootprintsOfFriendsAndUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -333,13 +453,6 @@ export class FootprintRouter implements RouterInterface {
          *     summary: Returns footprints from friends and the user itself
          *     tags:
          *       - Footprint
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns footprints
@@ -351,7 +464,7 @@ export class FootprintRouter implements RouterInterface {
          *                 data:
          *                   type: array
          *                   items:
-         *                     $ref: '#/components/schemas/Footprint'
+         *                     $ref: '#/components/schemas/FootprintWithFlag'
          *                 points:
          *                   type: object
          *                   default: {}
@@ -367,6 +480,8 @@ export class FootprintRouter implements RouterInterface {
         this.generateGetAllFootprintsRoute()
         this.generateGetFootprintsOfFriendsAndUserRoute()
         this.generateCreateFootprintReactionRoute()
+        this.generateDeleteFootprintReactionRoute()
+        this.generateDeleteFootprintRoute()
         this.generateGetFootprintByIdRoute()
         this.generateGetFootprintReactionsRoute()
         this.generateCreateFootprintRoute()

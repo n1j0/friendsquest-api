@@ -17,7 +17,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Auth } from 'firebase-admin/auth'
 import { AUTH_HEADER_KEY, AUTH_HEADER_UID } from '../constants/index.js'
-import ErrorController from '../controller/errorController.js'
+import ResponseSender from '../helper/responseSender.js'
 import { InternalServerError } from '../errors/InternalServerError.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 import { UnauthorizedError } from '../errors/UnauthorizedError.js'
@@ -25,13 +25,13 @@ import { UnauthorizedError } from '../errors/UnauthorizedError.js'
 function authFailed(response: Response, status: number, error: string) {
     switch (status) {
     case 401: {
-        return ErrorController.sendError(response, UnauthorizedError.getErrorDocument(error))
+        return ResponseSender.error(response, UnauthorizedError.getErrorDocument(error))
     }
     case 403: {
-        return ErrorController.sendError(response, ForbiddenError.getErrorDocument(error))
+        return ResponseSender.error(response, ForbiddenError.getErrorDocument(error))
     }
     default: {
-        return ErrorController.sendError(response, InternalServerError.getErrorDocument(error))
+        return ResponseSender.error(response, InternalServerError.getErrorDocument(error))
     }
     }
 }
@@ -55,13 +55,10 @@ export const firebaseAuthMiddleware = (
 
     return async function auth(request: Request, response: Response, next: NextFunction) {
         try {
-            // eslint-disable-next-line security/detect-object-injection
-            if (request.headers[authHeaderKey]) {
-                // eslint-disable-next-line security/detect-object-injection
-                const authHeader = request.headers[authHeaderKey] as string
+            if (request.headers[String(authHeaderKey)]) {
+                const authHeader = request.headers[String(authHeaderKey)] as string
                 const decodedToken = await firebaseAuth.verifyIdToken(authHeader, checkRevoked)
-                // eslint-disable-next-line security/detect-object-injection
-                request.headers[attachUserTo] = decodedToken.uid
+                request.headers[String(attachUserTo)] = decodedToken.uid
                 return next()
             }
             return authFailed(response, 401, 'MISSING OR MALFORMED AUTH')

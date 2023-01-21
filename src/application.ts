@@ -24,7 +24,10 @@ export default class Application {
         this.server = server
         this.router = new Router(this.server, this.orm)
         this.port = Number.parseInt(process.env.PORT as string, 10)
-        initializeApp({ credential: cert(serviceAccountConfig) })
+        initializeApp({
+            credential: cert(serviceAccountConfig),
+            storageBucket: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/`,
+        })
         this.initSentry()
     }
 
@@ -39,6 +42,7 @@ export default class Application {
             ],
 
             tracesSampleRate: 1,
+            release: `friendsquest-api@${process.env.npm_package_version}`,
         })
     }
 
@@ -65,7 +69,7 @@ export default class Application {
 
         this.server.disable('x-powered-by')
 
-        this.router.initRoutes(this.port, routes)
+        this.router.initRoutes(routes)
 
         try {
             this.server.listen(this.port)

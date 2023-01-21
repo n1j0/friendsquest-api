@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { body } from 'express-validator'
 import UserController from '../controller/userController.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -6,6 +7,10 @@ import { UserRepositoryInterface } from '../repositories/user/userRepositoryInte
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeInvalidError } from '../errors/AttributeInvalidError.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService.js'
 
 export class UserRouter implements RouterInterface {
     private readonly router: Router
@@ -16,7 +21,8 @@ export class UserRouter implements RouterInterface {
         router: Router,
         orm: ORM,
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         userController: UserController = new UserController(userRepository),
     ) {
         this.router = router
@@ -33,13 +39,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Returns all users
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     responses:
          *       200:
          *         description: Returns persons
@@ -75,12 +74,6 @@ export class UserRouter implements RouterInterface {
          *     tags:
          *       - User
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: id
          *         schema:
@@ -122,12 +115,6 @@ export class UserRouter implements RouterInterface {
          *     tags:
          *       - User
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *       - in: path
          *         name: uid
          *         schema:
@@ -155,11 +142,52 @@ export class UserRouter implements RouterInterface {
         this.router.get('/uid/:uid', this.getUserByUidHandler)
     }
 
+    getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
+        { fc: request.params.fc },
+        response,
+    )
+
+    generateGetUserByFriendsCodeRoute = () => {
+        /**
+         * @openapi
+         * /users/fc/{fc}:
+         *   get:
+         *     summary: Get a user by friends code
+         *     tags:
+         *       - User
+         *     parameters:
+         *       - in: path
+         *         name: fc
+         *         schema:
+         *           type: string
+         *         required: true
+         *         description: Friends code of the user to get
+         *     responses:
+         *       200:
+         *         description: Returns a user by friends code
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 data:
+         *                   $ref: '#/components/schemas/User'
+         *                 points:
+         *                   type: object
+         *                   default: {}
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.get('/fc/:fc', this.getUserByFriendsCodeHandler)
+    }
+
     createUserHandler = (request: Request, response: Response) => this.userController.createUser(
         {
             email: request.body.email,
             username: request.body.username,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -172,13 +200,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Create a new user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -189,11 +210,12 @@ export class UserRouter implements RouterInterface {
          *               email:
          *                 type: string
          *                 description: The email of the user
-         *                 required: true
          *               username:
          *                 type: string
          *                 description: The username of the user
-         *                 required: true
+         *             required:
+         *               - email
+         *               - username
          *           examples:
          *             normal:
          *               summary: Example for valid creation of user
@@ -223,7 +245,45 @@ export class UserRouter implements RouterInterface {
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
-        this.router.post('/', this.createUserHandler)
+        this.router.post(
+            '/',
+            [
+                body('email')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Email is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isEmail()
+                    .withMessage(
+                        {
+                            message: 'Email is invalid',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('username')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'Username is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Username must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createUserHandler,
+        )
     }
 
     updateUserHandler = (request: Request, response: Response) => this.userController.updateUser(
@@ -231,7 +291,7 @@ export class UserRouter implements RouterInterface {
             email: request.body.email,
             username: request.body.username,
             body: request.body,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -244,13 +304,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Update a user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *         required: true
-         *         description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -261,11 +314,12 @@ export class UserRouter implements RouterInterface {
          *               email:
          *                 type: string
          *                 description: The email of the user
-         *                 required: true
          *               username:
          *                 type: string
          *                 description: The username of the user
-         *                 required: false
+         *             required:
+         *               - email
+         *               - username
          *           examples:
          *             normal:
          *               summary: Example for valid change of one user
@@ -295,12 +349,33 @@ export class UserRouter implements RouterInterface {
          */
         this.router.patch(
             '/',
+            [
+                body('email')
+                    .isEmail()
+                    .withMessage(
+                        {
+                            message: 'Email is invalid',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+                body('username')
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Username must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
             this.updateUserHandler,
         )
     }
 
     deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -312,13 +387,6 @@ export class UserRouter implements RouterInterface {
          *     summary: Delete a user
          *     tags:
          *       - User
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         required: true
-         *         description: Authorization header
-         *         schema:
-         *           type: string
          *     responses:
          *       204:
          *         description: Ok
@@ -327,16 +395,14 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/',
-            this.deleteUserHandler,
-        )
+        this.router.delete('/', this.deleteUserHandler)
     }
 
     createAndReturnRoutes = () => {
         this.generateAllUsersRoute()
         this.generateGetUserByIdRoute()
         this.generateGetUserByUidRoute()
+        this.generateGetUserByFriendsCodeRoute()
         this.generateCreateUserRoute()
         this.generateUpdateUserRoute()
         this.generateDeleteUserRoute()

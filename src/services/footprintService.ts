@@ -2,6 +2,7 @@ import Multer from 'multer'
 import { Express, Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import { getStorage, Storage } from 'firebase-admin/storage'
+import fetch from 'node-fetch'
 import { MulterFiles } from '../types/multer.js'
 
 export class FootprintService {
@@ -35,7 +36,7 @@ export class FootprintService {
     ) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(pathToFile)}?alt=media&token=${downloadToken}`
 
     uploadFilesToFireStorage = async (files: MulterFiles['files'], uid: string) => {
-        const bucket = this.storage.bucket('gs://friends-quest.appspot.com/')
+        const bucket = this.storage.bucket()
         const images: Express.Multer.File[] = files.image
         const audios: Express.Multer.File[] = files.audio
         const allFiles = [ ...images, ...audios ]
@@ -52,6 +53,7 @@ export class FootprintService {
                     contentType: value.mimetype,
                     downloadTokens: downloadToken,
                 },
+                gzip: true,
             }))
 
             return this.createPersistentDownloadUrl(bucket.name, fullPath, downloadToken)
@@ -60,6 +62,12 @@ export class FootprintService {
         await Promise.all(promises)
 
         return downloadURLs
+    }
+
+    getTemperature = async (latitude: string, longitude: string): Promise<unknown | undefined> => {
+        // eslint-disable-next-line max-len
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`)
+        return await response.json() as unknown as Promise<unknown | undefined>
     }
 
     uploadMiddleware = Multer({

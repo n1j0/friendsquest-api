@@ -6,14 +6,19 @@ import { UserRepositoryInterface } from './userRepositoryInterface.js'
 import { UserService } from '../../services/userService.js'
 import Points from '../../constants/points.js'
 import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError.js'
+import { DeletionService } from '../../services/deletionService.js'
+import { Footprint } from '../../entities/footprint.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
 
+    private readonly deletionService: DeletionService
+
     private readonly orm: ORM
 
-    constructor(userService: UserService, orm: ORM) {
+    constructor(userService: UserService, deletionService: DeletionService, orm: ORM) {
         this.userService = userService
+        this.deletionService = deletionService
         this.orm = orm
     }
 
@@ -28,7 +33,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         }
     }
 
-    getUserById = async (id: number | string) => {
+    getUserById = async (id: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -37,7 +42,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         )
     }
 
-    getUserByUid = async (uid: number | string) => {
+    getUserByUid = async (uid: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -46,7 +51,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         )
     }
 
-    getUserByFriendsCode = async (friendsCode: number | string) => {
+    getUserByFriendsCode = async (friendsCode: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -93,25 +98,30 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         // we can't include repos here due to circular dependency injection in the router
         const [ friendships, footprints ] = await Promise.all([
             em.find('Friendship', { $or: [{ invitor: user }, { invitee: user }] }),
-            em.find('Footprint', { createdBy: user } as any),
+            em.find(
+                'Footprint',
+                { createdBy: user } as any,
+                { populate: ['users'] } as any,
+            ) as Promise<Footprint[]>,
         ])
         const reactions = await em.find(
             'FootprintReaction',
             { $or: [{ createdBy: user }, { footprint: [...footprints] }] },
         )
-        await Promise.all(footprints.map(async (footprint) => {
-            if (!footprint.users.isInitialized()) {
-                await footprint.users.init()
-            }
+        footprints.forEach((footprint) => {
             footprint.users.removeAll()
             em.persist(footprint)
-        }))
+        })
         em.persist(user)
         em.remove(friendships)
         em.remove(reactions)
         em.remove(footprints)
         em.remove(user)
-        return em.flush()
+        await Promise.all([
+            em.flush(),
+            this.deletionService.deleteAllUserFiles(uid),
+        ])
+        return this.deletionService.deleteUser(uid)
     }
 
     addPoints = async (uid: string, points: number) => {

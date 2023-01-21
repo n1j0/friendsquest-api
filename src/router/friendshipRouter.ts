@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express'
+import { body } from 'express-validator'
 import FriendshipController from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
@@ -8,6 +9,9 @@ import { UserRepositoryInterface } from '../repositories/user/userRepositoryInte
 import { ORM } from '../orm.js'
 import { RouterInterface } from './routerInterface.js'
 import { UserService } from '../services/userService.js'
+import { errorHandler } from '../middlewares/errorHandler.js'
+import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
+import { DeletionService } from '../services/deletionService.js'
 
 export class FriendshipRouter implements RouterInterface {
     private readonly router: Router
@@ -18,7 +22,8 @@ export class FriendshipRouter implements RouterInterface {
         router: Router,
         orm: ORM,
         userService: UserService = new UserService(),
-        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, orm),
+        deletionService: DeletionService = new DeletionService(),
+        userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         friendshipController: FriendshipController = new FriendshipController(friendshipRepository, userRepository),
     ) {
@@ -40,17 +45,11 @@ export class FriendshipRouter implements RouterInterface {
          *    tags:
          *      - Friendship
          *    parameters:
-         *      - in: header
-         *        name: X-Auth
-         *        schema:
-         *          type: string
-         *          required: true
-         *          description: Authorization header
          *      - in: query
          *        name: userId
+         *        required: true
          *        schema:
          *          type: integer
-         *          required: true
          *          description: Numeric ID of the user to get the friendships of
          *          example: 1
          *    responses:
@@ -77,7 +76,7 @@ export class FriendshipRouter implements RouterInterface {
     }
 
     createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
-        { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
+        { friendsCode: request.body.friendsCode, uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -89,13 +88,6 @@ export class FriendshipRouter implements RouterInterface {
          *     summary: Create a friendship
          *     tags:
          *       - Friendship
-         *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *           required: true
-         *           description: Authorization header
          *     requestBody:
          *       required: true
          *       content:
@@ -105,9 +97,10 @@ export class FriendshipRouter implements RouterInterface {
          *             properties:
          *               friendsCode:
          *                 type: string
-         *                 required: true
          *                 description: Friends code of the user to create a friendship with
          *                 example: 0rIxc
+         *             required:
+         *               - friendsCode
          *     responses:
          *       200:
          *         description: Returns the created friendship
@@ -126,13 +119,28 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.post('/', this.createFriendshipHandler)
+        this.router.post(
+            '/',
+            [
+                body('friendsCode')
+                    .notEmpty()
+                    .withMessage(
+                        {
+                            message: 'FriendsCode is required',
+                            type: AttributeIsMissingError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.createFriendshipHandler,
+        )
     }
 
     acceptFriendshipHandler = (request: Request, response: Response) => this.friendshipController.acceptFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -146,17 +154,11 @@ export class FriendshipRouter implements RouterInterface {
          *     tags:
          *       - Friendship
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *           required: true
-         *           description: Authorization header
          *       - in: path
          *         name: id
+         *         required: true
          *         schema:
          *           type: integer
-         *           required: true
          *           description: Numeric ID of the friendship to accept
          *     responses:
          *       200:
@@ -184,7 +186,7 @@ export class FriendshipRouter implements RouterInterface {
     ) => this.friendshipController.declineOrDeleteFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -198,17 +200,11 @@ export class FriendshipRouter implements RouterInterface {
          *     tags:
          *       - Friendship
          *     parameters:
-         *       - in: header
-         *         name: X-Auth
-         *         schema:
-         *           type: string
-         *           required: true
-         *           description: Authorization header
          *       - in: path
          *         name: id
+         *         required: true
          *         schema:
          *           type: integer
-         *           required: true
          *           description: Numeric ID of the friendship to delete
          *     responses:
          *       204:
