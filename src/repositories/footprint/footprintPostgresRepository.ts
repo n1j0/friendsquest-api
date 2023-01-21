@@ -104,6 +104,20 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         }
     }
 
+    deleteFootprint = async ({ id, uid }: { id: number | string, uid: string }) => {
+        const em = this.orm.forkEm()
+        const footprint = await this.findFootprintById(id)
+        if (footprint.createdBy.uid !== uid) {
+            throw new ForbiddenError()
+        }
+        const reactions = await em.find(
+            'FootprintReaction',
+            { footprint },
+        )
+        em.remove(reactions)
+        return em.removeAndFlush(footprint)
+    }
+
     deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }) => {
         const em = this.orm.forkEm()
         const reaction: FootprintReaction = await em.findOneOrFail(

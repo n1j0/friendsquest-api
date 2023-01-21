@@ -82,6 +82,22 @@ export default class FootprintController {
         }
     }
 
+    deleteFootprint = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
+        try {
+            await this.footprintRepository.deleteFootprint({ id, uid })
+            return response.sendStatus(204)
+        } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return ResponseSender.error(response, NotFoundError.getErrorDocument('The footprint'))
+            }
+            if (error instanceof ForbiddenError) {
+                // eslint-disable-next-line max-len
+                return ResponseSender.error(response, ForbiddenError.getErrorDocument('You cannot delete footprints of others'))
+            }
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
     deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
         try {
             await this.footprintRepository.deleteFootprintReaction({ id, uid })
