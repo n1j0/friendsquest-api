@@ -1,0 +1,25 @@
+name: General Testing for CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  codecheck:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+    - run: npm ci --prefer-offline --no-audit --ignore-scripts
+    - run: npm run lint
+    - run: npm run typecheck
+    - run: npm run test:ci
