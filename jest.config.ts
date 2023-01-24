@@ -23,6 +23,14 @@ const jestSetup: JestConfigWithTsJest = {
         '<rootDir>/src/**/*.{js,ts}',
         '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
     ],
+    coverageThreshold: {
+        global: {
+            branches: 80,
+            functions: 80,
+            lines: 80,
+            statements: 80,
+        },
+    },
     setupFiles: ['<rootDir>/jest.setup.ts'],
     restoreMocks: true,
 }
