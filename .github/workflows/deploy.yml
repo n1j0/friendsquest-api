@@ -1,0 +1,29 @@
+name: Deployment Staging/Production
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: git push to staging system
+      # if: github.ref_name == 'develop'
+      run: |
+        git remote add staging ssh://dokku@projects.multimediatechnology.at:5412/friendsqueststaging
+        git config --global user.name "GitHub Deployment"
+        git config --global user.email "nijo@duck.com"
+        git push staging develop:master
+    #- name: git push to production system
+    #  if: github.ref_name == 'main'
+    #  run: |
+    #    git remote add production ssh://dokku@projects.multimediatechnology.at:5412/friendsquest
+    #    git config --global user.name "GitHub Deployment"
+    #    git config --global user.email "nijo@duck.com"
+    #    git push production main:main
