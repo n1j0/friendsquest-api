@@ -23,3 +23,29 @@ jobs:
     - run: npm run lint
     - run: npm run typecheck
     - run: npm run test:ci
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage-report
+        path: coverage/
+
+  coverage:
+    if: github.event_name == 'pull_request'
+    needs: codecheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@master
+      with:
+        name: code-coverage-report
+        path: coverage/
+    - uses: ArtiomTr/jest-coverage-report-action@v2
+      id: coverage
+      with:
+        skip-step: all
+        coverage-file: coverage/coverage-final.json
+        base-coverage-file: coverage/coverage-final.json
+        output: report-markdown
+    - uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        message: ${{ steps.coverage.outputs.report }}
