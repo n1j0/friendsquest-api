@@ -30,7 +30,7 @@ jobs:
         path: coverage/
 
   coverage:
-    if: github.event_name == 'pull_request'
+    if: (success() || failure()) && github.event_name == 'pull_request'
     needs: codecheck
     runs-on: ubuntu-latest
     steps:
