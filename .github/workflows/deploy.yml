@@ -23,7 +23,7 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - name: git push to staging system
-      # if: github.ref_name == 'develop'
+      if: github.ref_name == 'develop'
       run: |
         git remote add staging ssh://dokku@projects.multimediatechnology.at:5412/friendsqueststaging
         git config --global user.name "GitHub Deployment"
