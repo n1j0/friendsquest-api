@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
 import { NotFoundError } from '../../errors/NotFoundError.js'
@@ -70,20 +69,15 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         await em.persistAndFlush(user)
         const userInDatabase = await this.getUserByUid(user.uid)
         const friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
-        wrap(user).assign({
-            friendsCode,
-        })
-        await em.persistAndFlush(user)
-        return user
+        const userWithFriendsCode = em.assign(user, { friendsCode })
+        await em.persistAndFlush(userWithFriendsCode)
+        return userWithFriendsCode
     }
 
     updateUser = async (uid: string, userData: any) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        wrap(user).assign({
-            ...userData,
-            points: user.points + Points.PROFILE_EDITED,
-        })
+        em.assign(user, { ...userData, points: user.points + Points.PROFILE_EDITED })
         await em.persistAndFlush(user)
         return { user, points: Points.PROFILE_EDITED }
     }
@@ -127,9 +121,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     addPoints = async (uid: string, points: number) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        wrap(user).assign({
-            points: user.points + points,
-        })
+        em.assign(user, { points: user.points + points })
         try {
             await em.persistAndFlush(user)
         } catch { /* empty */ }
