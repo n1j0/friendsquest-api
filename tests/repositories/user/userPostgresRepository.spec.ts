@@ -3,7 +3,8 @@ import { ORM } from '../../../src/orm'
 import { UserService } from '../../../src/services/userService'
 import { UserRepositoryInterface } from '../../../src/repositories/user/userRepositoryInterface'
 import { UserPostgresRepository } from '../../../src/repositories/user/userPostgresRepository'
-import { UserNotFoundError } from '../../../.out/src/errors/UserNotFoundError'
+import { DeletionService } from '../../../src/services/deletionService'
+import { User } from '../../../src/entities/user'
 
 jest.mock('@mikro-orm/core', () => ({
     PrimaryKey: jest.fn(),
@@ -23,50 +24,49 @@ describe(
     'UserPostgresRepository',
     () => {
         let orm: ORM
-        // eslint-disable-next-line no-unused-vars
-        let userRepository: UserRepositoryInterface
         let userPostgresRepository: UserRepositoryInterface
         let userService: UserService
+        let deletionService: DeletionService
 
         beforeEach(() => {
             orm = mock<ORM>()
-            userRepository = mock<UserRepositoryInterface>()
-            userPostgresRepository = new UserPostgresRepository(userService, orm)
+            userService = mock<UserService>()
+            deletionService = mock<DeletionService>()
+            userPostgresRepository = new UserPostgresRepository(userService, deletionService, orm)
         })
 
-        describe.skip('getUserById', () => {
-            it('returns one user by id', async () => {
-                const findOneOrFail = jest.fn().mockReturnValue('user')
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
-                }))
+        it.skip('check username and email', async () => {
+            const find = jest.fn().mockResolvedValueOnce([])
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                find,
+            }))
 
-                const id = 1
-                const user = await userPostgresRepository.getUserById(id)
+            const user = new User('email', 'uid', 'username')
+            const result = await userPostgresRepository.checkUsernameAndMail(user.username, user.email)
 
-                expect(orm.forkEm).toHaveBeenCalled()
-                expect(findOneOrFail).toHaveBeenCalledWith(
-                    'User',
-                    { id: 1 },
-                    {
-                        failHandler: expect.any(Function),
-                    },
-                )
-                expect(user).toBe('user')
-            })
+            expect(result).toStrictEqual([])
+        })
 
-            it('throws NotFoundError when user not found', async () => {
-                const findOneOrFail = jest.fn().mockRejectedValueOnce(new UserNotFoundError())
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
-                }))
+        it('returns one user by id', async () => {
+            const findOneOrFail = jest.fn().mockReturnValue('user')
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail,
+            }))
 
-                const id = 1
+            const id = 1
+            const user = await userPostgresRepository.getUserById(id)
 
-                await expect(userPostgresRepository.getUserById(id)).rejects.toThrow(UserNotFoundError)
-            })
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(findOneOrFail).toHaveBeenCalledWith(
+                'User',
+                { id: 1 },
+                {
+                    failHandler: expect.any(Function),
+                },
+            )
+            expect(user).toBe('user')
         })
 
         it('returns one user by uid', async () => {
@@ -125,6 +125,35 @@ describe(
             expect(orm.forkEm).toHaveBeenCalled()
             expect(findAll).toHaveBeenCalledWith()
             expect(users).toStrictEqual([])
+        })
+
+        it('creates and returns a new user', async () => {
+            const friendsCode = '00000'
+            const persistAndFlush = jest.fn().mockResolvedValue(true)
+            const assign = jest.fn().mockReturnValue('user')
+            const getUserByUidMock = jest.fn().mockResolvedValue({ id: 1 })
+            userService.numberToBase36String = jest.fn().mockReturnValue(friendsCode)
+            userPostgresRepository.getUserByUid = getUserByUidMock
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                persistAndFlush,
+                assign,
+            }))
+
+            const user = {
+                id: 1,
+                uid: 1,
+            } as unknown as User
+
+            const exampleUser = await userPostgresRepository.createUser(user)
+
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(persistAndFlush).toHaveBeenNthCalledWith(1, user)
+            expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+            expect(assign).toHaveBeenCalledWith(user, { friendsCode })
+            expect(persistAndFlush).toHaveBeenNthCalledWith(2, 'user')
+            expect(exampleUser).toBe('user')
         })
     },
 )
