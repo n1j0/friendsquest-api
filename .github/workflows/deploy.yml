@@ -16,14 +16,12 @@ jobs:
     - name: add SSH information
       env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
       run: |
         mkdir -p ~/.ssh/
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        cat >> ~/.ssh/config <<END
-        Host projects.multimediatechnology.at
-          IdentityFile ~/.ssh/id_rsa
-        END
+        echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - name: git push to staging system
       # if: github.ref_name == 'develop'
       run: |
