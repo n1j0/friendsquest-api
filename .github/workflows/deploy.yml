@@ -17,8 +17,8 @@ jobs:
         fetch-depth: 0
     - name: add SSH information
       env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
+        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
       run: |
         mkdir -p ~/.ssh/
         echo "$SSH_KEY" > ~/.ssh/id_rsa
@@ -26,15 +26,19 @@ jobs:
         echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - name: git push to staging system
       if: github.ref_name == 'develop'
+      env:
+        SSH_URL: ${{ vars.SSH_STAGING_URL }}
       run: |
-        git remote add staging ssh://dokku@projects.multimediatechnology.at:5412/friendsqueststaging
+        git remote add staging $SSH_URL
         git config --global user.name "GitHub Deployment"
         git config --global user.email "nijo@duck.com"
         git push staging develop:master --force
-    #- name: git push to production system
-    #  if: github.ref_name == 'main'
-    #  run: |
-    #    git remote add production ssh://dokku@projects.multimediatechnology.at:5412/friendsquest
-    #    git config --global user.name "GitHub Deployment"
-    #    git config --global user.email "nijo@duck.com"
-    #    git push production main:main
+    - name: git push to production system
+      if: github.ref_name == 'main'
+      env:
+        SSH_URL: ${{ vars.SSH_PROD_URL }}
+      run: |
+        git remote add production $SSH_URL
+        git config --global user.name "GitHub Deployment"
+        git config --global user.email "nijo@duck.com"
+        git push production main:main --force

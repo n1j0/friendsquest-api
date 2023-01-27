@@ -3,6 +3,8 @@ import express from 'express'
 import Application from './application.js'
 import { ORM } from './orm.js'
 
+// possible: outsource and test the function
+// http request to /health router and check for "up"
 config()
 
 try {
