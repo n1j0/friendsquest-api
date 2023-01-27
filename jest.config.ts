@@ -22,6 +22,7 @@ const jestSetup: JestConfigWithTsJest = {
     collectCoverageFrom: [
         '<rootDir>/src/**/*.{js,ts}',
         '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
+        '!<rootDir>/src/index.ts',
     ],
     coverageThreshold: {
         global: {

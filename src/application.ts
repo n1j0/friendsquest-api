@@ -58,7 +58,7 @@ export default class Application {
         }
     }
 
-    init = (): void => {
+    init = (): ExpressApplication | undefined => {
         this.server.use(json())
         this.server.use(urlencoded({ extended: true }))
         this.server.use(helmet())
@@ -73,8 +73,10 @@ export default class Application {
 
         try {
             this.server.listen(this.port)
+            return this.server
         } catch (error: any) {
             console.error('Could not start server', error)
+            return undefined
         }
     }
 }
