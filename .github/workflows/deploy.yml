@@ -27,7 +27,7 @@ jobs:
     - name: git push to staging system
       if: github.ref_name == 'develop'
       env:
-        SSH_URL: ${{ secrets.SSH_STAGING_URL }}
+        SSH_URL: ${{ vars.SSH_STAGING_URL }}
       run: |
         git remote add staging $SSH_URL
         git config --global user.name "GitHub Deployment"
