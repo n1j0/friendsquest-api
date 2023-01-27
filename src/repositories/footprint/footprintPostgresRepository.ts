@@ -88,6 +88,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const reaction = new FootprintReaction(user, message, footprint)
         const reactions: FootprintReaction[] = await em.find('FootprintReaction', { footprint: { id } } as any)
         await em.persistAndFlush(reaction)
+        // TODO: rewrite to "isFirstReaction"
         if (reactions) {
             if (footprint.createdBy.id === user.id) {
                 return {
