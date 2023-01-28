@@ -1,5 +1,6 @@
 import { mock, mockDeep } from 'jest-mock-extended'
 import { Application as ExpressApplication, urlencoded } from 'express'
+import * as http from 'node:http'
 import { initializeApp } from 'firebase-admin/app'
 import { ORM } from '../src/orm'
 import Application from '../src/application'
@@ -29,6 +30,23 @@ jest.mock('../src/router.js', () => ({
 
 jest.mock('../src/router/routes', () => ({
     routes: [],
+}))
+
+jest.mock('@sentry/node', () => ({
+    Handlers: {
+        requestHandler: jest.fn().mockReturnValue('requestHandler'),
+        tracingHandler: jest.fn().mockReturnValue('tracingHandler'),
+    },
+    Integrations: {
+        Http: jest.fn().mockReturnValue('Http'),
+    },
+    init: jest.fn(),
+}))
+
+jest.mock('@sentry/tracing', () => ({
+    Integrations: {
+        Express: jest.fn().mockReturnValue('Express'),
+    },
 }))
 
 describe('Application', () => {
@@ -85,9 +103,17 @@ describe('Application', () => {
     })
 
     describe('init', () => {
+        let server: http.Server | undefined
+
         beforeEach(() => {
             app = new Application(ormMock, serverMock)
-            app.init()
+            server = app.init()
+        })
+
+        afterEach(() => {
+            if (server) {
+                server.close()
+            }
         })
 
         it.skip('sets up global middlewares', () => {

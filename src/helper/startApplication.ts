@@ -3,7 +3,7 @@ import express from 'express'
 import { ORM } from '../orm.js'
 import Application from '../application.js'
 
-export const startApplication = async (): Promise<express.Application | undefined> => {
+export const startApplication = async (): Promise<void> => {
     config()
 
     try {
@@ -11,9 +11,8 @@ export const startApplication = async (): Promise<express.Application | undefine
         const server = express()
         const application = new Application(orm, server)
         await application.migrate()
-        return application.init()
+        application.init()
     } catch (error: any) {
         console.error(error)
-        return undefined
     }
 }

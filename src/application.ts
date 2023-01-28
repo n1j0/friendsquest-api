@@ -5,6 +5,7 @@ import compression from 'compression'
 import { cert, initializeApp } from 'firebase-admin/app'
 import * as Sentry from '@sentry/node'
 import * as Tracing from '@sentry/tracing'
+import * as http from 'node:http'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
@@ -58,7 +59,7 @@ export default class Application {
         }
     }
 
-    init = (): ExpressApplication | undefined => {
+    init = (): http.Server | undefined => {
         this.server.use(json())
         this.server.use(urlencoded({ extended: true }))
         this.server.use(helmet())
@@ -72,8 +73,7 @@ export default class Application {
         this.router.initRoutes(routes)
 
         try {
-            this.server.listen(this.port)
-            return this.server
+            return this.server.listen(this.port)
         } catch (error: any) {
             console.error('Could not start server', error)
             return undefined
