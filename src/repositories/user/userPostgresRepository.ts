@@ -77,10 +77,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return userWithFriendsCode
     }
 
-    updateUser = async (uid: string, userData: any) => {
+    updateUser = async (uid: string, userData: { username: string, email: string }) => {
         const em = this.orm.forkEm()
-        const user = await this.getUserByUid(uid)
-        em.assign(user, { ...userData, points: user.points + Points.PROFILE_EDITED })
+        const userByUid = await this.getUserByUid(uid)
+        const user = em.assign(userByUid, { ...userData, points: userByUid.points + Points.PROFILE_EDITED })
         await em.persistAndFlush(user)
         return { user, points: Points.PROFILE_EDITED }
     }
@@ -124,10 +124,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     addPoints = async (uid: string, points: number) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        em.assign(user, { points: user.points + points })
+        const userWithPoints = em.assign(user, { points: user.points + points })
         try {
-            await em.persistAndFlush(user)
+            await em.persistAndFlush(userWithPoints)
         } catch { /* empty */ }
-        return user
+        return userWithPoints
     }
 }
