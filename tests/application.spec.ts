@@ -159,7 +159,7 @@ describe('Application', () => {
             app.initSentry()
             jest.spyOn(Sentry, 'init').mockImplementation(() => {})
             expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({
-                dsn: expect.any(String),
+                dsn: 'sentry_dsn',
                 integrations: expect.any(Array),
                 tracesSampleRate: 1,
                 release: expect.any(String),
