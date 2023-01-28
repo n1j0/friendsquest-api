@@ -1,18 +1,19 @@
 import { config } from 'dotenv'
 import express from 'express'
+import { Server } from 'node:http'
 import { ORM } from '../orm.js'
 import Application from '../application.js'
 
-export const startApplication = async (): Promise<void> => {
+export const startApplication = async (): Promise<Server | undefined> => {
     config()
 
     try {
         const orm = await ORM.init()
         const server = express()
         const application = new Application(orm, server)
-        await application.migrate()
-        application.init()
+        return application.init()
     } catch (error: any) {
         console.error(error)
+        return undefined
     }
 }

@@ -2,6 +2,7 @@ import { mock, mockDeep } from 'jest-mock-extended'
 import { Application as ExpressApplication, urlencoded } from 'express'
 import * as http from 'node:http'
 import { initializeApp } from 'firebase-admin/app'
+import * as Sentry from '@sentry/node'
 import { ORM } from '../src/orm'
 import Application from '../src/application'
 import { Router } from '../src/router'
@@ -93,7 +94,7 @@ describe('Application', () => {
 
         it('prints an error if something goes wrong', async () => {
             const error = new Error('test')
-            const consoleSpy = jest.spyOn(console, 'error')
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             // @ts-ignore
             ormMock.orm.getMigrator.mockImplementation(() => { throw error })
             app = new Application(ormMock, serverMock)
@@ -105,9 +106,10 @@ describe('Application', () => {
     describe('init', () => {
         let server: http.Server | undefined
 
-        beforeEach(() => {
+        beforeEach(async () => {
             app = new Application(ormMock, serverMock)
-            server = app.init()
+            app.migrate = jest.fn()
+            server = await app.init()
         })
 
         afterEach(() => {
@@ -116,7 +118,11 @@ describe('Application', () => {
             }
         })
 
-        it.skip('sets up global middlewares', () => {
+        it('calls migrations', () => {
+            expect(app.migrate).toHaveBeenCalled()
+        })
+
+        it('sets up global middlewares', () => {
             expect(serverMock.use).toHaveBeenNthCalledWith(1, 'json')
             expect(serverMock.use).toHaveBeenNthCalledWith(2, urlencoded())
             expect(urlencoded).toHaveBeenCalledWith({ extended: true })
@@ -137,12 +143,55 @@ describe('Application', () => {
             expect(serverMock.listen).toHaveBeenCalledWith(1234)
         })
 
-        it('throws an error if server cannot be started', () => {
-            const consoleSpy = jest.spyOn(console, 'error')
+        it('throws an error if server cannot be started', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             const error = new Error('test')
             serverMock.listen.mockImplementation(() => { throw error })
-            app.init()
+            server = await app.init()
             expect(consoleSpy).toHaveBeenCalledWith('Could not start server', error)
+        })
+    })
+
+    describe('initSentry', () => {
+        app = new Application(ormMock, serverMock)
+
+        it('initializes sentry', () => {
+            app.initSentry()
+            jest.spyOn(Sentry, 'init').mockImplementation(() => {})
+            expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({
+                dsn: expect.any(String),
+                integrations: expect.any(Array),
+                tracesSampleRate: 1,
+                release: expect.any(String),
+            }))
+        })
+    })
+
+    describe('migrate', () => {
+        it('throws error if something goes wrong', async () => {
+            ormMock.orm.getMigrator.mockImplementation(() => { throw new Error('test') })
+            jest.spyOn(console, 'error').mockImplementation(() => {})
+            app = new Application(ormMock, serverMock)
+            await app.migrate()
+            expect(console.error).toHaveBeenCalledWith('Error occurred: test')
+        })
+
+        it.each([
+            [ [], 0 ],
+            [ ['foo'], 1 ],
+            [ [ 'foo', 'bar' ], 1 ],
+        ])('migrates pending migrations %s in %i step(s)', async (migrations: string[], upCalls: number) => {
+            const getPendingMigrations = jest.fn().mockResolvedValue(migrations)
+            const migrateUp = jest.fn().mockReturnValue(Promise.resolve())
+            // @ts-ignore
+            ormMock.orm.getMigrator.mockImplementation(() => ({
+                getPendingMigrations,
+                up: migrateUp,
+            }))
+            app = new Application(ormMock, serverMock)
+            await app.migrate()
+            expect(getPendingMigrations).toHaveBeenCalled()
+            expect(migrateUp).toHaveBeenCalledTimes(upCalls)
         })
     })
 })

@@ -76,7 +76,7 @@ describe('Router', () => {
         })
 
         it('creates custom 500 response', () => {
-            const consoleSpy = jest.spyOn(console, 'error')
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)

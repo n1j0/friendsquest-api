@@ -36,6 +36,7 @@ const jestSetup: JestConfigWithTsJest = {
     },
     setupFiles: ['<rootDir>/jest.setup.ts'],
     restoreMocks: true,
+    clearMocks: true,
 }
 
 export default jestSetup

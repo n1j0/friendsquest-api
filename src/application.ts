@@ -32,7 +32,7 @@ export default class Application {
         this.initSentry()
     }
 
-    private initSentry(): void {
+    initSentry(): void {
         Sentry.init({
             dsn: process.env.SENTRY_DSN,
             integrations: [
@@ -59,7 +59,9 @@ export default class Application {
         }
     }
 
-    init = (): http.Server | undefined => {
+    init = async (): Promise<http.Server | undefined> => {
+        await this.migrate()
+
         this.server.use(json())
         this.server.use(urlencoded({ extended: true }))
         this.server.use(helmet())
