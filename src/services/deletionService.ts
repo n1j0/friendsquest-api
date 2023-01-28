@@ -1,14 +1,17 @@
 import { getStorage, Storage } from 'firebase-admin/storage'
-import { getAuth } from 'firebase-admin/auth'
+import { Auth, getAuth } from 'firebase-admin/auth'
 
 export class DeletionService {
     readonly storage: Storage
 
-    constructor(storage: Storage = getStorage()) {
+    readonly auth: Auth
+
+    constructor(storage: Storage = getStorage(), auth: Auth = getAuth()) {
         this.storage = storage
+        this.auth = auth
     }
 
-    private refFromUrl = (url: string): string => {
+    refFromUrl = (url: string): string => {
         const BASEURL = `https://firebasestorage.googleapis.com/v0/b/${process.env.FIREBASE_STORAGE_BUCKET}/o/`
 
         let imagePath: string = url.replace(BASEURL, '')
@@ -18,7 +21,7 @@ export class DeletionService {
         return imagePath.replace(/%20/g, ' ')
     }
 
-    deleteUser = async (uid: string) => getAuth().deleteUser(uid)
+    deleteUser = async (uid: string) => this.auth.deleteUser(uid)
 
     deleteFilesOfOneFootprint = async (audioUrl: string, imageUrl: string) => {
         const bucket = this.storage.bucket()

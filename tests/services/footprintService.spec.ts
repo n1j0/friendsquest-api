@@ -2,6 +2,7 @@ import { Express } from 'express'
 import { Readable } from 'node:stream'
 import { Storage } from 'firebase-admin/storage'
 import { FootprintService } from '../../src/services/footprintService'
+import { storage } from '../test-helper/storage'
 
 jest.mock('node-fetch', () => jest.fn().mockImplementation(() => ({
     ok: true,
@@ -11,16 +12,6 @@ jest.mock('node-fetch', () => jest.fn().mockImplementation(() => ({
 jest.mock('firebase-admin/storage', () => ({
     getStorage: jest.fn().mockReturnValue('getStorage'),
 }))
-
-const storage: { bucket: jest.Mock, storageClient: string, appInternal: string } = {
-    appInternal: '',
-    storageClient: '',
-    bucket: jest.fn().mockReturnValue({
-        file: jest.fn().mockReturnValue({
-            save: jest.fn(),
-        }),
-    }),
-}
 
 const generateFile = (fieldname: string, mimetype: string): Express.Multer.File => ({
     fieldname,
