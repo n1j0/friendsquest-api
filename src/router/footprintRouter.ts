@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import FootprintController from '../controller/footprintController.js'
+import { FootprintController } from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'

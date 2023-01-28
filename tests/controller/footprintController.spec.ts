@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended'
 import { Response } from 'express'
 import { FootprintRepositoryInterface } from '../../src/repositories/footprint/footprintRepositoryInterface'
-import FootprintController from '../../src/controller/footprintController'
+import { FootprintController } from '../../src/controller/footprintController'
 import responseMock from '../test-helper/responseMock'
 import ResponseSender from '../../src/helper/responseSender'
 import { NotFoundError } from '../../src/errors/NotFoundError'

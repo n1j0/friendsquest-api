@@ -6,7 +6,7 @@ import { InternalServerError } from '../errors/InternalServerError.js'
 import ResponseSender from '../helper/responseSender.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
 
-export default class FootprintController {
+export class FootprintController {
     private footprintRepository: FootprintRepositoryInterface
 
     constructor(footprintRepository: FootprintRepositoryInterface) {
