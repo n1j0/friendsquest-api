@@ -11,7 +11,6 @@ import { Route } from './types/routes'
 import ResponseSender from './helper/responseSender.js'
 import { NotFoundError } from './errors/NotFoundError.js'
 import { InternalServerError } from './errors/InternalServerError.js'
-// @ts-ignore
 import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
@@ -40,6 +39,10 @@ export class Router {
         ResponseSender.error(response, InternalServerError.getErrorDocument('Internal Server Error'))
     }
 
+    sentryErrorHandlingOptions = () => ({
+        shouldHandleError: () => true,
+    })
+
     initRoutes = (
         routes: Route[],
         authMiddleware = firebaseAuthMiddleware,
@@ -64,11 +67,7 @@ export class Router {
         this.server.set('views', join(currentPath.default, './views'))
         this.server.use('/admin', basicAuth(), new AdminRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
 
-        this.server.use(Sentry.Handlers.errorHandler({
-            shouldHandleError() {
-                return true
-            },
-        }))
+        this.server.use(Sentry.Handlers.errorHandler(this.sentryErrorHandlingOptions()))
 
         // custom 404
         this.server.use(this.custom404)

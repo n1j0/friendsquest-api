@@ -5,6 +5,10 @@ process.env.DB_HOST = '111.222.111'
 process.env.DB_PORT = '3000'
 process.env.PORT = '1234'
 
+process.env.OPEN_WEATHER_API_KEY = 'open_weather_api_key'
+
+process.env.SENTRY_DSN = 'sentry_dsn'
+
 process.env.FIREBASE_PROJECT_ID = 'project_id'
 process.env.FIREBASE_STORAGE_BUCKET = 'storage_bucket'
 process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID = 'admin_private_key_id'
