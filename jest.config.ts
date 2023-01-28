@@ -23,6 +23,8 @@ const jestSetup: JestConfigWithTsJest = {
         '<rootDir>/src/**/*.{js,ts}',
         '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
         '!<rootDir>/src/index.ts',
+        '!<rootDir>/src/errors/**/*.ts',
+        '<rootDir>/src/errors/ProblemDocument.{ts}',
     ],
     coverageThreshold: {
         global: {
