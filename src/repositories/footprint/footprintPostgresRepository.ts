@@ -38,7 +38,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         this.orm = orm
     }
 
-    private findFootprintById = async (id: number | string): Promise<Footprint> => {
+    findFootprintById = async (id: number | string): Promise<Footprint> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'Footprint',

@@ -17,4 +17,5 @@ export interface FootprintRepositoryInterface {
         id: number | string,
     ): Promise<{ footprint: Footprint, points?: number, userPoints?: number }>
     getFootprintReactions(id: number | string): Promise<any[]>
+    findFootprintById(id: number | string): Promise<Footprint>
 }
