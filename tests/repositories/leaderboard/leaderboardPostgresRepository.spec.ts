@@ -15,17 +15,19 @@ describe(
         })
 
         it('return top 100 users', async () => {
-            const find = jest.fn().mockReturnValue([])
+            const top100Users = ['user1']
+            const find = jest.fn().mockReturnValue(top100Users)
 
             // @ts-ignore
             orm.forkEm.mockImplementation(() => ({
                 find,
             }))
 
-            await leaderboardPostgresRepository.getTop100()
+            const result = await leaderboardPostgresRepository.getTop100()
 
             expect(orm.forkEm).toHaveBeenCalled()
             expect(find).toHaveBeenCalledWith('User', {}, { limit: 100, orderBy: [{ points: 'desc' }] })
+            expect(result).toBe(top100Users)
         })
     },
 )
