@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import FriendshipController from '../controller/friendshipController.js'
+import { FriendshipController } from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -14,7 +14,7 @@ import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { DeletionService } from '../services/deletionService.js'
 
 export class FriendshipRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly friendshipController: FriendshipController
 
