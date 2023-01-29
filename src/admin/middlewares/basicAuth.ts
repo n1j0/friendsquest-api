@@ -1,5 +1,9 @@
 /*
  @see https://www.rfc-editor.org/rfc/rfc7235
+ This is a combined implementation of multiple existing packages/repos
+    (e.g. express-basic-auth, basic-auth, basic-connect).
+ In addition, newer syntax, methods and concepts are used (the code was modernized).
+ Moreover, the existing packages have awful ESModule support. This is fixed as well.
  */
 
 import { Request, Response, NextFunction } from 'express'
