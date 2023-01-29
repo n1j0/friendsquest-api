@@ -69,9 +69,9 @@ describe('FriendshipRouter', () => {
     })
 
     it('initializes the constructor with all default values', () => {
-        friendshipRouter = new FriendshipRouter(router, orm)
-        expect(friendshipRouter).toBeDefined()
-        expect(friendshipRouter.router).toBeDefined()
+        const friendshipRouterWithDefaultValues = new FriendshipRouter(router, orm)
+        expect(friendshipRouterWithDefaultValues).toBeDefined()
+        expect(friendshipRouterWithDefaultValues.router).toBeDefined()
     })
 
     it('creates all routes and returns router', () => {

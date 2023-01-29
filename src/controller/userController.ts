@@ -9,7 +9,7 @@ import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllo
 import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
 import ResponseSender from '../helper/responseSender.js'
 
-export default class UserController {
+export class UserController {
     private userRepository: UserRepositoryInterface
 
     constructor(userRepository: UserRepositoryInterface) {
@@ -93,14 +93,14 @@ export default class UserController {
     }
 
     updateUser = async (
-        { email, username, uid, body }: { email: string, username: string, uid: string, body: any },
+        { email, username, uid }: { email: string, username: string, uid: string },
         response: Response,
     ) => {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
         try {
             await this.userRepository.checkUsernameAndMail(username, email)
-            const { user, points } = await this.userRepository.updateUser(uid, body)
+            const { user, points } = await this.userRepository.updateUser(uid, { username, email })
             return ResponseSender.result(response, 200, user, { amount: points, total: user.points })
         } catch (error: any) {
             switch (error.constructor) {
