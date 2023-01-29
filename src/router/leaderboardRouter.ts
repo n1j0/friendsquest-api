@@ -6,7 +6,7 @@ import { LeaderboardRepositoryInterface } from '../repositories/leaderboard/lead
 import { LeaderboardPostgresRepository } from '../repositories/leaderboard/leaderboardPostgresRepository.js'
 
 export class LeaderboardRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly leaderboardController: LeaderboardController
 

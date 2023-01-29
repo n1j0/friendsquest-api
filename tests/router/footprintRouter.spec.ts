@@ -117,9 +117,9 @@ describe('FootprintRouter', () => {
         )
         const generateDeleteFootprintRouteSpy = jest.spyOn(footprintRouter, 'generateDeleteFootprintRoute')
 
-        const result = footprintRouter.createAndReturnRoutes()
+        const routes = footprintRouter.createAndReturnRoutes()
 
-        expect(result).toBe(footprintRouter.router)
+        expect(routes).toBe(footprintRouter.router)
 
         expect(generateGetAllFootprintsRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateGetFootprintsOfFriendsAndUserRouteSpy).toHaveBeenCalledTimes(1)
