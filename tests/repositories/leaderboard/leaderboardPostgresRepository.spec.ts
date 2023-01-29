@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended'
 import { ORM } from '../../../src/orm'
-import { LeaderboardRepositoryInterface } from '../../../src/repositories/leaderboard/leaderboardRepositoryInterface.js'
-import { LeaderboardPostgresRepository } from '../../../src/repositories/leaderboard/leaderboardPostgresRepository.js'
+import { LeaderboardRepositoryInterface } from '../../../src/repositories/leaderboard/leaderboardRepositoryInterface'
+import { LeaderboardPostgresRepository } from '../../../src/repositories/leaderboard/leaderboardPostgresRepository'
 
 describe(
     'LeaderboardPostgresRepository',
