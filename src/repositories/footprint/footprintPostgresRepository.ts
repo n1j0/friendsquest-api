@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { ORM } from '../../orm.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
@@ -68,7 +67,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             temperature,
         )
         if (description) {
-            wrap(footprint).assign({ description })
+            em.assign(footprint, { description })
         }
         await em.persistAndFlush(footprint)
         const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
