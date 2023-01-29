@@ -106,10 +106,11 @@ describe('FootprintPostgresRepository', () => {
         it('return one footprint by id (myFootprint - no points)', async () => {
             const uid = 'abc'
             const id = '123'
+            const myFootprint = true
 
-            /* const points = {
-                FOOTPRINT_VIEWED: 50,
-            } */
+            const isInitialized = jest.fn().mockReturnValue(false)
+            const init = jest.fn().mockReturnValue(true)
+            const promiseSpy = jest.spyOn(Promise, 'all')
 
             const footprint = {
                 id: '1',
@@ -117,11 +118,17 @@ describe('FootprintPostgresRepository', () => {
                     id,
                 },
                 users: {
-                    isInitialized: jest.fn().mockReturnValue(true),
+                    isInitialized,
+                    init,
                     add: jest.fn(),
                 },
             }
             const user = { id, uid, points: 10 }
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                isInitialized,
+            }))
 
             const findFootprintByIdMock = jest.fn().mockResolvedValue(footprint)
             footprintPostgresRepository.findFootprintById = findFootprintByIdMock
@@ -134,10 +141,113 @@ describe('FootprintPostgresRepository', () => {
             const result = await footprintPostgresRepository.getFootprintById(uid, footprint.id)
 
             expect(orm.forkEm).toHaveBeenCalled()
+            expect(promiseSpy).toHaveBeenCalled()
             expect(findFootprintByIdMock).toHaveBeenCalledWith(footprint.id)
             expect(getUserByUidMock).toHaveBeenCalledWith(uid)
+            expect(footprint.users.isInitialized).toHaveBeenCalled()
+            expect(footprint.users.init).toHaveBeenCalled()
             // TODO: ask if I should test this
             expect(result.footprint.users.add).not.toHaveBeenCalled()
+            expect(myFootprint).toBeTruthy()
+            expect(result).toEqual({ footprint })
+        })
+
+        it('return one footprint by id (notMyFootprint - points)', async () => {
+            const uid = 'abc'
+            const id = '123'
+            const myFootprint = false
+
+            const promiseSpy = jest.spyOn(Promise, 'all')
+            const isInitialized = jest.fn().mockReturnValue(true)
+            const init = jest.fn().mockReturnValue(true)
+            const persistAndFlush = jest.fn().mockReturnValue(true)
+
+            const points = {
+                FOOTPRINT_VIEWED: 500,
+            }
+
+            const footprint = {
+                id: '1',
+                createdBy: {
+                    id: '456',
+                },
+                users: {
+                    isInitialized,
+                    init,
+                    add: jest.fn(),
+                },
+            }
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                isInitialized,
+                persistAndFlush,
+            }))
+
+            const user = { id, uid, points: 10 }
+            const userUpdate = { id, uid, points: 510 }
+
+            const findFootprintByIdMock = jest.fn().mockResolvedValue(footprint)
+            footprintPostgresRepository.findFootprintById = findFootprintByIdMock
+
+            const getUserByUidMock = jest.fn().mockResolvedValue(user)
+            userRepository.getUserByUid = getUserByUidMock
+
+            userRepository.addPoints = jest.fn()
+
+            const addPoints = jest.fn().mockResolvedValue(userUpdate)
+            userRepository.addPoints = addPoints
+
+            const result = await footprintPostgresRepository.getFootprintById(uid, footprint.id)
+
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(promiseSpy).toHaveBeenCalled()
+            expect(findFootprintByIdMock).toHaveBeenCalledWith(footprint.id)
+            expect(getUserByUidMock).toHaveBeenCalledWith(uid)
+            expect(result.footprint.users.add).toHaveBeenCalledWith(user)
+            expect(myFootprint).toBeFalsy()
+            expect(persistAndFlush).toHaveBeenCalledWith(footprint)
+            expect(addPoints).toHaveBeenCalledWith(user.uid, points.FOOTPRINT_VIEWED)
+            expect(result).toEqual({ footprint, points: points.FOOTPRINT_VIEWED, userPoints: userUpdate.points })
+        })
+
+        it('return footprint if error is thrown', async () => {
+            const uid = 'abc'
+            const id = '123'
+
+            const isInitialized = jest.fn().mockReturnValue(true)
+            const init = jest.fn().mockReturnValue(true)
+            const persistAndFlush = jest.fn().mockRejectedValue(new Error('error'))
+
+            const footprint = {
+                id: '1',
+                createdBy: {
+                    id: '456',
+                },
+                users: {
+                    isInitialized,
+                    init,
+                    add: jest.fn(),
+                },
+            }
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                isInitialized,
+                persistAndFlush,
+            }))
+
+            const user = { id, uid, points: 10 }
+
+            footprintPostgresRepository.findFootprintById = jest.fn().mockResolvedValue(footprint)
+
+            userRepository.getUserByUid = jest.fn().mockResolvedValue(user)
+
+            userRepository.addPoints = jest.fn()
+
+            const result = await footprintPostgresRepository.getFootprintById(uid, footprint.id)
+
+            expect(orm.forkEm).toHaveBeenCalled()
             expect(result).toEqual({ footprint })
         })
     })
