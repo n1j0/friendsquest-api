@@ -34,17 +34,78 @@ describe('FriendshipPostgresRepository', () => {
     })
 
     it('returns all friendships of given user id', async () => {
-        const find = jest.fn().mockResolvedValueOnce([])
+        const id = 1
+        const user = {
+            id,
+        } as unknown as User
+
+        const friendship = {
+            invitor: { id: 4 },
+            invitee: { id },
+        } as unknown as Friendship
+
+        const friendship2 = {
+            invitor: { id },
+            invitee: { id: 2 },
+        } as unknown as Friendship
+
+        const getUserByIdMock = jest.fn().mockResolvedValue(user)
+        userRepository.getUserById = getUserByIdMock
+
+        const getFriendshipsWithSpecifiedOptionsMock = jest.fn().mockResolvedValue([ friendship, friendship2 ])
+        friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions = getFriendshipsWithSpecifiedOptionsMock
+
+        const friendships = await friendshipPostgresRepository.getFriendshipsByUid(id)
+
+        expect(getUserByIdMock).toHaveBeenCalledWith(id)
+        expect(getFriendshipsWithSpecifiedOptionsMock).toHaveBeenCalledWith(
+            user,
+            {},
+            {
+                populate: [ 'invitor', 'invitee' ],
+            },
+        )
+        expect(friendships).toStrictEqual([
+            {
+                ...friendship,
+                invitor: friendship.invitor.id,
+                invitee: friendship.invitee.id,
+                friend: { id: friendship.invitor.id },
+            },
+            {
+                ...friendship2,
+                invitor: friendship2.invitor.id,
+                invitee: friendship2.invitee.id,
+                friend: { id: friendship2.invitee.id },
+            }])
+    })
+
+    it('returns a friendship with specified options', async () => {
+        const find = jest.fn().mockReturnValue(['friendship'])
+
+        const user = {
+            id: 1,
+        } as unknown as User
 
         // @ts-ignore
         orm.forkEm.mockImplementation(() => ({
             find,
-            findOneOrFail: jest.fn(),
         }))
 
-        const friendships = await friendshipPostgresRepository.getFriendshipsByUid(1)
+        const result = await friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions(user)
 
-        expect(friendships).toStrictEqual([])
+        expect(orm.forkEm).toHaveBeenCalled()
+        expect(find).toHaveBeenCalledWith(
+            'Friendship',
+            {
+                $or: [
+                    { invitor: user },
+                    { invitee: user },
+                ],
+            },
+            {},
+        )
+        expect(result).toStrictEqual(['friendship'])
     })
 
     describe('getFriendshipsById', () => {
