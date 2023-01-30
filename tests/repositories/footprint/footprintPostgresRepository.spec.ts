@@ -10,6 +10,7 @@ import { NotFoundError } from '../../../src/errors/NotFoundError'
 import { Footprint } from '../../../src/entities/footprint'
 import { ForbiddenError } from '../../../src/errors/ForbiddenError'
 import { FootprintReaction } from '../../../src/entities/footprintReaction'
+import { User } from '../../../src/entities/user'
 
 jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
 
@@ -91,11 +92,18 @@ describe('FootprintPostgresRepository', () => {
         })
 
         it('throws an error if footprint is not found', async () => {
-            const findOneOrFail = jest.fn().mockRejectedValue(new NotFoundError())
             // @ts-ignore
             orm.forkEm.mockImplementation(() => ({
-                findOneOrFail,
+                findOneOrFail: (
+                    entityName: any,
+                    where: any,
+                    { failHandler }:
+                        {
+                            failHandler: () => {}
+                        },
+                ) => failHandler(),
             }))
+
             const id = 1
 
             await expect(footprintPostgresRepository.findFootprintById(id)).rejects.toThrow(NotFoundError)
@@ -306,62 +314,97 @@ describe('FootprintPostgresRepository', () => {
 
             await expect(footprintPostgresRepository.deleteFootprint({ id, uid })).rejects.toThrow(ForbiddenError)
         })
+    })
 
-        describe('deleteFootprintReaction', () => {
-            it('deletes a footprint reaction', async () => {
-                const uid = 'abc'
-                const id = 1
-                const footprintReaction = {
-                    id,
-                    createdBy: {
-                        id: 19,
-                        uid: 'abc',
-                    },
-                } as unknown as FootprintReaction
+    describe('deleteFootprintReaction', () => {
+        it('deletes a footprint reaction', async () => {
+            const uid = 'abc'
+            const id = 1
+            const footprintReaction = {
+                id,
+                createdBy: {
+                    id: 19,
+                    uid: 'abc',
+                },
+            } as unknown as FootprintReaction
 
-                const findOneOrFail = jest.fn().mockResolvedValue(footprintReaction)
-                const removeAndFlush = jest.fn()
+            const findOneOrFail = jest.fn().mockResolvedValue(footprintReaction)
+            const removeAndFlush = jest.fn()
 
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
-                    removeAndFlush,
-                }))
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail,
+                removeAndFlush,
+            }))
 
-                await footprintPostgresRepository.deleteFootprintReaction({ id, uid })
+            await footprintPostgresRepository.deleteFootprintReaction({ id, uid })
 
-                expect(orm.forkEm).toHaveBeenCalled()
-                expect(findOneOrFail).toHaveBeenCalledWith(
-                    'FootprintReaction',
-                    { id },
-                    {
-                        populate: ['createdBy'],
-                        failHandler: expect.any(Function),
-                    },
-                )
-                expect(removeAndFlush).toHaveBeenCalledWith(footprintReaction)
-            })
-
-            it('throws an error if user is not the owner of the footprint reaction', async () => {
-                const uid = 'user-not-owner'
-                const id = 1
-                const footprintReaction = {
-                    id,
-                    createdBy: {
-                        id: 19,
-                    },
-                } as unknown as FootprintReaction
-
-                const findOneOrFail = jest.fn().mockResolvedValue(footprintReaction)
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
-                }))
-
-                await expect(footprintPostgresRepository.deleteFootprintReaction({ id, uid }))
-                    .rejects.toThrow(ForbiddenError)
-            })
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(findOneOrFail).toHaveBeenCalledWith(
+                'FootprintReaction',
+                { id },
+                {
+                    populate: ['createdBy'],
+                    failHandler: expect.any(Function),
+                },
+            )
+            expect(removeAndFlush).toHaveBeenCalledWith(footprintReaction)
         })
+
+        it('throws an ForbiddenError if user is not the owner of the footprint reaction', async () => {
+            const uid = 'user-not-owner'
+            const id = 1
+            const footprintReaction = {
+                id,
+                createdBy: {
+                    id: 19,
+                },
+            } as unknown as FootprintReaction
+
+            const findOneOrFail = jest.fn().mockResolvedValue(footprintReaction)
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail,
+            }))
+
+            await expect(footprintPostgresRepository.deleteFootprintReaction({ id, uid }))
+                .rejects.toThrow(ForbiddenError)
+        })
+
+        it('throws an NotFoundError if footprint reaction does not exist', async () => {
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail: (
+                    entityName: any,
+                    where: any,
+                    { failHandler }:
+                        {
+                            failHandler: () => {}
+                        },
+                ) => failHandler(),
+            }))
+
+            await expect(footprintPostgresRepository.deleteFootprintReaction({ id: 1, uid: 'abc' }))
+                .rejects.toThrow(NotFoundError)
+        })
+    })
+
+    it.skip('returns all footprints of friends and the user', async () => {
+        const user = {
+            id: 1,
+            uid: 'abc',
+        } as unknown as User
+
+        const getUserByUidMock = jest.fn().mockResolvedValue(user)
+        userRepository.getUserByUid = getUserByUidMock
+
+        // const getFriendshipsWithSpecifiedOptionsMock = jest.fn().mockResolvedValue([])
+
+        const find = jest.fn().mockReturnValue([])
+        // @ts-ignore
+        orm.forkEm.mockImplementation(() => ({
+            find,
+        }))
     })
 
     it('returns all reactions of a footprint', async () => {
