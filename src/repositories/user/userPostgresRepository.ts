@@ -64,10 +64,11 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return em.getRepository('User').findAll()
     }
 
-    createUser = async (user: User) => {
+    createUser = async ({ email, username, uid }: { email: string, username: string, uid: string }) => {
         const em = this.orm.forkEm()
+        const user = new User(email, uid, username)
         await em.persistAndFlush(user)
-        const userInDatabase = await this.getUserByUid(user.uid)
+        const userInDatabase = await this.getUserByUid(uid)
         const friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
         const userWithFriendsCode = em.assign(user, { friendsCode })
         await em.persistAndFlush(userWithFriendsCode)
