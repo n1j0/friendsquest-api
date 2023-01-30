@@ -6,6 +6,7 @@ on:
       - closed
     branches:
       - develop
+      - main
 
 jobs:
   deploy:
@@ -25,7 +26,7 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - name: git push to staging system
-      if: github.ref_name == 'develop'
+      if: ${{ success() && github.ref == 'refs/heads/develop' }}
       env:
         SSH_URL: ${{ vars.SSH_STAGING_URL }}
       run: |
@@ -34,7 +35,7 @@ jobs:
         git config --global user.email "nijo@duck.com"
         git push staging develop:master --force
     - name: git push to production system
-      if: github.ref_name == 'main'
+      if: ${{ success() && github.ref == 'refs/heads/main' }}
       env:
         SSH_URL: ${{ vars.SSH_PROD_URL }}
       run: |
