@@ -55,48 +55,21 @@ describe(
         })
 
         describe('checkUsernameAndMail', () => {
-            it('throws a ValueAlreadyExistsError if username and email is already taken', async () => {
-                const username = 'username'
-                const email = 'email'
+            it.each([
+                [ [''], [''] ],
+                [ [], [''] ],
+                [ [''], [] ],
+                // eslint-disable-next-line max-len
+            ])('throws a ValueAlreadyExistsError if username (%s) or email (%s) exists', async (usersByUsername, usersByMail) => {
                 const find = jest.fn()
-                    .mockResolvedValueOnce([{ username, email }])
-                    .mockResolvedValueOnce([{ username, email }])
+                    .mockResolvedValueOnce(usersByUsername)
+                    .mockResolvedValueOnce(usersByMail)
                 // @ts-ignore
                 orm.forkEm.mockImplementation(() => ({
                     find,
                 }))
 
-                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
-                    .rejects.toThrow(ValueAlreadyExistsError)
-            })
-
-            it('throws a ValueAlreadyExistsError if username is already taken', async () => {
-                const username = 'username'
-                const email = 'email'
-                const find = jest.fn()
-                    .mockResolvedValueOnce([{ username }])
-                    .mockResolvedValueOnce([])
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    find,
-                }))
-
-                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
-                    .rejects.toThrow(ValueAlreadyExistsError)
-            })
-
-            it('throws a ValueAlreadyExistsError if email is already taken', async () => {
-                const username = 'username'
-                const email = 'email'
-                const find = jest.fn()
-                    .mockResolvedValueOnce([])
-                    .mockResolvedValueOnce([{ email }])
-                // @ts-ignore
-                orm.forkEm.mockImplementation(() => ({
-                    find,
-                }))
-
-                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
+                await expect(userPostgresRepository.checkUsernameAndMail('', ''))
                     .rejects.toThrow(ValueAlreadyExistsError)
             })
 
