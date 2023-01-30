@@ -2,16 +2,16 @@ import { Express } from 'express'
 import { Readable } from 'node:stream'
 import { Storage } from 'firebase-admin/storage'
 import { FootprintService } from '../../src/services/footprintService'
+import { storage } from '../test-helper/storage'
 
-const storage: { bucket: jest.Mock, storageClient: string, appInternal: string } = {
-    appInternal: '',
-    storageClient: '',
-    bucket: jest.fn().mockReturnValue({
-        file: jest.fn().mockReturnValue({
-            save: jest.fn(),
-        }),
-    }),
-}
+jest.mock('node-fetch', () => jest.fn().mockImplementation(() => ({
+    ok: true,
+    json: jest.fn().mockImplementation(() => 'temp'),
+})))
+
+jest.mock('firebase-admin/storage', () => ({
+    getStorage: jest.fn().mockReturnValue('getStorage'),
+}))
 
 const generateFile = (fieldname: string, mimetype: string): Express.Multer.File => ({
     fieldname,
@@ -31,6 +31,11 @@ describe('FootprintService', () => {
 
     beforeEach(() => {
         footprintService = new FootprintService(storage as unknown as Storage)
+    })
+
+    it('initializes default storage', () => {
+        const footprintServiceWithDefaultStorage = new FootprintService()
+        expect(footprintServiceWithDefaultStorage.storage).toBe('getStorage')
     })
 
     it('creates persistent download Url', () => {
@@ -101,6 +106,36 @@ describe('FootprintService', () => {
         it('rejects invalid mimetype', () => {
             middleware.fileFilter({}, generateFile('foo', 'not/valid'), callback)
             expect(callback).toHaveBeenCalledWith(new Error('Type of file is not supported'))
+        })
+    })
+
+    describe('getTemperature', () => {
+        it('calls api with correct parameters', async () => {
+            // eslint-disable-next-line global-require,unicorn/prefer-module
+            const fetch = require('node-fetch')
+            fetch.mockImplementation(() => ({
+                ok: true,
+                json: jest.fn().mockImplementation(() => 'temp'),
+            }))
+            await footprintService.getTemperature('12.34', '23.234')
+            // eslint-disable-next-line max-len
+            expect(fetch).toHaveBeenCalledWith('https://api.openweathermap.org/data/2.5/weather?lat=12.34&lon=23.234&appid=open_weather_api_key&units=metric')
+        })
+
+        it('returns temperature', async () => {
+            const result = await footprintService.getTemperature('12.34', '23.234')
+            expect(result).toBe('temp')
+        })
+
+        it('returns undefined if api call fails', async () => {
+            // eslint-disable-next-line global-require,unicorn/prefer-module
+            const fetch = require('node-fetch')
+            fetch.mockImplementation(() => ({
+                ok: false,
+                json: jest.fn().mockImplementation(() => 'temp'),
+            }))
+            const result = await footprintService.getTemperature('12.34', '23.234')
+            expect(result).toBeUndefined()
         })
     })
 })

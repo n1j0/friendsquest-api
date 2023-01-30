@@ -23,11 +23,29 @@ jest.mock('@mikro-orm/core', () => ({
     },
 }))
 
+jest.mock('@sentry/node', () => ({
+    Handlers: {
+        errorHandler: jest.fn().mockReturnValue('errorHandler'),
+    },
+}))
+
 jest.mock('../src/router/_firebaseAuth.js', () => ({
     firebaseRoutes: 'firebaseRoutes',
 }))
 
+jest.mock('../src/admin/middlewares/basicAuth.js', () => ({
+    basicAuth: () => 'basicAuth',
+}))
+
 jest.mock('../src/admin/currentPath.cjs')
+
+jest.mock('../src/middlewares/firebaseAuth.js', () => ({
+    firebaseAuthMiddleware: jest.fn().mockReturnValue('firebaseAuthMiddleware'),
+}))
+
+jest.mock('firebase-admin/auth', () => ({
+    getAuth: jest.fn().mockReturnValue('getAuth'),
+}))
 
 describe('Router', () => {
     let router: Router
@@ -58,7 +76,7 @@ describe('Router', () => {
         })
 
         it('creates custom 500 response', () => {
-            const consoleSpy = jest.spyOn(console, 'error')
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             const error = new Error('test')
             router.custom500(error as unknown as ErrorRequestHandler, {} as unknown as Request, response)
             expect(consoleSpy).toHaveBeenCalledWith(error)
@@ -66,6 +84,12 @@ describe('Router', () => {
                 response,
                 InternalServerError.getErrorDocument('Internal Server Error'),
             )
+        })
+
+        it('set sentry error handling object', () => {
+            const sentryErrorOptions = router.sentryErrorHandlingOptions()
+            expect(sentryErrorOptions).toHaveProperty('shouldHandleError')
+            expect(sentryErrorOptions.shouldHandleError()).toBe(true)
         })
 
         it('sets orm request context', () => {
@@ -77,10 +101,12 @@ describe('Router', () => {
         })
 
         it('generates "firebase" route', () => {
-            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'firebaseRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'basicAuth', 'firebaseRoutes')
         })
 
-        it.todo('sets sentry middleware')
+        it('sets sentry middleware', () => {
+            expect(server.use).toHaveBeenNthCalledWith(5, 'errorHandler')
+        })
 
         it('sets custom 404 page', () => {
             expect(server.use).toHaveBeenNthCalledWith(6, router.custom404)
@@ -117,6 +143,18 @@ describe('Router', () => {
             expect(authMiddleware).toHaveBeenCalledTimes(2)
             expect(authMiddleware).toHaveBeenCalledWith(auth)
             expect(server.use).toHaveBeenNthCalledWith(3, routes[0].path, 'authMiddleware', 'someRoutes')
+        })
+    })
+
+    describe('init routes', () => {
+        beforeEach(() => {
+            server = mock<Application>()
+            orm = mock<ORM>()
+            router = new Router(server, orm)
+        })
+
+        it('uses default values for params', () => {
+            expect(router.initRoutes([])).toBeUndefined()
         })
     })
 })

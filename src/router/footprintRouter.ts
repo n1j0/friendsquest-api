@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import FootprintController from '../controller/footprintController.js'
+import { FootprintController } from '../controller/footprintController.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintService } from '../services/footprintService.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -35,6 +35,7 @@ export class FootprintRouter implements RouterInterface {
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
             footprintService,
+            deletionService,
             userRepository,
             friendshipRepository,
             orm,
@@ -89,7 +90,7 @@ export class FootprintRouter implements RouterInterface {
         {
             id: request.params.id,
             message: request.body.message,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -159,10 +160,84 @@ export class FootprintRouter implements RouterInterface {
         )
     }
 
+    deleteFootprintHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.deleteFootprint(
+        {
+            id: request.params.id,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
+        },
+        response,
+    )
+
+    generateDeleteFootprintRoute = () => {
+        /**
+         * @openapi
+         * /footprints/{id}:
+         *   delete:
+         *     summary: Delete a footprint
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: integer
+         *         required: true
+         *         description: Numeric ID of the footprint to delete
+         *     responses:
+         *       204:
+         *         description: Ok
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.delete('/:id', this.deleteFootprintHandler)
+    }
+
+    deleteFootprintReactionHandler = (
+        request: Request,
+        response: Response,
+    ) => this.footprintController.deleteFootprintReaction(
+        {
+            id: request.params.id,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
+        },
+        response,
+    )
+
+    generateDeleteFootprintReactionRoute = () => {
+        /**
+         * @openapi
+         * /footprints/reactions/{id}:
+         *   delete:
+         *     summary: Delete a reaction
+         *     tags:
+         *       - Footprint
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         schema:
+         *           type: integer
+         *         required: true
+         *         description: Numeric ID of the reaction to delete
+         *     responses:
+         *       204:
+         *         description: Ok
+         *       403:
+         *         $ref: '#/components/responses/Forbidden'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.delete('/reactions/:id', this.deleteFootprintReactionHandler)
+    }
+
     getFootprintByIdHandler = (request: Request, response: Response) => this.footprintController.getFootprintById(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -197,11 +272,7 @@ export class FootprintRouter implements RouterInterface {
          *       403:
          *         $ref: '#/components/responses/Forbidden'
          */
-        this.router.get(
-            '/:id',
-            errorHandler,
-            this.getFootprintByIdHandler,
-        )
+        this.router.get('/:id', this.getFootprintByIdHandler)
     }
 
     getFootprintReactionsHandler = (
@@ -247,11 +318,7 @@ export class FootprintRouter implements RouterInterface {
          *       500:
          *         $ref: '#/components/responses/InternalServerError'
          */
-        this.router.get(
-            '/:id/reactions',
-            errorHandler,
-            this.getFootprintReactionsHandler,
-        )
+        this.router.get('/:id/reactions', this.getFootprintReactionsHandler)
     }
 
     createFootprintHandler = (request: Request, response: Response) => this.footprintController.createFootprint(
@@ -261,7 +328,7 @@ export class FootprintRouter implements RouterInterface {
             latitude: request.body.latitude,
             longitude: request.body.longitude,
             files: request.files as MulterFiles['files'],
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -374,7 +441,7 @@ export class FootprintRouter implements RouterInterface {
         request: Request,
         response: Response,
     ) => this.footprintController.getFootprintsOfFriendsAndUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -413,6 +480,8 @@ export class FootprintRouter implements RouterInterface {
         this.generateGetAllFootprintsRoute()
         this.generateGetFootprintsOfFriendsAndUserRoute()
         this.generateCreateFootprintReactionRoute()
+        this.generateDeleteFootprintReactionRoute()
+        this.generateDeleteFootprintRoute()
         this.generateGetFootprintByIdRoute()
         this.generateGetFootprintReactionsRoute()
         this.generateCreateFootprintRoute()

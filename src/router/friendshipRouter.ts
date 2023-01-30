@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import FriendshipController from '../controller/friendshipController.js'
+import { FriendshipController } from '../controller/friendshipController.js'
 import { FriendshipPostgresRepository } from '../repositories/friendship/friendshipPostgresRepository.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
@@ -14,7 +14,7 @@ import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { DeletionService } from '../services/deletionService.js'
 
 export class FriendshipRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly friendshipController: FriendshipController
 
@@ -72,15 +72,11 @@ export class FriendshipRouter implements RouterInterface {
          *      404:
          *        $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/',
-            errorHandler,
-            this.getFriendshipsHandler,
-        )
+        this.router.get('/', this.getFriendshipsHandler)
     }
 
     createFriendshipHandler = (request: Request, response: Response) => this.friendshipController.createFriendship(
-        { friendsCode: request.body.friendsCode, uid: request.headers[AUTH_HEADER_UID] as string },
+        { friendsCode: request.body.friendsCode, uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -144,7 +140,7 @@ export class FriendshipRouter implements RouterInterface {
     acceptFriendshipHandler = (request: Request, response: Response) => this.friendshipController.acceptFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -181,11 +177,7 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.patch(
-            '/:id',
-            errorHandler,
-            this.acceptFriendshipHandler,
-        )
+        this.router.patch('/:id', this.acceptFriendshipHandler)
     }
 
     declineOrDeleteFriendshipHandler = (
@@ -194,7 +186,7 @@ export class FriendshipRouter implements RouterInterface {
     ) => this.friendshipController.declineOrDeleteFriendship(
         {
             id: request.params.id,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -222,11 +214,7 @@ export class FriendshipRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/:id',
-            errorHandler,
-            this.declineOrDeleteFriendshipHandler,
-        )
+        this.router.delete('/:id', this.declineOrDeleteFriendshipHandler)
     }
 
     createAndReturnRoutes = () => {

@@ -21,6 +21,9 @@ export class Footprint extends BaseEntity {
     @Property({ type: types.double })
     public longitude!: string
 
+    @Property()
+    public temperature: number | undefined
+
     @Formula(() => '(SELECT COUNT(*) FROM "user_footprints" WHERE footprint_id = id)')
     @Property()
     public viewCount?: number = 0
@@ -44,6 +47,7 @@ export class Footprint extends BaseEntity {
         longitude: string,
         imageURL: string,
         audioURL: string,
+        temperature?: number,
     ) {
         super()
         this.title = title
@@ -52,5 +56,6 @@ export class Footprint extends BaseEntity {
         this.longitude = longitude
         this.imageURL = imageURL
         this.audioURL = audioURL
+        this.temperature = temperature
     }
 }

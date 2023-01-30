@@ -27,7 +27,7 @@ services:
     command: npm run dev
   db:
     container_name: postgres
-    image: postgres:10.21
+    image: postgres:13.2
     restart: unless-stopped
     ports:
       - "5432:5432"

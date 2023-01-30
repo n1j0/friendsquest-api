@@ -6,18 +6,22 @@ const options = {
         openapi: '3.0.0',
         info: {
             title: 'FriendsQuest',
-            version: '2.7.0',
+            version: '2.7.1',
             // eslint-disable-next-line max-len
             description: 'Please pay attention to the first route. It is needed to get an idToken in order to test the other routes.',
         },
         servers: [
             {
                 url: 'http://localhost:1234',
-                description: 'Development server',
+                description: 'Local',
+            },
+            {
+                url: 'https://friendsqueststaging.projects.multimediatechnology.at',
+                description: 'Staging',
             },
             {
                 url: 'https://friendsquest.projects.multimediatechnology.at',
-                description: 'FH server',
+                description: 'Production',
             },
         ],
         components: {

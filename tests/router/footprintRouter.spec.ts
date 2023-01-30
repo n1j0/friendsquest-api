@@ -3,7 +3,7 @@ import { mock, mockDeep } from 'jest-mock-extended'
 import { ORM } from '../../src/orm'
 import { FootprintService } from '../../src/services/footprintService'
 import { FootprintRepositoryInterface } from '../../src/repositories/footprint/footprintRepositoryInterface'
-import FootprintController from '../../src/controller/footprintController'
+import { FootprintController } from '../../src/controller/footprintController'
 import { FootprintPostgresRepository } from '../../src/repositories/footprint/footprintPostgresRepository'
 import { FootprintRouter } from '../../src/router/footprintRouter'
 import responseMock from '../test-helper/responseMock'
@@ -20,6 +20,40 @@ jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () 
 jest.mock('../../src/constants/index.js', () => ({
     AUTH_HEADER_UID: 'uidHeader',
 }))
+
+jest.mock('../../src/middlewares/errorHandler.js', () => ({
+    errorHandler: 'errorHandler',
+}))
+
+jest.mock('../../src/services/footprintService.js', () => ({
+    FootprintService: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/services/userService.js', () => ({
+    UserService: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/services/deletionService.js', () => ({
+    DeletionService: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/repositories/user/userPostgresRepository.js', () => ({
+    UserPostgresRepository: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/repositories/friendship/friendshipPostgresRepository.js', () => ({
+    FriendshipPostgresRepository: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
+    FootprintPostgresRepository: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('../../src/controller/footprintController.js', () => ({
+    FootprintController: jest.fn().mockImplementation(() => ({})),
+}))
+
+jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
 
 describe('FootprintRouter', () => {
     let router: Router
@@ -58,8 +92,18 @@ describe('FootprintRouter', () => {
         response = responseMock
     })
 
+    it('initializes the constructor with all default values', () => {
+        const footprintRouterWithDefaultValues = new FootprintRouter(router, orm)
+        expect(footprintRouterWithDefaultValues).toBeDefined()
+        expect(footprintRouterWithDefaultValues.router).toBeDefined()
+    })
+
     it('creates all routes and returns router', () => {
         const generateGetAllFootprintsRouteSpy = jest.spyOn(footprintRouter, 'generateGetAllFootprintsRoute')
+        const generateGetFootprintsOfFriendsAndUserRouteSpy = jest.spyOn(
+            footprintRouter,
+            'generateGetFootprintsOfFriendsAndUserRoute',
+        )
         const generateCreateFootprintReactionRouteSpy = jest.spyOn(
             footprintRouter,
             'generateCreateFootprintReactionRoute',
@@ -67,16 +111,24 @@ describe('FootprintRouter', () => {
         const generateGetFootprintByIdRouteSpy = jest.spyOn(footprintRouter, 'generateGetFootprintByIdRoute')
         const generateGetFootprintReactionsRouteSpy = jest.spyOn(footprintRouter, 'generateGetFootprintReactionsRoute')
         const generateCreateFootprintRouteSpy = jest.spyOn(footprintRouter, 'generateCreateFootprintRoute')
+        const generateDeleteFootprintReactionRouteSpy = jest.spyOn(
+            footprintRouter,
+            'generateDeleteFootprintReactionRoute',
+        )
+        const generateDeleteFootprintRouteSpy = jest.spyOn(footprintRouter, 'generateDeleteFootprintRoute')
 
-        const result = footprintRouter.createAndReturnRoutes()
+        const routes = footprintRouter.createAndReturnRoutes()
 
-        expect(result).toBe(footprintRouter.router)
+        expect(routes).toBe(footprintRouter.router)
 
         expect(generateGetAllFootprintsRouteSpy).toHaveBeenCalledTimes(1)
+        expect(generateGetFootprintsOfFriendsAndUserRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateCreateFootprintReactionRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateGetFootprintByIdRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateGetFootprintReactionsRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateCreateFootprintRouteSpy).toHaveBeenCalledTimes(1)
+        expect(generateDeleteFootprintReactionRouteSpy).toHaveBeenCalledTimes(1)
+        expect(generateDeleteFootprintRouteSpy).toHaveBeenCalledTimes(1)
     })
 
     describe('handler functions', () => {
@@ -103,6 +155,42 @@ describe('FootprintRouter', () => {
             footprintRouter.createFootprintReactionHandler(request, response)
             expect(footprintController.createFootprintReaction).toHaveBeenCalledWith(
                 { id, message, uid },
+                response,
+            )
+        })
+
+        it('handles deleteFootprint', () => {
+            const id = 1
+            const uid = 'uid'
+            const request = {
+                params: {
+                    id,
+                },
+                headers: {
+                    uidHeader: uid,
+                },
+            } as unknown as Request
+            footprintRouter.deleteFootprintHandler(request, response)
+            expect(footprintController.deleteFootprint).toHaveBeenCalledWith(
+                { uid, id },
+                response,
+            )
+        })
+
+        it('handles deleteFootprintReaction', () => {
+            const id = 1
+            const uid = 'uid'
+            const request = {
+                params: {
+                    id,
+                },
+                headers: {
+                    uidHeader: uid,
+                },
+            } as unknown as Request
+            footprintRouter.deleteFootprintReactionHandler(request, response)
+            expect(footprintController.deleteFootprintReaction).toHaveBeenCalledWith(
+                { uid, id },
                 response,
             )
         })
@@ -162,6 +250,20 @@ describe('FootprintRouter', () => {
                 response,
             )
         })
+
+        it('handles getFootprintsOfFriendsAndUser', () => {
+            const uid = 'uid'
+            const request = {
+                headers: {
+                    uidHeader: uid,
+                },
+            } as unknown as Request
+            footprintRouter.getFootprintsOfFriendsAndUserHandler(request, response)
+            expect(footprintController.getFootprintsOfFriendsAndUser).toHaveBeenCalledWith(
+                { uid },
+                response,
+            )
+        })
     })
 
     describe('routes', () => {
@@ -170,13 +272,26 @@ describe('FootprintRouter', () => {
             expect(router.get).toHaveBeenCalledWith('/all', footprintRouter.getAllFootprintsHandler)
         })
 
-        it('generates generateCreateFootprintReaction route', () => {
+        it('generates createFootprintReaction route', () => {
             footprintRouter.generateCreateFootprintReactionRoute()
             expect(router.post).toHaveBeenCalledWith(
                 '/:id/reactions',
                 expect.any(Array),
-                expect.any(Function),
+                'errorHandler',
                 footprintRouter.createFootprintReactionHandler,
+            )
+        })
+
+        it('generates deleteFootprint route', () => {
+            footprintRouter.generateDeleteFootprintRoute()
+            expect(router.delete).toHaveBeenCalledWith('/:id', footprintRouter.deleteFootprintHandler)
+        })
+
+        it('generates deleteFootprintReaction route', () => {
+            footprintRouter.generateDeleteFootprintReactionRoute()
+            expect(router.delete).toHaveBeenCalledWith(
+                '/reactions/:id',
+                footprintRouter.deleteFootprintReactionHandler,
             )
         })
 
@@ -184,21 +299,19 @@ describe('FootprintRouter', () => {
             footprintRouter.generateGetFootprintByIdRoute()
             expect(router.get).toHaveBeenCalledWith(
                 '/:id',
-                expect.any(Function),
                 footprintRouter.getFootprintByIdHandler,
             )
         })
 
-        it('generates generateGetFootprintReactions route', () => {
+        it('generates getFootprintReactions route', () => {
             footprintRouter.generateGetFootprintReactionsRoute()
             expect(router.get).toHaveBeenCalledWith(
                 '/:id/reactions',
-                expect.any(Function),
                 footprintRouter.getFootprintReactionsHandler,
             )
         })
 
-        it('generates generateCreateFootprint route', () => {
+        it('generates createFootprint route', () => {
             const fields = jest.fn()
             // @ts-ignore
             footprintService.uploadMiddleware.fields.mockImplementation(() => fields)
@@ -207,13 +320,21 @@ describe('FootprintRouter', () => {
                 '/',
                 fields,
                 expect.any(Array),
-                expect.any(Function),
+                'errorHandler',
                 footprintRouter.createFootprintHandler,
             )
             expect(footprintService.uploadMiddleware.fields).toHaveBeenCalledWith([
                 { name: 'image', maxCount: 1 },
                 { name: 'audio', maxCount: 1 },
             ])
+        })
+
+        it('generates getFootprintsOfFriendsAndUser route', () => {
+            footprintRouter.generateGetFootprintsOfFriendsAndUserRoute()
+            expect(router.get).toHaveBeenCalledWith(
+                '/',
+                footprintRouter.getFootprintsOfFriendsAndUserHandler,
+            )
         })
     })
 })

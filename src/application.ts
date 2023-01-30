@@ -5,6 +5,7 @@ import compression from 'compression'
 import { cert, initializeApp } from 'firebase-admin/app'
 import * as Sentry from '@sentry/node'
 import * as Tracing from '@sentry/tracing'
+import * as http from 'node:http'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
@@ -26,12 +27,12 @@ export default class Application {
         this.port = Number.parseInt(process.env.PORT as string, 10)
         initializeApp({
             credential: cert(serviceAccountConfig),
-            storageBucket: 'gs://friends-quest.appspot.com/',
+            storageBucket: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/`,
         })
         this.initSentry()
     }
 
-    private initSentry(): void {
+    initSentry(): void {
         Sentry.init({
             dsn: process.env.SENTRY_DSN,
             integrations: [
@@ -42,6 +43,7 @@ export default class Application {
             ],
 
             tracesSampleRate: 1,
+            release: `friendsquest-api@${process.env.npm_package_version}`,
         })
     }
 
@@ -57,7 +59,9 @@ export default class Application {
         }
     }
 
-    init = (): void => {
+    init = async (): Promise<http.Server | undefined> => {
+        await this.migrate()
+
         this.server.use(json())
         this.server.use(urlencoded({ extended: true }))
         this.server.use(helmet())
@@ -71,9 +75,10 @@ export default class Application {
         this.router.initRoutes(routes)
 
         try {
-            this.server.listen(this.port)
+            return this.server.listen(this.port)
         } catch (error: any) {
             console.error('Could not start server', error)
+            return undefined
         }
     }
 }

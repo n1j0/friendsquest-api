@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { ORM } from '../../orm.js'
 import { FriendshipAlreadyExistsError } from '../../errors/FriendshipAlreadyExistsError.js'
 import { Friendship } from '../../entities/friendship.js'
@@ -19,7 +18,11 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         this.orm = orm
     }
 
-    getFriendshipsWithSpecifiedOptions = async (user: User, filters: {} = {}, options: {} = {}) => {
+    getFriendshipsWithSpecifiedOptions = async (
+        user: User,
+        filters: {} = {},
+        options: {} = {},
+    ): Promise<Friendship[]> => {
         const em = this.orm.forkEm()
         return em.find(
             'Friendship',
@@ -48,7 +51,7 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
         )
     }
 
-    getFriendshipById = async (id: number | string) => {
+    getFriendshipById = async (id: number | string): Promise<Friendship> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'Friendship',
@@ -80,11 +83,11 @@ export class FriendshipPostgresRepository implements FriendshipRepositoryInterfa
 
     acceptFriendship = async (friendship: Friendship) => {
         const em = this.orm.forkEm()
-        wrap(friendship).assign({
+        const friendshipWithStatus = em.assign(friendship, {
             status: FriendshipStatus.ACCEPTED,
         })
         /* eslint-disable-next-line no-unused-vars */
-        await em.persistAndFlush(friendship)
+        await em.persistAndFlush(friendshipWithStatus)
         const [ invitor, invitee ] = await Promise.all([
             this.userRepository.addPoints(friendship.invitor.uid, Points.NEW_FRIENDSHIP),
             this.userRepository.addPoints(friendship.invitee.uid, Points.NEW_FRIENDSHIP),

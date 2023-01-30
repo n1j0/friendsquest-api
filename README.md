@@ -148,9 +148,19 @@ The controllers (routes) are tested using unit tests and integration tests with 
 
 
 ## Pushing to FH system
+
+⚠️ This is done by the pipeline automatically. Just for informational purpose ⚠️
+
+### Production
 ```bash
 $ git remote add dokku ssh://dokku@projects.multimediatechnology.at:5412/friendsquest
 $ git push dokku main:main
+```
+
+### Staging
+```bash
+$ git remote add staging ssh://dokku@projects.multimediatechnology.at:5412/friendsqueststaging
+$ git push staging develop:master
 ```
 
 ## Health checks

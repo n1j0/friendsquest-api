@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { ORM } from '../../orm.js'
 import { User } from '../../entities/user.js'
 import { NotFoundError } from '../../errors/NotFoundError.js'
@@ -7,6 +6,7 @@ import { UserService } from '../../services/userService.js'
 import Points from '../../constants/points.js'
 import { ValueAlreadyExistsError } from '../../errors/ValueAlreadyExistsError.js'
 import { DeletionService } from '../../services/deletionService.js'
+import { Footprint } from '../../entities/footprint.js'
 
 export class UserPostgresRepository implements UserRepositoryInterface {
     private readonly userService: UserService
@@ -32,7 +32,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         }
     }
 
-    getUserById = async (id: number | string) => {
+    getUserById = async (id: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -41,7 +41,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         )
     }
 
-    getUserByUid = async (uid: number | string) => {
+    getUserByUid = async (uid: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -50,7 +50,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         )
     }
 
-    getUserByFriendsCode = async (friendsCode: number | string) => {
+    getUserByFriendsCode = async (friendsCode: number | string): Promise<User> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
@@ -64,25 +64,21 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return em.getRepository('User').findAll()
     }
 
-    createUser = async (user: User) => {
+    createUser = async ({ email, username, uid }: { email: string, username: string, uid: string }) => {
         const em = this.orm.forkEm()
+        const user = new User(email, uid, username)
         await em.persistAndFlush(user)
-        const userInDatabase = await this.getUserByUid(user.uid)
+        const userInDatabase = await this.getUserByUid(uid)
         const friendsCode = this.userService.numberToBase36String(userInDatabase.id - 1)
-        wrap(user).assign({
-            friendsCode,
-        })
-        await em.persistAndFlush(user)
-        return user
+        const userWithFriendsCode = em.assign(user, { friendsCode })
+        await em.persistAndFlush(userWithFriendsCode)
+        return userWithFriendsCode
     }
 
-    updateUser = async (uid: string, userData: any) => {
+    updateUser = async (uid: string, userData: { username: string, email: string }) => {
         const em = this.orm.forkEm()
-        const user = await this.getUserByUid(uid)
-        wrap(user).assign({
-            ...userData,
-            points: user.points + Points.PROFILE_EDITED,
-        })
+        const userByUid = await this.getUserByUid(uid)
+        const user = em.assign(userByUid, { ...userData, points: userByUid.points + Points.PROFILE_EDITED })
         await em.persistAndFlush(user)
         return { user, points: Points.PROFILE_EDITED }
     }
@@ -97,19 +93,20 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         // we can't include repos here due to circular dependency injection in the router
         const [ friendships, footprints ] = await Promise.all([
             em.find('Friendship', { $or: [{ invitor: user }, { invitee: user }] }),
-            em.find('Footprint', { createdBy: user } as any),
+            em.find(
+                'Footprint',
+                { createdBy: user } as any,
+                { populate: ['users'] } as any,
+            ) as Promise<Footprint[]>,
         ])
         const reactions = await em.find(
             'FootprintReaction',
             { $or: [{ createdBy: user }, { footprint: [...footprints] }] },
         )
-        await Promise.all(footprints.map(async (footprint) => {
-            if (!footprint.users.isInitialized()) {
-                await footprint.users.init()
-            }
+        footprints.forEach((footprint) => {
             footprint.users.removeAll()
             em.persist(footprint)
-        }))
+        })
         em.persist(user)
         em.remove(friendships)
         em.remove(reactions)
@@ -117,7 +114,7 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         em.remove(user)
         await Promise.all([
             em.flush(),
-            this.deletionService.deleteFiles(uid),
+            this.deletionService.deleteAllUserFiles(uid),
         ])
         return this.deletionService.deleteUser(uid)
     }
@@ -125,12 +122,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     addPoints = async (uid: string, points: number) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)
-        wrap(user).assign({
-            points: user.points + points,
-        })
+        const userWithPoints = em.assign(user, { points: user.points + points })
         try {
-            await em.persistAndFlush(user)
+            await em.persistAndFlush(userWithPoints)
         } catch { /* empty */ }
-        return user
+        return userWithPoints
     }
 }

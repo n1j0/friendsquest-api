@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import UserController from '../controller/userController.js'
+import { UserController } from '../controller/userController.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
@@ -13,7 +13,7 @@ import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { DeletionService } from '../services/deletionService.js'
 
 export class UserRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly userController: UserController
 
@@ -98,11 +98,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/:id',
-            errorHandler,
-            this.getUserByIdHandler,
-        )
+        this.router.get('/:id', this.getUserByIdHandler)
     }
 
     getUserByUidHandler = (request: Request, response: Response) => this.userController.getUserByUid(
@@ -143,11 +139,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/uid/:uid',
-            errorHandler,
-            this.getUserByUidHandler,
-        )
+        this.router.get('/uid/:uid', this.getUserByUidHandler)
     }
 
     getUserByFriendsCodeHandler = (request: Request, response: Response) => this.userController.getUserByFriendsCode(
@@ -188,18 +180,14 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.get(
-            '/fc/:fc',
-            errorHandler,
-            this.getUserByFriendsCodeHandler,
-        )
+        this.router.get('/fc/:fc', this.getUserByFriendsCodeHandler)
     }
 
     createUserHandler = (request: Request, response: Response) => this.userController.createUser(
         {
             email: request.body.email,
             username: request.body.username,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -302,8 +290,7 @@ export class UserRouter implements RouterInterface {
         {
             email: request.body.email,
             username: request.body.username,
-            body: request.body,
-            uid: request.headers[AUTH_HEADER_UID] as string,
+            uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,
     )
@@ -387,7 +374,7 @@ export class UserRouter implements RouterInterface {
     }
 
     deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
-        { uid: request.headers[AUTH_HEADER_UID] as string },
+        { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
     )
 
@@ -407,10 +394,7 @@ export class UserRouter implements RouterInterface {
          *       404:
          *         $ref: '#/components/responses/NotFound'
          */
-        this.router.delete(
-            '/',
-            this.deleteUserHandler,
-        )
+        this.router.delete('/', this.deleteUserHandler)
     }
 
     createAndReturnRoutes = () => {

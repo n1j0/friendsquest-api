@@ -1,4 +1,3 @@
-import { wrap } from '@mikro-orm/core'
 import { FootprintRepositoryInterface } from './footprintRepositoryInterface.js'
 import { ORM } from '../../orm.js'
 import { FootprintReaction } from '../../entities/footprintReaction.js'
@@ -10,9 +9,13 @@ import { UserRepositoryInterface } from '../user/userRepositoryInterface.js'
 import Points from '../../constants/points.js'
 import { FriendshipRepositoryInterface } from '../friendship/friendshipRepositoryInterface.js'
 import { FriendshipStatus } from '../../constants/index.js'
+import { ForbiddenError } from '../../errors/ForbiddenError.js'
+import { DeletionService } from '../../services/deletionService.js'
 
 export class FootprintPostgresRepository implements FootprintRepositoryInterface {
     private readonly footprintService: FootprintService
+
+    private readonly deletionService: DeletionService
 
     private readonly userRepository: UserRepositoryInterface
 
@@ -22,17 +25,19 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
 
     constructor(
         footprintService: FootprintService,
+        deletionService: DeletionService,
         userRepository: UserRepositoryInterface,
         friendshipRepository: FriendshipRepositoryInterface,
         orm: ORM,
     ) {
         this.footprintService = footprintService
+        this.deletionService = deletionService
         this.userRepository = userRepository
         this.friendshipRepository = friendshipRepository
         this.orm = orm
     }
 
-    private findFootprintById = async (id: number | string) => {
+    findFootprintById = async (id: number | string): Promise<Footprint> => {
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'Footprint',
@@ -48,6 +53,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
             this.footprintService.uploadFilesToFireStorage(files, uid),
         ])
+        const temperatureData = await this
+            .footprintService
+            .getTemperature(latitude, longitude) as unknown as { main: { temp: number } }
+        const temperature = temperatureData?.main?.temp || undefined
         const footprint = new Footprint(
             title,
             user,
@@ -55,9 +64,10 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             longitude,
             photoURL,
             audioURL,
+            temperature,
         )
         if (description) {
-            wrap(footprint).assign({ description })
+            em.assign(footprint, { description })
         }
         await em.persistAndFlush(footprint)
         const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
@@ -75,8 +85,9 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             this.userRepository.getUserByUid(uid),
         ])
         const reaction = new FootprintReaction(user, message, footprint)
-        const reactions = await em.find('FootprintReaction', { footprint: { id } } as any)
+        const reactions: FootprintReaction[] = await em.find('FootprintReaction', { footprint: { id } } as any)
         await em.persistAndFlush(reaction)
+        // TODO: rewrite to "isFirstReaction"
         if (reactions) {
             if (footprint.createdBy.id === user.id) {
                 return {
@@ -98,6 +109,39 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         }
     }
 
+    deleteFootprint = async ({ id, uid }: { id: number | string, uid: string }) => {
+        const em = this.orm.forkEm()
+        const footprint = await this.findFootprintById(id)
+        if (footprint.createdBy.uid !== uid) {
+            throw new ForbiddenError()
+        }
+        const reactions = await em.find(
+            'FootprintReaction',
+            { footprint },
+        )
+        em.remove(reactions)
+        return Promise.all([
+            this.deletionService.deleteFilesOfOneFootprint(footprint.audioURL, footprint.imageURL),
+            em.removeAndFlush(footprint),
+        ])
+    }
+
+    deleteFootprintReaction = async ({ id, uid }: { id: number | string, uid: string }) => {
+        const em = this.orm.forkEm()
+        const reaction: FootprintReaction = await em.findOneOrFail(
+            'FootprintReaction',
+            { id } as any,
+            {
+                populate: ['createdBy'],
+                failHandler: () => { throw new NotFoundError() },
+            } as any,
+        )
+        if (reaction.createdBy.uid !== uid) {
+            throw new ForbiddenError()
+        }
+        return em.removeAndFlush(reaction)
+    }
+
     getAllFootprints = async () => {
         const em = this.orm.forkEm()
         return em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
@@ -114,20 +158,17 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const friends = friendships.map(
             friendship => (friendship.invitor.id === user.id ? friendship.invitee.id : friendship.invitor.id),
         )
-        const footprints = await em.find(
+        const footprints: Footprint[] = await em.find(
             'Footprint',
             { createdBy: [ user, ...friends ] } as any,
-            { populate: ['createdBy'] } as any,
+            { populate: [ 'createdBy', 'users' ] } as any,
         )
 
-        return Promise.all(footprints.map(async (footprint) => {
-            if (!footprint.users.isInitialized()) {
-                await footprint.users.init()
-            }
+        return footprints.map((footprint) => {
             const hasVisited = footprint.users.getIdentifiers('id').includes(user.id)
                 || footprint.createdBy.id === user.id
             return { ...footprint, hasVisited }
-        }))
+        })
     }
 
     getFootprintById = async (uid: string, id: string | number) => {

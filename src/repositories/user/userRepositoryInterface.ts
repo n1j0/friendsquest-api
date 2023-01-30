@@ -6,8 +6,9 @@ export interface UserRepositoryInterface {
     getUserByUid(uid: number | string): Promise<User>
     getUserByFriendsCode(friendsCode: number | string): Promise<User>
     getAllUsers(): Promise<object[]>
-    createUser(user: User): Promise<User>
-    updateUser(id: number | string, userData: any): Promise<{ user: User, points: number }>
+    createUser({ email, username, uid }: { email: string, username: string, uid: string }): Promise<User>
+    updateUser(id: number | string,
+               userData: { username: string, email: string }): Promise<{ user: User, points: number }>
     deleteUser(id: number | string): Promise<void>
     addPoints(uid: string, points: number): Promise<User>
 }
