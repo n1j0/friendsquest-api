@@ -88,11 +88,16 @@ describe(
             })
 
             it('throws error when user is not found', async () => {
-                const findOneOrFail = jest.fn().mockRejectedValue(new NotFoundError())
-
                 // @ts-ignore
                 orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
+                    findOneOrFail: (
+                        entityName: any,
+                        where: any,
+                        { failHandler }:
+                            {
+                                failHandler: () => {}
+                            },
+                    ) => failHandler(),
                 }))
 
                 const id = 1
@@ -124,15 +129,17 @@ describe(
             })
 
             it('throws error when user is not found', async () => {
-                const findOneOrFail = jest.fn().mockRejectedValue(new NotFoundError())
                 // @ts-ignore
                 orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
+                    findOneOrFail: (
+                        entityName: any,
+                        where: any,
+                        { failHandler }:
+                            {
+                                failHandler: () => {}
+                            },
+                    ) => failHandler(),
                 }))
-
-                // orm.forkEm.mockImplementation(() => ({
-                // findOneOrFail: (entityName: any, where: any, failHandler: () => {}) => failHandler(),
-                // }))
 
                 const uid = '39FDDRsAsZNPmocG4ZIgcnwO5BF2'
 
@@ -164,10 +171,16 @@ describe(
             })
 
             it('throws error when user is not found', async () => {
-                const findOneOrFail = jest.fn().mockRejectedValue(new NotFoundError())
                 // @ts-ignore
                 orm.forkEm.mockImplementation(() => ({
-                    findOneOrFail,
+                    findOneOrFail: (
+                        entityName: any,
+                        where: any,
+                        { failHandler }:
+                            {
+                                failHandler: () => {}
+                            },
+                    ) => failHandler(),
                 }))
 
                 const friendsCode = '00001'
@@ -324,11 +337,11 @@ describe(
                     assign,
                 }))
 
-                // TODO: do I need to call this?
                 const points = 50
-                await userPostgresRepository.addPoints(user.uid, points)
+                const exampleUser = await userPostgresRepository.addPoints(user.uid, points)
 
                 await expect(persistAndFlush).rejects.toMatch('error')
+                expect(exampleUser).toBe('user')
             })
         })
     },
