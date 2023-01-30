@@ -42,9 +42,6 @@ export class UserPostgresRepository implements UserRepositoryInterface {
     }
 
     getUserByUid = async (uid: number | string): Promise<User> => {
-        // override orm with own custom mock
-        // create fake "mockImplementation((entityName, {}, {failHandler: () => {}}) => { failHandler() })
-        // expect(() => methode()).toThrowError(NotFoundError)
         const em = this.orm.forkEm()
         return em.findOneOrFail(
             'User',
