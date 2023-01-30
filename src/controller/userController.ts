@@ -98,6 +98,7 @@ export class UserController {
     ) => {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
+        // this has to be done before FQ-275
         try {
             await this.userRepository.checkUsernameAndMail(username, email)
             const { user, points } = await this.userRepository.updateUser(uid, { username, email })
