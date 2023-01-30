@@ -6,6 +6,7 @@ import { User } from '../../../src/entities/user'
 import { FriendshipAlreadyExistsError } from '../../../src/errors/FriendshipAlreadyExistsError'
 import { Friendship } from '../../../src/entities/friendship'
 import { UserRepositoryInterface } from '../../../src/repositories/user/userRepositoryInterface'
+import { NotFoundError } from '../../../src/errors/NotFoundError'
 
 jest.mock('@mikro-orm/core', () => ({
     PrimaryKey: jest.fn(),
@@ -46,26 +47,48 @@ describe('FriendshipPostgresRepository', () => {
         expect(friendships).toStrictEqual([])
     })
 
-    it('returns one friendship by id', async () => {
-        const findOneOrFail = jest.fn().mockReturnValue('friendship')
-        // @ts-ignore
-        orm.forkEm.mockImplementation(() => ({
-            findOneOrFail,
-        }))
+    describe('getFriendshipsById', () => {
+        it('returns one friendship by id', async () => {
+            const findOneOrFail = jest.fn().mockReturnValue('friendship')
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail,
+            }))
 
-        const id = 1
-        const friendship = await friendshipPostgresRepository.getFriendshipById(id)
+            const id = 1
+            const friendship = await friendshipPostgresRepository.getFriendshipById(id)
 
-        expect(orm.forkEm).toHaveBeenCalled()
-        expect(findOneOrFail).toHaveBeenCalledWith(
-            'Friendship',
-            { id },
-            {
-                populate: [ 'invitor', 'invitee' ],
-                failHandler: expect.any(Function),
-            },
-        )
-        expect(friendship).toBe('friendship')
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(findOneOrFail).toHaveBeenCalledWith(
+                'Friendship',
+                { id },
+                {
+                    populate: [ 'invitor', 'invitee' ],
+                    failHandler: expect.any(Function),
+                },
+            )
+            expect(friendship).toBe('friendship')
+        })
+
+        it('throws an error if friendship does not exist', async () => {
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail: (
+                    entityName: any,
+                    where: any,
+                    { failHandler }:
+                        {
+                            failHandler: () => {}
+                        },
+                ) => failHandler(),
+            }))
+
+            const id = 1
+
+            await expect(friendshipPostgresRepository.getFriendshipById(id))
+                .rejects
+                .toThrow(NotFoundError)
+        })
     })
 
     describe('checkForExistingFriendship', () => {
@@ -120,29 +143,50 @@ describe('FriendshipPostgresRepository', () => {
         expect(friendship).toBeInstanceOf(Friendship)
     })
 
-    it.skip('accepts a friendship', async () => {
+    it('accepts a friendship', async () => {
         const persistAndFlush = jest.fn().mockResolvedValue(true)
-        // @ts-ignore
-        orm.forkEm.mockImplementation(() => ({
-            persistAndFlush,
-        }))
+        const promiseSpy = jest.spyOn(Promise, 'all')
+
+        const addPointsMock = jest.fn().mockResolvedValueOnce('user1').mockResolvedValueOnce('user2')
+        userRepository.addPoints = addPointsMock
 
         const friendship = {
             id: 1,
             foo: 'bar',
             status: 'invited',
+            invitor: {
+                uid: 'abc',
+            },
+            invitee: {
+                uid: 'def',
+            },
         } as unknown as Friendship
         const acceptedFriendship = {
             ...friendship,
             status: 'accepted',
         }
 
-        await friendshipPostgresRepository.acceptFriendship(friendship)
+        const points = {
+            NEW_FRIENDSHIP: 250,
+        }
+
+        const assign = jest.fn().mockReturnValue(acceptedFriendship)
+
+        // @ts-ignore
+        orm.forkEm.mockImplementation(() => ({
+            persistAndFlush,
+            assign,
+        }))
+
+        const exampleFriendship = await friendshipPostgresRepository.acceptFriendship(friendship)
 
         expect(orm.forkEm).toHaveBeenCalled()
+        expect(assign).toHaveBeenCalledWith(friendship, { status: 'accepted' })
         expect(persistAndFlush).toHaveBeenCalledWith(acceptedFriendship)
-
-        // TODO: mock wrap().assign() and check if it was called with the correct arguments
+        expect(promiseSpy).toHaveBeenCalled()
+        expect(addPointsMock).toHaveBeenNthCalledWith(1, friendship.invitor.uid, points.NEW_FRIENDSHIP)
+        expect(addPointsMock).toHaveBeenNthCalledWith(2, friendship.invitee.uid, points.NEW_FRIENDSHIP)
+        expect(exampleFriendship).toStrictEqual({ invitor: 'user1', invitee: 'user2', points: points.NEW_FRIENDSHIP })
     })
 
     it('declines or deletes a friendship', async () => {
