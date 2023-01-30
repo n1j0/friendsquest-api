@@ -16,16 +16,22 @@ export class UserController {
         this.userRepository = userRepository
     }
 
-    private userNotFoundError = (response: Response) => ResponseSender.error(
+    userNotFoundError = (response: Response) => ResponseSender.error(
         response,
         NotFoundError.getErrorDocument('The user'),
     )
 
-    getAllUsers = async (response: Response) => ResponseSender.result(
-        response,
-        200,
-        await this.userRepository.getAllUsers(),
-    )
+    getAllUsers = async (response: Response) => {
+        try {
+            return ResponseSender.result(
+                response,
+                200,
+                await this.userRepository.getAllUsers(),
+            )
+        } catch (error: any) {
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
         try {
@@ -66,7 +72,7 @@ export class UserController {
             return ResponseSender.result(
                 response,
                 201,
-                await this.userRepository.createUser(new User(email, uid, username)),
+                await this.userRepository.createUser({ email, uid, username }),
             )
         } catch (error: any) {
             switch (error.constructor) {

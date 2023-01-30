@@ -129,11 +129,14 @@ describe(
 
         it('creates and returns a new user', async () => {
             const friendsCode = '00000'
+            const user = { id: 1 }
             const persistAndFlush = jest.fn().mockResolvedValue(true)
             const assign = jest.fn().mockReturnValue('user')
             const getUserByUidMock = jest.fn().mockResolvedValue({ id: 1 })
             userService.numberToBase36String = jest.fn().mockReturnValue(friendsCode)
             userPostgresRepository.getUserByUid = getUserByUidMock
+            // @ts-ignore
+            User.mockReturnValue(user)
 
             // @ts-ignore
             orm.forkEm.mockImplementation(() => ({
@@ -141,16 +144,17 @@ describe(
                 assign,
             }))
 
-            const user = {
-                id: 1,
-                uid: 1,
-            } as unknown as User
+            const email = 'email'
+            const username = 'username'
+            const uid = 'uid'
 
-            const exampleUser = await userPostgresRepository.createUser(user)
+            const exampleUser = await userPostgresRepository.createUser({ email, username, uid })
 
             expect(orm.forkEm).toHaveBeenCalled()
+            expect(User).toHaveBeenCalledWith(email, uid, username)
             expect(persistAndFlush).toHaveBeenNthCalledWith(1, user)
-            expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+            expect(getUserByUidMock).toHaveBeenCalledWith(uid)
+            expect(userService.numberToBase36String).toHaveBeenCalledWith(0)
             expect(assign).toHaveBeenCalledWith(user, { friendsCode })
             expect(persistAndFlush).toHaveBeenNthCalledWith(2, 'user')
             expect(exampleUser).toBe('user')

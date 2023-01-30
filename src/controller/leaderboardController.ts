@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { LeaderboardRepositoryInterface } from '../repositories/leaderboard/leaderboardRepositoryInterface.js'
 import ResponseSender from '../helper/responseSender.js'
-import { InternalServerError } from '../errors/InternalServerError'
+import { InternalServerError } from '../errors/InternalServerError.js'
 
 export class LeaderboardController {
     private readonly leaderboardRepository: LeaderboardRepositoryInterface
