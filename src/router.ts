@@ -15,6 +15,7 @@ import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
+import { actuatorConfig } from './config/actuatorConfig.js'
 
 export class Router {
     private server: Application
@@ -50,7 +51,7 @@ export class Router {
     ) => {
         this.server.use(this.createRequestContext)
 
-        this.server.use(actuator())
+        this.server.use(actuator(actuatorConfig))
 
         routes.forEach((route) => {
             this.server.use(
