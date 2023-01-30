@@ -1,11 +1,12 @@
 import { mock } from 'jest-mock-extended'
 import { Response } from 'express'
 import { FootprintRepositoryInterface } from '../../src/repositories/footprint/footprintRepositoryInterface'
-import FootprintController from '../../src/controller/footprintController'
+import { FootprintController } from '../../src/controller/footprintController'
 import responseMock from '../test-helper/responseMock'
 import ResponseSender from '../../src/helper/responseSender'
 import { NotFoundError } from '../../src/errors/NotFoundError'
 import { InternalServerError } from '../../src/errors/InternalServerError'
+import { ForbiddenError } from '../../src/errors/ForbiddenError'
 
 describe('FootprintController', () => {
     let footprintController: FootprintController
@@ -40,6 +41,28 @@ describe('FootprintController', () => {
                 throw error
             })
             await footprintController.getAllFootprints(response)
+            expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
+        })
+    })
+
+    describe('getFootprintsOfFriendsAndUser', () => {
+        it('returns footprints in response', async () => {
+            const uid = 'uid'
+            const footprints = 'footprints'
+            // @ts-ignore
+            footprintRepository.getFootprintsOfFriendsAndUser.mockReturnValue(footprints)
+            await footprintController.getFootprintsOfFriendsAndUser({ uid }, response)
+            expect(footprintRepository.getFootprintsOfFriendsAndUser).toHaveBeenCalledWith(uid)
+            expect(resultSpy).toHaveBeenCalledWith(response, 200, footprints)
+        })
+
+        it('sends an error if something goes wrong', async () => {
+            const error = new Error('test')
+            // @ts-ignore
+            footprintRepository.getFootprintsOfFriendsAndUser.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.getFootprintsOfFriendsAndUser({ uid: 'a' }, response)
             expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
         })
     })
@@ -133,6 +156,84 @@ describe('FootprintController', () => {
                 throw error
             })
             await footprintController.createFootprintReaction({ id: 1, message: 'a', uid: 'abc' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
+        })
+    })
+
+    describe('deleteFootprint', () => {
+        it('deletes a footprint', async () => {
+            const id = 12
+            const uid = 'uid'
+            // @ts-ignore
+            footprintRepository.deleteFootprint.mockResolvedValue(true)
+            await footprintController.deleteFootprint({ id, uid }, response)
+            expect(footprintRepository.deleteFootprint).toHaveBeenCalledWith({ id, uid })
+            expect(response.sendStatus).toHaveBeenCalledWith(204)
+        })
+        it('sends an NotFoundError if footprint is not found', async () => {
+            const error = new NotFoundError('The footprint')
+            // @ts-ignore
+            footprintRepository.deleteFootprint.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprint({ id: 1, uid: 'uid' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument(error.message))
+        })
+        it('sends an ForbiddenError if user is not allowed to delete footprint', async () => {
+            const error = new ForbiddenError('You cannot delete footprints of others')
+            // @ts-ignore
+            footprintRepository.deleteFootprint.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprint({ id: 1, uid: 'uid' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, ForbiddenError.getErrorDocument(error.message))
+        })
+        it('sends an error if something goes wrong', async () => {
+            const error = new Error('test')
+            // @ts-ignore
+            footprintRepository.deleteFootprint.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprint({ id: 1, uid: 'uid' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
+        })
+    })
+
+    describe('deleteFootprintReaction', () => {
+        it('deletes a footprint reaction', async () => {
+            const id = 12
+            const uid = 'uid'
+            // @ts-ignore
+            footprintRepository.deleteFootprintReaction.mockResolvedValue(true)
+            await footprintController.deleteFootprintReaction({ id, uid }, response)
+            expect(footprintRepository.deleteFootprintReaction).toHaveBeenCalledWith({ id, uid })
+            expect(response.sendStatus).toHaveBeenCalledWith(204)
+        })
+        it('sends an NotFoundError if reaction is not found', async () => {
+            const error = new NotFoundError('The reaction')
+            // @ts-ignore
+            footprintRepository.deleteFootprintReaction.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprintReaction({ id: 1, uid: 'uid' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, NotFoundError.getErrorDocument(error.message))
+        })
+        it('sends an ForbiddenError if user is not allowed to delete reaction', async () => {
+            const error = new ForbiddenError('You cannot delete reactions of others')
+            // @ts-ignore
+            footprintRepository.deleteFootprintReaction.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprintReaction({ id: 1, uid: 'uid' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, ForbiddenError.getErrorDocument(error.message))
+        })
+        it('sends an error if something goes wrong', async () => {
+            const error = new Error('test')
+            // @ts-ignore
+            footprintRepository.deleteFootprintReaction.mockImplementation(() => {
+                throw error
+            })
+            await footprintController.deleteFootprintReaction({ id: 1, uid: 'uid' }, response)
             expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
         })
     })

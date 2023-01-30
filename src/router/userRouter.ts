@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
-import UserController from '../controller/userController.js'
+import { UserController } from '../controller/userController.js'
 import { UserPostgresRepository } from '../repositories/user/userPostgresRepository.js'
 import { AUTH_HEADER_UID } from '../constants/index.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
@@ -13,7 +13,7 @@ import { AttributeIsMissingError } from '../errors/AttributeIsMissingError.js'
 import { DeletionService } from '../services/deletionService.js'
 
 export class UserRouter implements RouterInterface {
-    private readonly router: Router
+    readonly router: Router
 
     private readonly userController: UserController
 
@@ -290,7 +290,6 @@ export class UserRouter implements RouterInterface {
         {
             email: request.body.email,
             username: request.body.username,
-            body: request.body,
             uid: request.headers[String(AUTH_HEADER_UID)] as string,
         },
         response,

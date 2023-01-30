@@ -1,11 +1,19 @@
+/*
+ @see https://www.rfc-editor.org/rfc/rfc7235
+ This is a combined implementation of multiple existing packages/repos
+    (e.g. express-basic-auth, basic-auth, basic-connect).
+ In addition, newer syntax, methods and concepts are used (the code was modernized).
+ Moreover, the existing packages have awful ESModule support. This is fixed as well.
+ */
+
 import { Request, Response, NextFunction } from 'express'
 
 /**
  * RegExp for basic auth credentials
  *
- * credentials = auth-scheme 1*SP tokenBase64
+ * credentials = auth-scheme 1*SP token68
  * auth-scheme = "Basic" ; case insensitive
- * tokenBase64     = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="
+ * token68 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="
  */
 
 const CREDENTIALS_REGEXP = /^ *[Bb][Aa][Ss][Ii][Cc] +([\w+./~-]+=*) *$/

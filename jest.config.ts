@@ -21,7 +21,11 @@ const jestSetup: JestConfigWithTsJest = {
     collectCoverage: false,
     collectCoverageFrom: [
         '<rootDir>/src/**/*.{js,ts}',
-        '!<rootDir>/src/{docs,entities,migrations,seeders}/**/*.*',
+        '!<rootDir>/src/{admin,docs,entities,migrations,seeders}/**/*.*',
+        '!<rootDir>/src/index.ts',
+        '!<rootDir>/src/router/_*.ts',
+        '!<rootDir>/src/errors/**/*.ts',
+        '<rootDir>/src/errors/ProblemDocument.{ts}',
     ],
     coverageThreshold: {
         global: {
@@ -33,6 +37,7 @@ const jestSetup: JestConfigWithTsJest = {
     },
     setupFiles: ['<rootDir>/jest.setup.ts'],
     restoreMocks: true,
+    clearMocks: true,
 }
 
 export default jestSetup

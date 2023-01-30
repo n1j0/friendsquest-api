@@ -1,5 +1,4 @@
 import { Response } from 'express'
-import { User } from '../entities/user.js'
 import { NotFoundError } from '../errors/NotFoundError.js'
 import { UserRepositoryInterface } from '../repositories/user/userRepositoryInterface.js'
 import { ForbiddenError } from '../errors/ForbiddenError.js'
@@ -9,23 +8,29 @@ import { NegativeNumbersNotAllowedError } from '../errors/NegativeNumbersNotAllo
 import { MaximumFriendsCodeLimitExceededError } from '../errors/MaximumFriendsCodeLimitExceededError.js'
 import ResponseSender from '../helper/responseSender.js'
 
-export default class UserController {
+export class UserController {
     private userRepository: UserRepositoryInterface
 
     constructor(userRepository: UserRepositoryInterface) {
         this.userRepository = userRepository
     }
 
-    private userNotFoundError = (response: Response) => ResponseSender.error(
+    userNotFoundError = (response: Response) => ResponseSender.error(
         response,
         NotFoundError.getErrorDocument('The user'),
     )
 
-    getAllUsers = async (response: Response) => ResponseSender.result(
-        response,
-        200,
-        await this.userRepository.getAllUsers(),
-    )
+    getAllUsers = async (response: Response) => {
+        try {
+            return ResponseSender.result(
+                response,
+                200,
+                await this.userRepository.getAllUsers(),
+            )
+        } catch (error: any) {
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
 
     getUserById = async ({ id }: { id: number | string }, response: Response) => {
         try {
@@ -66,7 +71,7 @@ export default class UserController {
             return ResponseSender.result(
                 response,
                 201,
-                await this.userRepository.createUser(new User(email, uid, username)),
+                await this.userRepository.createUser({ email, uid, username }),
             )
         } catch (error: any) {
             switch (error.constructor) {
@@ -93,14 +98,15 @@ export default class UserController {
     }
 
     updateUser = async (
-        { email, username, uid, body }: { email: string, username: string, uid: string, body: any },
+        { email, username, uid }: { email: string, username: string, uid: string },
         response: Response,
     ) => {
         // TODO: what if just one attribute has changed?
         // right now this would probably throw an error "Email or Username already taken"
+        // this has to be done before FQ-275
         try {
             await this.userRepository.checkUsernameAndMail(username, email)
-            const { user, points } = await this.userRepository.updateUser(uid, body)
+            const { user, points } = await this.userRepository.updateUser(uid, { username, email })
             return ResponseSender.result(response, 200, user, { amount: points, total: user.points })
         } catch (error: any) {
             switch (error.constructor) {

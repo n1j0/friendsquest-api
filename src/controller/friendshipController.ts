@@ -8,7 +8,7 @@ import { InternalServerError } from '../errors/InternalServerError.js'
 import { FriendshipAlreadyExistsError } from '../errors/FriendshipAlreadyExistsError.js'
 import ResponseSender from '../helper/responseSender.js'
 
-export default class FriendshipController {
+export class FriendshipController {
     private friendshipRepository: FriendshipRepositoryInterface
 
     private userRepository: UserRepositoryInterface
