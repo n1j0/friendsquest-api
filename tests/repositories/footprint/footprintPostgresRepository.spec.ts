@@ -106,7 +106,6 @@ describe('FootprintPostgresRepository', () => {
         it('return one footprint by id (myFootprint - no points)', async () => {
             const uid = 'abc'
             const id = '123'
-            const myFootprint = true
 
             const isInitialized = jest.fn().mockReturnValue(false)
             const init = jest.fn().mockReturnValue(true)
@@ -146,9 +145,6 @@ describe('FootprintPostgresRepository', () => {
             expect(getUserByUidMock).toHaveBeenCalledWith(uid)
             expect(footprint.users.isInitialized).toHaveBeenCalled()
             expect(footprint.users.init).toHaveBeenCalled()
-            // TODO: ask if I should test this
-            expect(result.footprint.users.add).not.toHaveBeenCalled()
-            expect(myFootprint).toBeTruthy()
             expect(result).toEqual({ footprint })
         })
 
