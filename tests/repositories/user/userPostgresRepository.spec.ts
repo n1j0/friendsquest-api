@@ -7,6 +7,7 @@ import { DeletionService } from '../../../src/services/deletionService'
 import { User } from '../../../src/entities/user'
 import { ValueAlreadyExistsError } from '../../../src/errors/ValueAlreadyExistsError'
 import { NotFoundError } from '../../../src/errors/NotFoundError'
+import { Footprint } from '../../../src/entities/footprint'
 
 jest.mock('@mikro-orm/core', () => ({
     PrimaryKey: jest.fn(),
@@ -53,16 +54,71 @@ describe(
             expect(users).toStrictEqual([])
         })
 
-        it('checks if a username and email already exists', async () => {
-            const find = jest.fn().mockResolvedValueOnce([{ id: 1, username: 'username', email: 'email' }])
-            // @ts-ignore
-            orm.forkEm.mockImplementation(() => ({
-                find,
-            }))
-            await expect(userPostgresRepository.checkUsernameAndMail(
-                'username',
-                'email',
-            )).rejects.toThrow(ValueAlreadyExistsError)
+        describe('checkUsernameAndMail', () => {
+            it('throws a ValueAlreadyExistsError if username and email is already taken', async () => {
+                const username = 'username'
+                const email = 'email'
+                const find = jest.fn()
+                    .mockResolvedValueOnce([{ username, email }])
+                    .mockResolvedValueOnce([{ username, email }])
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
+                    find,
+                }))
+
+                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
+                    .rejects.toThrow(ValueAlreadyExistsError)
+            })
+
+            it('throws a ValueAlreadyExistsError if username is already taken', async () => {
+                const username = 'username'
+                const email = 'email'
+                const find = jest.fn()
+                    .mockResolvedValueOnce([{ username }])
+                    .mockResolvedValueOnce([])
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
+                    find,
+                }))
+
+                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
+                    .rejects.toThrow(ValueAlreadyExistsError)
+            })
+
+            it('throws a ValueAlreadyExistsError if email is already taken', async () => {
+                const username = 'username'
+                const email = 'email'
+                const find = jest.fn()
+                    .mockResolvedValueOnce([])
+                    .mockResolvedValueOnce([{ email }])
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
+                    find,
+                }))
+
+                await expect(userPostgresRepository.checkUsernameAndMail(username, email))
+                    .rejects.toThrow(ValueAlreadyExistsError)
+            })
+
+            it('does not throw an error if username and email is not taken', async () => {
+                const username = 'username'
+                const email = 'email'
+                const promiseSpy = jest.spyOn(Promise, 'all')
+                const find = jest.fn()
+                    .mockResolvedValueOnce([])
+                    .mockResolvedValueOnce([])
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
+                    find,
+                }))
+
+                await userPostgresRepository.checkUsernameAndMail(username, email)
+
+                expect(orm.forkEm).toHaveBeenCalled()
+                expect(promiseSpy).toHaveBeenCalled()
+                expect(find).toHaveBeenNthCalledWith(1, 'User', { username })
+                expect(find).toHaveBeenNthCalledWith(2, 'User', { email })
+            })
         })
 
         describe('get user by id', () => {
@@ -263,35 +319,113 @@ describe(
             expect(exampleUser).toEqual({ user: 'user', points: points.PROFILE_EDITED })
         })
 
-        it.skip('deletes a user', async () => {
-            const isInitialized = jest.fn().mockReturnValue(true)
-            const init = jest.fn().mockReturnValue(true)
+        describe('deleteUser', () => {
+            let promiseSpy: jest.SpyInstance
+            let isInitialized: jest.Mock
+            let init: jest.Mock
+            let removeAllFootprints: jest.Mock
+            let removeAllUsers: jest.Mock
+            let persist: jest.Mock
+            let remove: jest.Mock
+            let flush: jest.Mock
+            let deleteAllUserFilesMock: jest.Mock
+            let deleteUserMock: jest.Mock
+            let user: User
+            let footprints: Footprint []
+            let footprint: Footprint
+            let find: jest.Mock
+            let getUserByUidMock: jest.Mock
 
-            const user = {
-                id: 1,
-                uid: 1,
-                footprints: {
+            beforeEach(() => {
+                promiseSpy = jest.spyOn(Promise, 'all')
+                isInitialized = jest.fn().mockReturnValue(true)
+                init = jest.fn().mockReturnValue(true)
+                removeAllFootprints = jest.fn()
+                removeAllUsers = jest.fn()
+                persist = jest.fn()
+                remove = jest.fn()
+                flush = jest.fn()
+
+                deleteAllUserFilesMock = jest.fn()
+                deletionService.deleteAllUserFiles = deleteAllUserFilesMock
+
+                deleteUserMock = jest.fn().mockReturnValue('test')
+                deletionService.deleteUser = deleteUserMock
+
+                user = {
+                    id: 1,
+                    uid: 'abc',
+                    footprints: {
+                        isInitialized,
+                        init,
+                        removeAll: removeAllFootprints,
+                    },
+                } as unknown as User
+
+                footprint = {
+                    id: 1,
+                    users:
+                        {
+                            id: 1,
+                            removeAll: removeAllUsers,
+                        },
+                } as unknown as Footprint
+
+                footprints = [ footprint, footprint ]
+
+                find = jest.fn()
+                    .mockReturnValueOnce(['friendships'])
+                    .mockReturnValueOnce(footprints)
+                    .mockReturnValueOnce(['footprintReactions'])
+
+                getUserByUidMock = jest.fn().mockResolvedValue(user)
+
+                userPostgresRepository.getUserByUid = getUserByUidMock
+
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
                     isInitialized,
-                    init,
-                },
-            } as unknown as User
+                    find,
+                    persist,
+                    flush,
+                    remove,
+                }))
+            })
 
-            const persistAndFlush = jest.fn().mockResolvedValue(true)
-            const getUserByUidMock = jest.fn().mockResolvedValue(user)
+            it('deletes a user', async () => {
+                const result = await userPostgresRepository.deleteUser(user.uid)
 
-            userPostgresRepository.getUserByUid = getUserByUidMock
+                expect(orm.forkEm).toHaveBeenCalled()
+                expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+                expect(removeAllFootprints).toHaveBeenCalledTimes(1)
+                expect(promiseSpy).toHaveBeenCalled()
+                expect(find).toHaveBeenNthCalledWith(1, 'Friendship', { $or: [{ invitor: user }, { invitee: user }] })
+                expect(find).toHaveBeenNthCalledWith(2, 'Footprint', { createdBy: user }, { populate: ['users'] })
+                expect(find).toHaveBeenNthCalledWith(
+                    3,
+                    'FootprintReaction',
+                    { $or: [{ createdBy: user }, { footprint: footprints }] },
+                )
+                expect(persist).toHaveBeenCalledWith(user)
+                expect(removeAllUsers).toHaveBeenCalledTimes(2)
+                expect(persist).toHaveBeenCalledWith(user)
+                expect(remove).toHaveBeenNthCalledWith(1, ['friendships'])
+                expect(remove).toHaveBeenNthCalledWith(2, ['footprintReactions'])
+                expect(remove).toHaveBeenNthCalledWith(3, footprints)
+                expect(remove).toHaveBeenNthCalledWith(4, user)
+                expect(promiseSpy).toHaveBeenCalled()
+                expect(flush).toHaveBeenCalled()
+                expect(deleteAllUserFilesMock).toHaveBeenCalledWith(user.uid)
+                expect(deleteUserMock).toHaveBeenCalledWith(user.uid)
+                expect(result).toBe('test')
+            })
 
-            // @ts-ignore
-            orm.forkEm.mockImplementation(() => ({
-                persistAndFlush,
-                isInitialized,
-            }))
+            it('initializes footprints if not initialized', async () => {
+                isInitialized.mockReturnValue(false)
+                await userPostgresRepository.deleteUser(user.uid)
 
-            await userPostgresRepository.deleteUser(user.id)
-
-            expect(orm.forkEm).toHaveBeenCalled()
-            expect(getUserByUidMock).toHaveBeenCalledWith(user.id)
-            expect(persistAndFlush).toHaveBeenCalledWith(user)
+                expect(init).toHaveBeenCalled()
+            })
         })
 
         describe('addPoints', () => {
