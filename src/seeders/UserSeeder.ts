@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import type { Dictionary, EntityManager, RequiredEntityData } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { User } from '../entities/user.js'

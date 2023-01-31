@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import swaggerJsdoc from 'swagger-jsdoc'
 
 const options = {
