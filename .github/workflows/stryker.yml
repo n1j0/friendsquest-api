@@ -29,9 +29,9 @@ jobs:
         with:
           name: stryker-report
           path: reports/mutation/mutation.html
-      - name: Deploy to Github Pages
-        if: success()
-        uses: actions/deploy-pages@v1.2.3
-        with:
-          artifact_name: stryker-report
+      #- name: Deploy to Github Pages
+      #  if: success()
+      #  uses: actions/deploy-pages@v1.2.3
+      #  with:
+      #    artifact_name: stryker-report
 
