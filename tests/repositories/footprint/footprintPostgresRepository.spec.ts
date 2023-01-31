@@ -1,4 +1,5 @@
 import { mock } from 'jest-mock-extended'
+import { MulterFiles } from '../../../src/types/multer'
 import { ORM } from '../../../src/orm'
 import { FootprintService } from '../../../src/services/footprintService'
 import { FootprintRepositoryInterface } from '../../../src/repositories/footprint/footprintRepositoryInterface'
@@ -11,6 +12,8 @@ import { Footprint } from '../../../src/entities/footprint'
 import { ForbiddenError } from '../../../src/errors/ForbiddenError'
 import { FootprintReaction } from '../../../src/entities/footprintReaction'
 import { User } from '../../../src/entities/user'
+import { Friendship } from '../../../src/entities/friendship'
+import { NewFootprint } from '../../../src/types/footprint'
 
 jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
 
@@ -389,22 +392,189 @@ describe('FootprintPostgresRepository', () => {
         })
     })
 
-    it.skip('returns all footprints of friends and the user', async () => {
+    it('return a new footprint with points and user points', async () => {
+        const user = {
+            uid: 'abc',
+            points: 10,
+        } as unknown as User
+
+        const temperature = 20
+        const userPointsCreated = 310
+
+        const audioURL = 'audioURL'
+        const photoURL = 'photoURL'
+
+        const footprint = {
+            title: 'title',
+            description: 'description',
+            latitude: 1,
+            longitude: 1,
+            files: {
+                audio: audioURL,
+                image: photoURL,
+            } as unknown as MulterFiles['files'],
+            uid: user.uid,
+        } as unknown as NewFootprint
+
+        const footprintCreated = {
+            title: footprint.title,
+            user,
+            latitude: footprint.latitude,
+            longitude: footprint.longitude,
+            photoURL: 'imageURL',
+            audioURL,
+            temperature,
+        } as unknown as Footprint
+
+        const footprintWithDescription = {
+            ...footprintCreated,
+            description: footprint.description,
+        } as unknown as Footprint
+
+        const promiseSpy = jest.spyOn(Promise, 'all')
+
+        const getUserByUidMock = jest.fn().mockResolvedValue(user.uid)
+        userRepository.getUserByUid = getUserByUidMock
+
+        const uploadToFileStorageMock = jest.fn().mockResolvedValue([ audioURL, photoURL ])
+        footprintService.uploadFilesToFireStorage = uploadToFileStorageMock
+
+        const getTemperatureMock = jest.fn().mockResolvedValue({ main: { temp: temperature } })
+        footprintService.getTemperature = getTemperatureMock
+
+        const addPointsMock = jest.fn().mockResolvedValue({ points: userPointsCreated })
+        userRepository.addPoints = addPointsMock
+
+        const assign = jest.fn().mockReturnValue(footprintWithDescription)
+
+        const persistAndFlush = jest.fn().mockResolvedValue(true)
+
+        // @ts-ignore
+        Footprint.mockReturnValue(footprintCreated)
+
+        // @ts-ignore
+        orm.forkEm.mockImplementation(() => ({
+            assign,
+            persistAndFlush,
+        }))
+
+        const points = {
+            FOOTPRINT_CREATED: 300,
+        }
+        const result = await footprintPostgresRepository.createFootprint(footprint)
+
+        expect(orm.forkEm).toHaveBeenCalled()
+        expect(promiseSpy).toHaveBeenCalled()
+        expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+        expect(uploadToFileStorageMock).toHaveBeenCalledWith(footprint.files, user.uid)
+        expect(getTemperatureMock).toHaveBeenCalledWith(footprint.latitude, footprint.longitude)
+        expect(assign).toHaveBeenCalledWith(footprintCreated, { description: footprint.description })
+        expect(persistAndFlush).toHaveBeenCalledWith(footprintWithDescription)
+        expect(addPointsMock).toHaveBeenCalledWith(user.uid, points.FOOTPRINT_CREATED)
+        expect(result).toStrictEqual({
+            footprint: footprintWithDescription,
+            points: points.FOOTPRINT_CREATED,
+            userPoints: userPointsCreated,
+        })
+    })
+
+    it('returns all footprints of friends and the user', async () => {
+        const includes = jest.fn().mockReturnValueOnce(true)
+
+        const getIdentifiers = jest.fn().mockImplementation(() => ({
+            includes,
+        }))
+
+        const getIdentifiersNot = jest.fn().mockImplementation(() => ({
+            includes: () => false,
+        }))
+
+        const friendId1 = 3
+        const friendId2 = 5
+        const user2Id = 33
+
         const user = {
             id: 1,
             uid: 'abc',
         } as unknown as User
 
+        const friendship = {
+            id: 1,
+            invitor: {
+                id: 1,
+            },
+            invitee: {
+                id: friendId2,
+            },
+        } as unknown as Friendship
+
+        const friendship2 = {
+            id: 2,
+            invitor: {
+                id: friendId1,
+            },
+            invitee: {
+                id: 1,
+            },
+        } as unknown as Friendship
+
+        const friendships: Friendship [] = [ friendship, friendship2 ]
+
+        const footprint = {
+            id: 1,
+            createdBy: {
+                id: user.id,
+            },
+            users: {
+                getIdentifiers,
+            },
+        } as unknown as Footprint
+
+        const footprint2 = {
+            id: 2,
+            createdBy: {
+                id: user2Id,
+            },
+            users: {
+                getIdentifiers: getIdentifiersNot,
+            },
+        }
+        const friends = [ friendId2, friendId1 ]
         const getUserByUidMock = jest.fn().mockResolvedValue(user)
         userRepository.getUserByUid = getUserByUidMock
 
-        // const getFriendshipsWithSpecifiedOptionsMock = jest.fn().mockResolvedValue([])
+        const getFriendshipsWithSpecifiedOptionsMock = jest.fn().mockResolvedValue(friendships)
+        friendshipRepository.getFriendshipsWithSpecifiedOptions = getFriendshipsWithSpecifiedOptionsMock
 
-        const find = jest.fn().mockReturnValue([])
+        const find = jest.fn().mockReturnValue([ footprint, footprint2 ])
         // @ts-ignore
         orm.forkEm.mockImplementation(() => ({
             find,
         }))
+
+        const result = await footprintPostgresRepository.getFootprintsOfFriendsAndUser(user.uid)
+
+        expect(orm.forkEm).toHaveBeenCalled()
+        expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+        expect(getFriendshipsWithSpecifiedOptionsMock).toHaveBeenCalledWith(
+            user,
+            { status: 'accepted' },
+            { fields: [{ invitor: ['id'] }, { invitee: ['id'] }] },
+        )
+        expect(find).toHaveBeenCalledWith(
+            'Footprint',
+            {
+                createdBy: [ user, ...friends ],
+            },
+            {
+                populate: [ 'createdBy', 'users' ],
+            },
+        )
+
+        expect(getIdentifiers).toHaveBeenCalledWith('id')
+        expect(getIdentifiersNot).toHaveBeenCalledWith('id')
+        expect(includes).toHaveBeenCalledWith(user.id)
+        expect(result).toStrictEqual([{ ...footprint, hasVisited: true }, { ...footprint2, hasVisited: false }])
     })
 
     it('returns all reactions of a footprint', async () => {
