@@ -1,14 +1,10 @@
 import { getStorage, Storage } from 'firebase-admin/storage'
-import { Auth, getAuth } from 'firebase-admin/auth'
 
 export class DeletionService {
     readonly storage: Storage
 
-    readonly auth: Auth
-
-    constructor(storage: Storage = getStorage(), auth: Auth = getAuth()) {
+    constructor(storage: Storage = getStorage()) {
         this.storage = storage
-        this.auth = auth
     }
 
     refFromUrl = (url: string): string => {
@@ -20,8 +16,6 @@ export class DeletionService {
         imagePath = imagePath.replace(/%2F/g, '/')
         return imagePath.replace(/%20/g, ' ')
     }
-
-    deleteUser = async (uid: string) => this.auth.deleteUser(uid)
 
     deleteFilesOfOneFootprint = async (audioUrl: string, imageUrl: string) => {
         const bucket = this.storage.bucket()
