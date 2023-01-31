@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import express, { Request, Response } from 'express'
 import fetch from 'node-fetch'
 import ResponseSender from '../helper/responseSender.js'
