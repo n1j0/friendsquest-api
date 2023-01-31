@@ -80,32 +80,99 @@ describe('FriendshipPostgresRepository', () => {
             }])
     })
 
-    it('returns a friendship with specified options', async () => {
-        const find = jest.fn().mockReturnValue(['friendship'])
+    describe('returns a friendship with specified options', () => {
+        it('returns a friendship with no specified filters or options', async () => {
+            const find = jest.fn().mockReturnValue(['friendship'])
 
-        const user = {
-            id: 1,
-        } as unknown as User
+            const user = {
+                id: 1,
+            } as unknown as User
 
-        // @ts-ignore
-        orm.forkEm.mockImplementation(() => ({
-            find,
-        }))
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                find,
+            }))
 
-        const result = await friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions(user)
+            const result = await friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions(user)
 
-        expect(orm.forkEm).toHaveBeenCalled()
-        expect(find).toHaveBeenCalledWith(
-            'Friendship',
-            {
-                $or: [
-                    { invitor: user },
-                    { invitee: user },
-                ],
-            },
-            {},
-        )
-        expect(result).toStrictEqual(['friendship'])
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(find).toHaveBeenCalledWith(
+                'Friendship',
+                {
+                    $or: [
+                        { invitor: user },
+                        { invitee: user },
+                    ],
+                },
+                {},
+            )
+            expect(result).toStrictEqual(['friendship'])
+        })
+
+        it('returns a friendship with specified filters', async () => {
+            const find = jest.fn().mockReturnValue(['friendship'])
+
+            const user = {
+                id: 1,
+            } as unknown as User
+
+            const filters = {
+                invitor: 1,
+            }
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                find,
+            }))
+
+            await friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions(user, filters)
+
+            expect(find).toHaveBeenCalledWith(
+                'Friendship',
+                {
+                    ...filters,
+                    $or: [
+                        { invitor: user },
+                        { invitee: user },
+                    ],
+                },
+                {},
+            )
+        })
+
+        it('returns a friendship with specified options', async () => {
+            const find = jest.fn().mockReturnValue(['friendship'])
+
+            const user = {
+                id: 1,
+            } as unknown as User
+
+            const options = {
+                fields: [{ invitor: ['id'] }, { invitee: ['id'] }],
+            }
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                find,
+            }))
+
+            await friendshipPostgresRepository.getFriendshipsWithSpecifiedOptions(
+                user,
+                {},
+                { fields: [{ invitor: ['id'] }, { invitee: ['id'] }] },
+            )
+
+            expect(find).toHaveBeenCalledWith(
+                'Friendship',
+                {
+                    $or: [
+                        { invitor: user },
+                        { invitee: user },
+                    ],
+                },
+                options,
+            )
+        })
     })
 
     describe('getFriendshipsById', () => {
