@@ -302,7 +302,6 @@ describe(
             let remove: jest.Mock
             let flush: jest.Mock
             let deleteAllUserFilesMock: jest.Mock
-            let deleteUserMock: jest.Mock
             let user: User
             let footprints: Footprint []
             let footprint: Footprint
@@ -317,13 +316,10 @@ describe(
                 removeAllUsers = jest.fn()
                 persist = jest.fn()
                 remove = jest.fn()
-                flush = jest.fn()
+                flush = jest.fn().mockReturnValue('flush')
 
-                deleteAllUserFilesMock = jest.fn()
+                deleteAllUserFilesMock = jest.fn().mockReturnValue('deleteAllUserFiles')
                 deletionService.deleteAllUserFiles = deleteAllUserFilesMock
-
-                deleteUserMock = jest.fn().mockReturnValue('test')
-                deletionService.deleteUser = deleteUserMock
 
                 user = {
                     id: 1,
@@ -389,8 +385,7 @@ describe(
                 expect(promiseSpy).toHaveBeenCalled()
                 expect(flush).toHaveBeenCalled()
                 expect(deleteAllUserFilesMock).toHaveBeenCalledWith(user.uid)
-                expect(deleteUserMock).toHaveBeenCalledWith(user.uid)
-                expect(result).toBe('test')
+                expect(result).toStrictEqual([ 'flush', 'deleteAllUserFiles' ])
             })
 
             it('initializes footprints if not initialized', async () => {
