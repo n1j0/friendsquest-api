@@ -66,13 +66,14 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
             audioURL,
             temperature,
         )
+        let footprintWithDescription = footprint
         if (description) {
-            em.assign(footprint, { description })
+            footprintWithDescription = em.assign(footprint, { description })
         }
-        await em.persistAndFlush(footprint)
+        await em.persistAndFlush(footprintWithDescription)
         const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_CREATED)
         return {
-            footprint,
+            footprint: footprintWithDescription,
             points: Points.FOOTPRINT_CREATED,
             userPoints: userWithUpdatedPoints.points,
         }
