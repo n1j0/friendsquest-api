@@ -18,5 +18,6 @@ coverage
 .scannerwork
 sonar-scanner
 
-# stryker temp files
+# stryker files
 .stryker-tmp
+reports
