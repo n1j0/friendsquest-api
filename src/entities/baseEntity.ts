@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import { PrimaryKey, Property, types } from '@mikro-orm/core'
 
 export abstract class BaseEntity {

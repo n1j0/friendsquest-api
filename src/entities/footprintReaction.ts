@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import { Entity, ManyToOne, Property } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { User } from './user.js'

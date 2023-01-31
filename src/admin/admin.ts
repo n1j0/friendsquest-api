@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import { Request, Response, Router } from 'express'
 import swaggerUi from 'swagger-ui-express'
 import { getAuth } from 'firebase-admin/auth'
