@@ -1,6 +1,7 @@
-name: General Testing for CI
+name: Stryker
 
-workflow_dispatch:
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read
