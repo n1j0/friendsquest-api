@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import { Collection, Entity, ManyToMany, Property } from '@mikro-orm/core'
 import { BaseEntity } from './baseEntity.js'
 import { Footprint } from './footprint.js'

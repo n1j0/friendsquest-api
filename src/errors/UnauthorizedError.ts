@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import { getReasonPhrase, StatusCodes } from 'http-status-codes'
 import { Mapper } from './ProblemDocument.js'
 import { ProblemDocument } from '../types/problemDocument'

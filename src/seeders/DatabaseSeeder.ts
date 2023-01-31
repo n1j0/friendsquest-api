@@ -1,3 +1,5 @@
+// Stryker disable all
+
 import type { EntityManager } from '@mikro-orm/core'
 import { Seeder } from '@mikro-orm/seeder'
 import { UserSeeder } from './UserSeeder.js'

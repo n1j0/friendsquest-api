@@ -1,3 +1,5 @@
+// Stryker disable all
+
 /*
  @see https://www.rfc-editor.org/rfc/rfc7235
  This is a combined implementation of multiple existing packages/repos
