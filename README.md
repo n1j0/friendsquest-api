@@ -279,6 +279,10 @@ The `/health-plain` route is used by dokku to check if the API is running. If th
 | `health`       | Shows application health information.                      |
 | `health-plain` | Shows application health information in plain text.        |
 
+## Git Branching Strategy
+
+We are using git-flow as branching strategy. Have a look at the [summary](https://nvie.com/posts/a-successful-git-branching-model/) in order to get a better understanding of the branching strategy.
+
 ## Conventional Commits
 
 We use Conventional Commits. Have a look at the [summary](https://www.conventionalcommits.org/en/v1.0.0/#summary) in order to make great commits.
