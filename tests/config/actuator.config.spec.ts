@@ -5,8 +5,7 @@ import responseMock from '../test-helper/responseMock'
 describe('actuatorConfig', () => {
     it('export custom health route with plain "UP" text', () => {
         const response = responseMock
-        const config = actuatorConfig
-        const { customEndpoints } = config
+        const { customEndpoints } = actuatorConfig
 
         expect(Array.isArray(customEndpoints)).toBe(true)
         expect(customEndpoints[0]).toStrictEqual({
