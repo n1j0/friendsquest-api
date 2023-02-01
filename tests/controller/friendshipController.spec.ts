@@ -407,18 +407,6 @@ describe('FriendshipController', () => {
             )
         })
 
-        it('returns FriendshipNotFoundError if friendship is not found', async () => {
-            const uid = '1'
-            const id = 1
-            // TODO: how to mock empty return value?
-            // @ts-ignore
-            // eslint-disable-next-line unicorn/no-useless-undefined
-            friendshipRepository.getFriendshipById.mockResolvedValue(undefined)
-            jest.spyOn(friendshipController, 'friendshipNotFoundError')
-            await friendshipController.declineOrDeleteFriendship({ id, uid }, response)
-            expect(friendshipController.friendshipNotFoundError).toHaveBeenCalledWith(response)
-        })
-
         it('returns FriendshipNotFoundError if an error occurs', async () => {
             const uid = '1'
             const id = 1

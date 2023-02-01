@@ -126,10 +126,6 @@ export class FriendshipController {
         try {
             const friendship = await this.friendshipRepository.getFriendshipById(id)
 
-            if (!friendship) {
-                return this.friendshipNotFoundError(response)
-            }
-
             if (friendship.invitor.uid !== uid && friendship.invitee.uid !== uid) {
                 return ResponseSender.error(
                     response,
