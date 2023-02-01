@@ -1,8 +1,6 @@
 import { Storage } from 'firebase-admin/lib/storage'
-import { Auth } from 'firebase-admin/auth'
 import { DeletionService } from '../../src/services/deletionService'
 import { storage } from '../test-helper/storage'
-import { auth } from '../test-helper/auth'
 
 jest.mock('firebase-admin/storage', () => ({
     getStorage: jest.fn().mockReturnValue('getStorage'),
@@ -16,7 +14,7 @@ describe('DeletionService', () => {
     let deletionService: DeletionService
 
     beforeEach(() => {
-        deletionService = new DeletionService(storage as unknown as Storage, auth as unknown as Auth)
+        deletionService = new DeletionService(storage as unknown as Storage)
     })
 
     afterEach(() => {
@@ -26,13 +24,6 @@ describe('DeletionService', () => {
     it('initializes default storage and auth', () => {
         const deletionServiceWithDefaultStorage = new DeletionService()
         expect(deletionServiceWithDefaultStorage.storage).toBe('getStorage')
-        expect(deletionServiceWithDefaultStorage.auth).toBe('getAuth')
-    })
-
-    it('deletes a user', async () => {
-        const userId = 'userId'
-        await deletionService.deleteUser(userId)
-        expect(auth.deleteUser).toHaveBeenCalledWith(userId)
     })
 
     it('returns the firebase storage ref from an url', () => {

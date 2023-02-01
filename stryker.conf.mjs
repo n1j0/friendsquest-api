@@ -15,6 +15,7 @@ const config = {
         '.out',
         '.coverage',
         'documentation',
+        'migrations',
         'reports',
         'temp',
     ],

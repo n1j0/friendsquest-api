@@ -112,11 +112,10 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         em.remove(reactions)
         em.remove(footprints)
         em.remove(user)
-        await Promise.all([
+        return Promise.all([
             em.flush(),
             this.deletionService.deleteAllUserFiles(uid),
         ])
-        return this.deletionService.deleteUser(uid)
     }
 
     addPoints = async (uid: string, points: number) => {

@@ -9,6 +9,6 @@ export interface UserRepositoryInterface {
     createUser({ email, username, uid }: { email: string, username: string, uid: string }): Promise<User>
     updateUser(id: number | string,
                userData: { username: string, email: string }): Promise<{ user: User, points: number }>
-    deleteUser(id: number | string): Promise<void>
+    deleteUser(id: number | string): Promise<[void, void[]]>
     addPoints(uid: string, points: number): Promise<User>
 }
