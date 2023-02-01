@@ -1,4 +1,4 @@
-import { serviceAccountConfig } from '../../src/config/firebaseServiceAccount'
+import { serviceAccountConfig } from '../../src/config/firebaseServiceAccount.config'
 
 // @see <rootDir>/jest.setup.ts
 

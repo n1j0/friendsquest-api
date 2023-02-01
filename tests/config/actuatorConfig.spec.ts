@@ -1,5 +1,5 @@
 import { Request } from 'express'
-import { actuatorConfig } from '../../src/config/actuatorConfig'
+import { actuatorConfig } from '../../src/config/actuator.config'
 import responseMock from '../test-helper/responseMock'
 
 describe('actuatorConfig', () => {
