@@ -18,12 +18,12 @@ export class FriendshipController {
         this.userRepository = userRepository
     }
 
-    private userNotFoundError = (response: Response) => ResponseSender.error(
+    userNotFoundError = (response: Response) => ResponseSender.error(
         response,
         NotFoundError.getErrorDocument('The user'),
     )
 
-    private friendshipNotFoundError = (response: Response) => {
+    friendshipNotFoundError = (response: Response) => {
         ResponseSender.error(response, NotFoundError.getErrorDocument('The friendship'))
     }
 
