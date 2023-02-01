@@ -79,6 +79,15 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         }
     }
 
+    // eslint-disable-next-line max-len
+    hasUserReactedOrCreatedFootprint = async (reactions : FootprintReaction[], footprint: Footprint, userId: number) => {
+        if (footprint.createdBy.id === userId) {
+            return true
+        }
+        const reactionsByUser = reactions.filter(react => react.createdBy.id === userId)
+        return reactionsByUser.length > 0
+    }
+
     createFootprintReaction = async ({ id, message, uid }: { id: number | string, message: string, uid: string }) => {
         const em = this.orm.forkEm()
         const [ footprint, user ] = await Promise.all([
@@ -88,18 +97,13 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const reaction = new FootprintReaction(user, message, footprint)
         const reactions: FootprintReaction[] = await em.find('FootprintReaction', { footprint: { id } } as any)
         await em.persistAndFlush(reaction)
-        // TODO: rewrite to "isFirstReaction"
+        let isNotFirstReaction = false
         if (reactions) {
-            if (footprint.createdBy.id === user.id) {
-                return {
-                    reaction,
-                }
-            }
-            const reactionsByUser = reactions.filter(react => react.createdBy.id === user.id)
-            if (reactionsByUser.length > 0) {
-                return {
-                    reaction,
-                }
+            isNotFirstReaction = await this.hasUserReactedOrCreatedFootprint(reactions, footprint, user.id)
+        }
+        if (isNotFirstReaction) {
+            return {
+                reaction,
             }
         }
         const userWithUpdatedPoints = await this.userRepository.addPoints(uid, Points.FOOTPRINT_REACTION)

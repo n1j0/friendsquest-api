@@ -392,6 +392,157 @@ describe('FootprintPostgresRepository', () => {
         })
     })
 
+    describe('hasUserReactedOrCreatedFootprint', () => {
+        // TODO: reactions.filter is not tested
+        it('returns true if the footprint was created by the user', async () => {
+            const id = '123'
+            const reactions = [
+                { createdBy: { id } },
+                { createdBy: { id: '456' } },
+            ] as unknown as FootprintReaction[]
+            const footprint = { createdBy: { id } } as unknown as Footprint
+            const user = { id } as unknown as User
+
+            const result = await footprintPostgresRepository.hasUserReactedOrCreatedFootprint(
+                reactions,
+                footprint,
+                user.id,
+            )
+            expect(result).toEqual(true)
+        })
+
+        it('returns true if there are reactions by the user', async () => {
+            const id = '123'
+
+            const reactions = [
+                { createdBy: { id } },
+                { createdBy: { id: '456' } },
+            ] as unknown as FootprintReaction[]
+            const footprint = { createdBy: { id: '323' } } as unknown as Footprint
+            const user = { id } as unknown as User
+            const result = await footprintPostgresRepository.hasUserReactedOrCreatedFootprint(
+                reactions,
+                footprint,
+                user.id,
+            )
+
+            expect(result).toBe(true)
+        })
+
+        it('returns false if there are no reactions by the user', async () => {
+            const reactions = [
+                { createdBy: { id: '444' } },
+                { createdBy: { id: '456' } },
+            ] as unknown as FootprintReaction[]
+            const footprint = { createdBy: { id: '323' } } as unknown as Footprint
+            const user = { id: '123' } as unknown as User
+            const result = await footprintPostgresRepository.hasUserReactedOrCreatedFootprint(
+                reactions,
+                footprint,
+                user.id,
+            )
+
+            expect(result).toBe(false)
+        })
+    })
+
+    describe('createFootprintReaction', () => {
+        it.skip('creates a footprint reaction', async () => {
+            const message = 'message'
+
+            const user = {
+                id: 19,
+                uid: 'abc',
+                points: 10,
+            } as unknown as User
+
+            const footprint = {
+                id: 1,
+                createdBy: {
+                    ...user,
+                },
+            } as unknown as Footprint
+
+            const footprintReactionCreated = {
+                id: 1,
+                createdBy: {
+                    ...user,
+                },
+                footprint,
+                message,
+                createdAt: '',
+                updatedAt: '',
+            } as unknown as FootprintReaction
+
+            const points = {
+                FOOTPRINT_REACTION: 150,
+            }
+
+            const userWithUpdatedPoints = {
+                points: 160,
+            }
+
+            const footprintReactions = [footprintReactionCreated]
+
+            const findFootprintByIdMock = jest.fn().mockResolvedValue(footprint)
+            footprintPostgresRepository.findFootprintById = findFootprintByIdMock
+
+            const getUserByUidMock = jest.fn().mockResolvedValue(user)
+            userRepository.getUserByUid = getUserByUidMock
+
+            const find = jest.fn().mockResolvedValue(footprintReactions)
+            const persistAndFlush = jest.fn().mockResolvedValue(footprintReactionCreated)
+
+            // @ts-ignore
+            FootprintReaction.mockReturnValue(footprintReactionCreated)
+
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                find,
+                persistAndFlush,
+            }))
+
+            const hasUserReactedOrCreatedFootprintMock = jest.fn().mockResolvedValue(false)
+            const addPointsMock = jest.fn().mockReturnValue(user)
+
+            const result = await footprintPostgresRepository.createFootprintReaction(
+                { id: footprint.id, message, uid: user.uid },
+            )
+
+            expect(orm.forkEm).toHaveBeenCalled()
+            expect(findFootprintByIdMock).toHaveBeenCalledWith(footprint.id)
+            expect(getUserByUidMock).toHaveBeenCalledWith(user.uid)
+            expect(find).toHaveBeenCalledWith('FootprintReaction', { footprint: { id: footprint.id } })
+            expect(persistAndFlush).toHaveBeenCalledWith(footprintReactionCreated)
+            expect(hasUserReactedOrCreatedFootprintMock).toHaveBeenCalledWith(footprintReactions, footprint, user.id)
+            expect(addPointsMock).toHaveBeenCalledWith(user, points.FOOTPRINT_REACTION)
+            expect(result).toStrictEqual({
+                footprintReaction: footprintReactionCreated,
+                points: points.FOOTPRINT_REACTION,
+                userPoints: userWithUpdatedPoints.points,
+            })
+        })
+
+        it.skip('throws an NotFoundError if footprint does not exist', async () => {
+            // const promiseSpy = jest.fn()
+            // @ts-ignore
+            orm.forkEm.mockImplementation(() => ({
+                findOneOrFail: (
+                    entityName: any,
+                    where: any,
+                    { failHandler }:
+                        {
+                            failHandler: () => {}
+                        },
+                ) => failHandler(),
+            }))
+
+            // const result = await footprintPostgresRepository.createFootprintReaction()
+
+            // expect(orm.forkEm).toHaveBeenCalled()
+        })
+    })
+
     it('return a new footprint with points and user points', async () => {
         const user = {
             uid: 'abc',
