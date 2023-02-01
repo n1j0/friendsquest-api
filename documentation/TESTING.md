@@ -70,6 +70,10 @@ The beta programm of the different App Stores will be used in the near future to
 
 All the test cases are written for the English UI (so labels might differ for other languages).
 
+**Note:** The test cases are written for the current state of the app. The test cases will be updated accordingly.
+
+**ATTENTION:** For every test case the user has to be online. If the user is offline the app cannot be used.
+
 #### Account
 
 | #1.1                | User Registration: Successful                                                                                                 |
