@@ -12,22 +12,32 @@ optional:
 
 ## Important notes
 
-* Always write `/index` at the end of the import path if you reference an index.ts file. This is necessary for the typescript compiler and `addJsExtensionToImports` script to work correctly.
-
+This is necessary for the typescript compiler:
+* Always write `/index.js` at the end of the import path if you reference an index.ts file.
+* Keep in mind to use `.js` for file extension. If you omit the extension, the application won't work because Typescript is used.
+    - `import { User } from './user/index.js';`: ☑️
+    - `import { User } from './user/index';`: ❌
+    - `import { User } from './user';`: ❌
+    - `import { User } from './user.js';`: ❌
+    - `import { User } from './user.ts';`: ❌
 ## Getting started
 
 You have two options: using the backend within or outside a docker container.
 
 Hot reloading of the Node.js app is always turned on for `npm run start`.
 
-Keep in mind to use ".js" for file extension. If you omit the extension, the application won't work because Typescript is used.
+### Setting up the .env file
+
+```bash 
+# copy env file
+$ cp .env.dist .env
+# of course you have to change some values in the .env file (there's a comment in the file)
+# you can finde the values in our teams channel in the section OneNote
+```
 
 ### Running with node in docker
 
 ```bash
-# copy env file
-$ cp .env.dist .env
-
 # installing pre-commit hooks
 $ npm install
 
@@ -42,9 +52,6 @@ Keep in mind that you have to rebuild the container when installing new dependen
 
 ### Running without node in docker
 ```bash
-# copy env file
-$ cp .env.dist .env
-
 # if running for the first time
 $ docker-compose up --build api
 
@@ -90,7 +97,7 @@ $ npm run lint
 
 ``` bash
 # automatically fix all ESLint issues
-$ npm run lint:fix
+$ npm run lintfix
 ```
 
 ## Mikro-ORM
@@ -99,7 +106,7 @@ We access our PostgreSQL-Database through the ORM-Tool [Mikro ORM](https://mikro
 
 ### Migrations and Entities
 
-Migrations are shipped by Mikro ORM. They are created automatically. Mikro ORM looks into the `entities` directory to create the migrations.
+Migrations are shipped by Mikro ORM. They are created automatically. Mikro ORM looks into the [entities](./src/entities) directory to create the migrations.
 
 #### Creating a Migration
 
@@ -137,15 +144,111 @@ You can create dummy data with Seeders. To create a new Seeder use `npm run seed
 $ npm run orm:restart
 ```
 
-## Architecture
-![Architecture](./documentation/architecture.jpeg)
+## Architecture and Folder Structure
 
-## Test Strategy
-The backend includes an ORM system (Mikro-ORM). This consists of so-called entities and controllers. The controllers contain the business logic. 
+### General architecture
+![GeneralArchitecture](./documentation/general-architecture.png)
+
+### Backend architecture
+![BackendArchitecture](./documentation/backend-architecture.png)
+
+### Frontend architecture
+![FrontendArchitecture](./documentation/frontend-architecture.png)
+
+### Logical business units
+
+The app is divided into different logical business units. Each business unit has its own file/sub-folder in the following folders ([controller](#controllers), [repositories](#repositories), [router](#router)). The business units are:
+
+* Footprint
+* Friendship
+* Leaderboard
+* User
+
+### Admin
+
+The [admin](./src/admin) folder contains the admin panel of the backend. The admin panel is used to manage the database and make use of the interactive swagger documentation. The admin panel is not a real part of the app. It's password protected and only accessible for the developers.
+
+### Config
+
+Within the [config](./src/config) folder you can find the configuration files for the app.
+
+### Constants
+
+The [constants](./src/constants) folder contains all constants used in the app. For better readability, the constants are divided into different files:
+
+* General constants are stored in [index.ts](./src/constants/index.ts).
+* Constants related to the point system are stored in the [points.ts](./src/constants/points.ts) file.
 
 ### Controllers
-The controllers (routes) are tested using unit tests and integration tests with jest. The methods of the Entity Manager are mocked in the process. The tests can be found in the app's `tests/routes` folder. In addition, path tests are created for migrations and seeders.
 
+The [controllers](./src/controllers) folder contains all controllers. The controllers are used to handle the business logic. They are the connecting component between the routers and the repositories.
+
+### Docs
+
+The [docs](./src/docs) folder contains parts of our swagger documentation.
+
+We use `jsdocs` to write Open API compliant documentation within js comments. Reusable components are managed as .yaml files in this folder.
+
+Moreover, the general swagger configuration is stored in [swagger.ts](./src/docs/swagger.ts).
+
+### Entities
+
+The [entities](./src/entities) folder contains all entities. The entities are used to define the database structure and is used my `mikro-orm` to create migrations ([see](#migrations-and-entities)).
+
+### Errors
+
+The [errors](./src/errors) folder contains all custom errors. The custom errors are used to handle errors in a more structured way.
+
+We use the RFC 7807 standard to define our errors. The errors are divided into different files.
+
+A general helper for correct data mapping to comply with the RFC 7807 standard is stored in [ProblemDocument.ts](./src/errors/ProblemDocument.ts).
+
+### Helper
+
+The [helper](./src/helper) folder contains all helper functions. The helper functions are used to handle (common) tasks in a more structured way.
+
+### Middlewares
+
+The [middlewares](./src/middlewares) folder contains all middlewares. The middlewares are used to handle requests and check the following things before the request is handled by the controller:
+
+* Check if request is valid ([errorHandler.ts](./src/middlewares/errorHandler.ts))
+* Check if the user is authenticated ([firebaseAuth.ts](./src/middlewares/firebaseAuth.ts))
+
+### Migrations
+
+The [migrations](./src/migrations) folder contains all migrations. All files are generated automatically by `mikro-orm`. It's possible to manually change migrations. But keep in mind to always write the "down" part, too. Otherwise, the migration can't be reversed.
+
+You can find more information about migrations [here](#migrations).
+
+### Repositories
+
+The [repositories](./src/repositories) folder contains all repositories. The repositories are used to handle database queries for each logical business unit.
+
+We use interfaces to define the repositories for easier usage in our tests (mocking).
+
+### Router
+
+The [router](./src/router) folder contains all routers. The routers are used to define the routes of the app.
+
+All routers starting with a "_" are not used in the app. They are used for development purposes only.
+
+To dynamically create our routes in the [main router](./src/router.ts) each router (except "_*.ts") implements the interface [routerInterface](./src/router/routerInterface.ts) and all routes are stored in the [routes](./src/router/routes.ts) file.
+
+### Seeders
+
+The [seeders](./src/seeders) folder contains all seeders. The seeders are used to create dummy data for development purposes.
+
+### Services
+
+The [services](./src/services) folder contains all services. The services are used to handle external services (e.g. Firebase, OpenWeather) and business unit related tasks (e.g. creating the friends code).
+
+### Types
+
+The [types](./src/types) folder contains all types. The types are used to define globally used types for the app.
+
+## Test Strategy
+
+See all relevant information in our separate [test strategy document](./documentation/TESTING.md).
 
 ## Pushing to FH system
 
@@ -164,14 +267,21 @@ $ git push staging develop:master
 ```
 
 ## Health checks
-In order to check if the API is running, you can use the health check endpoint `/health`. It returns `status: up` if the API is running.
+In order to check if the API is running, you can use the health check endpoints `/health` or `/health-plain`. It returns json with `{ status: 'up' }` or just plain `up` if the API is running.
+
+The `/health-plain` route is used by dokku to check if the API is running. If the API is not running, dokku will not deploy the new version. This is done in the [CHECKS file](./CHECKS).
 
 ### All endpoints
-| ID        | Description                                            |
-|-----------|--------------------------------------------------------|
-| `info`    | Displays application information.                      |
-| `metrics` | Shows metrics information for the current application. |
-| `health`  | Shows application health information.                  |
+| ID             | Description                                                |
+|----------------|------------------------------------------------------------|
+| `info`         | Displays application information.                          |
+| `metrics`      | Shows metrics information for the current application.     |
+| `health`       | Shows application health information.                      |
+| `health-plain` | Shows application health information in plain text.        |
+
+## Git Branching Strategy
+
+We are using git-flow as branching strategy. Have a look at the [summary](https://nvie.com/posts/a-successful-git-branching-model/) in order to get a better understanding of the branching strategy.
 
 ## Conventional Commits
 

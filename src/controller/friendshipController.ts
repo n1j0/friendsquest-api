@@ -18,12 +18,12 @@ export class FriendshipController {
         this.userRepository = userRepository
     }
 
-    private userNotFoundError = (response: Response) => ResponseSender.error(
+    userNotFoundError = (response: Response) => ResponseSender.error(
         response,
         NotFoundError.getErrorDocument('The user'),
     )
 
-    private friendshipNotFoundError = (response: Response) => {
+    friendshipNotFoundError = (response: Response) => {
         ResponseSender.error(response, NotFoundError.getErrorDocument('The friendship'))
     }
 
@@ -125,10 +125,6 @@ export class FriendshipController {
     declineOrDeleteFriendship = async ({ id, uid }: { id: number | string, uid: string }, response: Response) => {
         try {
             const friendship = await this.friendshipRepository.getFriendshipById(id)
-
-            if (!friendship) {
-                return this.friendshipNotFoundError(response)
-            }
 
             if (friendship.invitor.uid !== uid && friendship.invitee.uid !== uid) {
                 return ResponseSender.error(

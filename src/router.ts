@@ -15,7 +15,7 @@ import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
-import { actuatorConfig } from './config/actuatorConfig.js'
+import { actuatorConfig } from './config/actuator.config.js'
 
 export class Router {
     private server: Application
