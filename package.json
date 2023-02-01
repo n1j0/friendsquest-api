@@ -1,6 +1,6 @@
 {
   "name": "friendsquest-api",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "API for FriendsQuest-APP",
   "main": "./.out/src/index.js",
   "scripts": {
