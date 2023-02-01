@@ -145,7 +145,15 @@ $ npm run orm:restart
 ```
 
 ## Architecture and Folder Structure
-![Architecture](./documentation/architecture.jpeg)
+
+### General architecture
+![GeneralArchitecture](./documentation/general-architecture.png)
+
+### Backend architecture
+![BackendArchitecture](./documentation/backend-architecture.png)
+
+### Frontend architecture
+![FrontendArchitecture](./documentation/frontend-architecture.png)
 
 ### Logical business units
 
