@@ -8,7 +8,7 @@ import * as Tracing from '@sentry/tracing'
 import * as http from 'node:http'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
-import { serviceAccountConfig } from './config/firebaseServiceAccount.js'
+import { serviceAccountConfig } from './config/firebaseServiceAccount.config.js'
 import { routes } from './router/routes.js'
 
 export default class Application {

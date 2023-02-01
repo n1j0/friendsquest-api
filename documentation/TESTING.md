@@ -13,7 +13,6 @@
 - [E2E TESTS](#e2e-tests)
     - [USER ACCEPTANCE TEST STRATEGY](#e2e-test-strategy)
     - [USER ACCEPTANCE TEST CASES](#e2e-test-cases)
-- [Appendix](#appendix)
 
 ## IDENTIFICATION INFORMATION
 
@@ -49,21 +48,31 @@ Combine individual software modules and test as a group.
 
 ### INTEGRATION TEST STRATEGY
 
-Evaluate all integrations with locally developed shared libraries, with consumed services, and other touch points.
+Evaluation of the integration between the routers, controllers and repositories.
 
 ### INTEGRATION TEST CASES
 
 ## E2E TESTS
 
-Verify that the solution works for the end-user.
+Verification that new features work for the end-user.
 
 ### E2E TEST STRATEGY
 
-{Explain how user acceptance testing will be accomplished}
+The E2E tests are executed manually.
+
+After a pull request into `develop` was closed successfully the api will be deployed to the staging environment. The staging environment is used to test the api with the frontend.
+
+Currently, the E2E tests are executed locally with different virtual devices in Android Studio and Xcode using the "dev" branch of the frontend.
+
+The beta programm of the different App Stores will be used in the near future to connect to the staging environment and run the E2E Tests. 
 
 ### E2E TEST CASES
 
 All the test cases are written for the English UI (so labels might differ for other languages).
+
+**Note:** The test cases are written for the current state of the app. The test cases will be updated accordingly.
+
+**ATTENTION:** For every test case the user has to be online. If the user is offline the app cannot be used.
 
 #### Account
 
@@ -142,5 +151,3 @@ All the test cases are written for the English UI (so labels might differ for ot
 | **PRE-CONDITION**   | User is on the main screen (globe) |
 | **POST-CONDITION**  | Leaderboard is shown               |
 | **STEPS**           | 1. User clicks on "trophy" icon    |
-
-## Appendix
