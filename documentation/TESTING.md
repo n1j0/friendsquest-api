@@ -196,7 +196,16 @@ Keep in mind that the integration tests are not testing the database. The databa
 
 ### INTEGRATION TEST CASES
 
-{missing}
+| directory / file                        | description                                                              |
+|-----------------------------------------|--------------------------------------------------------------------------|
+| footprint/createFootprint               | Create a footprint with given parameters (e.g. title, image, audio, ...) |
+| footprint/getAllFootprints              | Return all footprints of all users                                       |
+| footprint/getFootprintsOfFriendsAndUser | Return all footprints from friends and the user itself with given uid    |
+| friendship/acceptFriendship             | Accept a friendship with given id                                        |
+| friendship/createFriendship             | Create a friendship with given friendscode                               |
+| user/createUser                         | Create an user with given email and username                             |
+| user/getUserByFriendsCode               | Return an user with given friendscode                                    |
+
 
 ## E2E TESTS
 
