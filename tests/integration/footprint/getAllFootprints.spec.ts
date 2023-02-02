@@ -2,6 +2,7 @@ import { mockDeep } from 'jest-mock-extended'
 import { Application, NextFunction, Request, Response } from 'express'
 import { EntityManager } from '@mikro-orm/core'
 import { PostgreSqlDriver } from '@mikro-orm/postgresql'
+// eslint-disable-next-line import/no-extraneous-dependencies
 import request from 'supertest'
 import { startApplication } from '../../../src/helper/startApplication'
 import { ORM } from '../../../src/orm'
@@ -100,5 +101,6 @@ describe('just for demonstration right now', () => {
             data: [ 'footprint1', 'footprint2' ],
             points: {},
         })
+        expect(response.status).toBe(200)
     })
 })
