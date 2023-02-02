@@ -58,9 +58,59 @@ In order to check if our Unit Tests are well written, we're using [stryker](http
 
 ### FRONTEND
 
-welche Tools werden verwendet? (Testing, auch Linting- und Metrik-Tools)
+#### Linting
 
-{missing}
+For static code analysis we use the `flutter analyze` command. The linting config is specified in `analysis_options.yaml` (frontend).
+
+#### test 
+
+For unit tests we use the Flutter [test](https://pub.dev/packages/test) package.
+
+#### flutter_test
+
+For widget tests (UI) we use the Flutter [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) package.
+
+#### Mockito
+
+For generating mocks we use the Flutter [mockito](https://pub.dev/packages/mockito) package.
+
+#### Code coverage
+
+The code coverage is measured with the following command: 
+```
+flutter test --coverage
+```
+
+The resulting coverage report combines unit and widget tests. It is generated with the following command: 
+```
+lcov --remove coverage/lcov.info 'lib/api/*' 'lib/exceptions' 'lib/app/*'  'lib/theme/*' 'lib/packages/*' 'lib/screens/_root/*' 'lib/screens/image_viewer/*' 'lib/screens/imprint/*' 'lib/screens/onboarding/*' 'lib/screens/about/*' 'lib/screens/home/*' 'lib/screens/home_my_profile/*' 'lib/services/*' 'lib/exceptions/*' 'lib/widgets/globe_map.dart' 'lib/screens/footprint_create/footprint_create_camera_screen_controller.dart' 'lib/screens/footprint_create_screen.dart' 'lib/screens/privacy/*' -o coverage/exclude_lcov.info
+```
+
+A HTML representation of the report is generated with:
+```
+genhtml coverage/exclude_lcov.info -o coverage/html
+open coverage/html/index.html
+``` 
+
+We are excluding some directories / files from the coverage report within the "lib" folder. These are:
+
+| directory / file              | reason                                                                                             |
+|-------------------------------|----------------------------------------------------------------------------------------------------|
+| api/                         | contains just a wrapper for the Dart `http` package         |
+| app/                          | contains just config, constants, and routing information/logic                                                            |
+| exceptions/ | contains just pure Exception classes (no logic)                                                                    |
+| theme/                      | contains just colors, button styles, text styles, etc.                                                        
+| services/       | contains just interfaces and their implementation (which are just wrappers for packages and device features such as camera, etc.) |
+| screens/_root/       | not much code but hard to test |
+| screens/image_viewer/       | no logic |
+| screens/imprint/       | no logic |
+| screens/onboarding/       | no logic |
+| screens/about/       | no logic |
+| screens/home/       | not much code but hard to test |
+| screens/home_my_profile/       | ??? |
+| screens/privacy/       | no logic |
+| screens/footprint_create/footprint_create_camera_screen_controller.dart       | very hard to test, because it uses the device camera |
+| widgets/globe_map.dart       | not testable (due to HTTP requests) |
 
 ## PIPELINE
 
@@ -100,9 +150,20 @@ So the manual tests are kind of part of our pipeline.
 
 ### FRONTEND
 
-beschreibung pipeline + codemagic
+We use [Codemagic](https://codemagic.io/start/) as CI/CD tool. 
 
-{missing}
+![Pipeline Frontend](/documentation/pipeline-frontend.png)
+
+The pipeline includes several steps:
+
+1. Fetching app sources: fetches the source code from our GitLab
+2. Setup code signing identities: keys and secrets required to sign the app for Android
+3. Installing dependencies: installs all dependencies 
+4. Testing: performs static code analysis and executes all unit and widget tests 
+5. Building Android: builds the app bundle
+6. Publishing: publishes the app in the Google Play Store
+
+The pipeline is triggered each time code is committed or merged into the `main` branch. 
 
 ## UNIT TEST
 
