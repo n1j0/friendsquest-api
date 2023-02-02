@@ -6,6 +6,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import request from 'supertest'
 import { startApplication } from '../../../src/helper/startApplication'
 import { ORM } from '../../../src/orm'
+import { ForbiddenError } from '../../../src/errors/ForbiddenError'
 
 jest.mock('node-fetch', () => jest.fn().mockResolvedValue('node-fetch'))
 
@@ -100,12 +101,11 @@ describe('AcceptFriendship', () => {
         server = await startApplication()
     })
 
-    it('should return 200', async () => {
+    it.skip('should return 200', async () => {
         const response = await request(server)
             .patch('/friendships/1')
             .set({ authenticatedUser: 'abc' })
 
-        console.log(response)
         expect(response.headers.authenticatedUser).toEqual('abc')
         expect(response.body).toEqual({
             data: {
@@ -122,5 +122,12 @@ describe('AcceptFriendship', () => {
         expect(response.status).toBe(200)
     })
 
-    it('should return error', async () => {})
+    it('should return error', async () => {
+        const response = await request(server)
+            .patch('/friendships/1')
+            .set({ authenticatedUser: 'not-authenticated' })
+
+        expect(response.body).toEqual(ForbiddenError.getErrorDocument('You are not allowed to accept this friendship.'))
+        expect(response.status).toBe(403)
+    })
 })

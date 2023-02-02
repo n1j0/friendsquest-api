@@ -81,7 +81,8 @@ jest.mock('../../../src/middlewares/firebaseAuth.js', () => ({
 
 jest.mock('../../../src/repositories/footprint/footprintPostgresRepository.js', () => ({
     FootprintPostgresRepository: jest.fn().mockImplementation(() => ({
-        getFootprintsOfFriendsAndUser: jest.fn().mockResolvedValue(['footprint1']),
+        getFootprintsOfFriendsAndUser: jest.fn().mockResolvedValueOnce(['footprint1'])
+            .mockRejectedValueOnce(new NotFoundError('The user')),
     })),
 }))
 
@@ -107,7 +108,7 @@ describe('GetFootprintsOfFriendsAndUser', () => {
         const response = await request(server)
             .get('/footprints')
 
-        expect(response.status).toBe(404)
         expect(response.body).toStrictEqual(NotFoundError.getErrorDocument('The user'))
+        expect(response.status).toBe(404)
     })
 })
