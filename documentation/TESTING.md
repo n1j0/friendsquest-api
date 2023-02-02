@@ -2,6 +2,12 @@
 
 ## TESTING TOOLS
 
+### GENERAL
+
+#### SENTRY
+
+In order to track errors and crashes we use [Sentry](https://sentry.io/). It is used in the Flutter App (frontend) and the Express API (backend).
+
 ### BACKEND
 
 #### LINTING
@@ -78,7 +84,7 @@ Stryker has its own manual pipeline. This pipeline can be started manually for e
 
 A pull request to the "main" branch is just performed for a new releases.
 
-Before we create a new release branch we manually execute our E2E Tests just after the deployment to our staging system was successful. Only if all the tests are successful we create a new release.
+Before we create a new release branch we manually execute our [E2E Tests](#e2e-tests) just after the deployment to our staging system was successful. Only if all the tests are successful we create a new release.
 
 So the manual tests are kind of part of our pipeline.
 
@@ -96,9 +102,9 @@ Evaluate new features and bug fixes introduced for each new release.
 
 Generally, we tried to write as much unit tests as possible so the underlying code base for integration tests was well covered.
 
-The backend uses unit tests to test logical behaviour of classes / modules / components.
+The backend uses unit tests to test logical behaviour of classes / modules / components. All unit tests are located in the [tests/unit](../tests/unit) folder.
 
-The frontend uses unit tests to test logical behaviour as well as UI-related components (widgets).
+The frontend uses unit tests to test logical behaviour as well as UI-related components (widgets). The unit tests are located in the [test](https://gitlab.mediacube.at/fhs47806/friendsquest/-/tree/main/test) folder.
 
 ## REGRESSION TEST
 
@@ -114,7 +120,9 @@ Mostly done in our pipelines and pre-commit hook. E2E Tests, as stated, manually
 
 ### INTEGRATION TEST STRATEGY
 
-Evaluation of the integration between the routers, middlewares, controllers, services and repositories.
+Evaluation of the integration between the routers, middlewares, controllers, services and repositories. You can find the integration tests in the [tests/integration](../tests/integration) folder.
+
+Keep in mind that the integration tests are not testing the database. The database is mocked.
 
 ### INTEGRATION TEST CASES
 
