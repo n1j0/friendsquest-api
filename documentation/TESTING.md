@@ -83,7 +83,7 @@ flutter test --coverage
 
 The resulting coverage report combines unit and widget tests. It is generated with the following command: 
 ```
-lcov --remove coverage/lcov.info 'lib/api/*' 'lib/exceptions' 'lib/app/*'  'lib/theme/*' 'lib/packages/*' 'lib/screens/_root/*' 'lib/screens/image_viewer/*' 'lib/screens/imprint/*' 'lib/screens/onboarding/*' 'lib/screens/about/*' 'lib/screens/home/*' 'lib/screens/home_my_profile/*' 'lib/services/*' 'lib/exceptions/*' 'lib/widgets/globe_map.dart' 'lib/screens/footprint_create/footprint_create_camera_screen_controller.dart' 'lib/screens/footprint_create_screen.dart' 'lib/screens/privacy/*' -o coverage/exclude_lcov.info
+lcov --remove coverage/lcov.info 'lib/api/*' 'lib/exceptions' 'lib/app/*'  'lib/theme/*' 'lib/packages/*' 'lib/screens/_root/*' 'lib/screens/image_viewer/*' 'lib/screens/imprint/*' 'lib/screens/onboarding/*' 'lib/screens/about/*' 'lib/screens/home/*' 'lib/services/*' 'lib/exceptions/*' 'lib/widgets/globe_map.dart' 'lib/screens/footprint_create/footprint_create_camera_screen_controller.dart' 'lib/screens/footprint_create_screen.dart' 'lib/screens/footprint_create/footprint_create_camera_screen.dart' 'lib/screens/privacy/*' -o coverage/exclude_lcov.info
 ```
 
 A HTML representation of the report is generated with:
@@ -109,6 +109,7 @@ We are excluding some directories / files from the coverage report within the "l
 | screens/home/                                                           | not much code but hard to test                                                                                                    |
 | screens/privacy/                                                        | no logic                                                                                                                          |
 | screens/footprint_create/footprint_create_camera_screen_controller.dart | very hard to test, because it uses the device camera                                                                              |
+| screens/footprint_create/footprint_create_camera_screen.dart | very hard to test, because it uses the device camera                                                                              |
 | widgets/globe_map.dart                                                  | not testable (due to HTTP requests)                                                                                               |
 
 ## PIPELINE
