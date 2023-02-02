@@ -55,8 +55,8 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         ])
         const temperatureData = await this
             .footprintService
-            .getTemperature(latitude, longitude) as unknown as { main: { temp: number } }
-        const temperature = temperatureData?.main?.temp || undefined
+            .getTemperature(latitude, longitude)
+        const temperature = temperatureData?.main?.temp
         const footprint = new Footprint(
             title,
             user,
@@ -80,7 +80,7 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
     }
 
     // eslint-disable-next-line max-len
-    hasUserReactedOrCreatedFootprint = async (reactions : FootprintReaction[], footprint: Footprint, userId: number) => {
+    hasUserReactedToOrCreatedFootprint = async (reactions : FootprintReaction[], footprint: Footprint, userId: number) => {
         if (footprint.createdBy.id === userId) {
             return true
         }
@@ -97,11 +97,12 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         const reaction = new FootprintReaction(user, message, footprint)
         const reactions: FootprintReaction[] = await em.find('FootprintReaction', { footprint: { id } } as any)
         await em.persistAndFlush(reaction)
-        let isNotFirstReaction = false
+        let hasUserReactedToOrCreatedFootprint = false
         if (reactions) {
-            isNotFirstReaction = await this.hasUserReactedOrCreatedFootprint(reactions, footprint, user.id)
+            hasUserReactedToOrCreatedFootprint = await this
+                .hasUserReactedToOrCreatedFootprint(reactions, footprint, user.id)
         }
-        if (isNotFirstReaction) {
+        if (hasUserReactedToOrCreatedFootprint) {
             return {
                 reaction,
             }

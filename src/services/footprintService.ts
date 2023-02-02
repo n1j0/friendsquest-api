@@ -64,13 +64,13 @@ export class FootprintService {
         return downloadURLs
     }
 
-    getTemperature = async (latitude: string, longitude: string): Promise<unknown | undefined> => {
+    getTemperature = async (latitude: string, longitude: string): Promise<{ main: { temp: number } } | undefined> => {
         // eslint-disable-next-line max-len
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`)
         if (!response.ok) {
             return undefined
         }
-        return await response.json() as unknown as Promise<unknown>
+        return await response.json() as Promise<{ main: { temp: number } }>
     }
 
     uploadMiddleware = Multer({
