@@ -107,7 +107,6 @@ We are excluding some directories / files from the coverage report within the "l
 | screens/onboarding/                                                     | no logic                                                                                                                          |
 | screens/about/                                                          | no logic                                                                                                                          |
 | screens/home/                                                           | not much code but hard to test                                                                                                    |
-| screens/home_my_profile/                                                | ???                                                                                                                               |
 | screens/privacy/                                                        | no logic                                                                                                                          |
 | screens/footprint_create/footprint_create_camera_screen_controller.dart | very hard to test, because it uses the device camera                                                                              |
 | widgets/globe_map.dart                                                  | not testable (due to HTTP requests)                                                                                               |
