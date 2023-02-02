@@ -1,7 +1,6 @@
 import { Application, ErrorRequestHandler, NextFunction, Request, Response, Router as ExpressRouter } from 'express'
 import { RequestContext } from '@mikro-orm/core'
 import { getAuth } from 'firebase-admin/auth'
-import actuator from 'express-actuator'
 import * as Sentry from '@sentry/node'
 import { join } from 'node:path'
 import { firebaseRoutes } from './router/_firebaseAuth.js'
@@ -15,7 +14,6 @@ import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
-import { actuatorConfig } from './config/actuator.config.js'
 
 export class Router {
     private server: Application
@@ -50,8 +48,6 @@ export class Router {
         auth = getAuth(),
     ) => {
         this.server.use(this.createRequestContext)
-
-        this.server.use(actuator(actuatorConfig))
 
         routes.forEach((route) => {
             this.server.use(

@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'testing'
+
 process.env.DB_USER = 'user'
 process.env.DB_PASSWORD = 'password'
 process.env.DB_DATABASE = 'dbName'

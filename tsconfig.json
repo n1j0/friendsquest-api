@@ -21,7 +21,8 @@
       "multer",
       "express-actuator",
       "jest",
-      "compression"
+      "compression",
+      "supertest"
     ]
   },
   "include": [
