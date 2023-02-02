@@ -56,6 +56,10 @@ We use SonarCloud to check our code for several issues (security issues, code sm
 
 In order to check if our Unit Tests are well written, we're using [stryker](https://stryker-mutator.io/). This tool mutates the original code and checks if the corresponding tests will fail. If they still succeed, the mutant wasn't killed and the test itself seems to be not that good.
 
+#### Uptime Robot
+
+We use [Uptime Robot](https://stats.uptimerobot.com/nk7vOfXEJX) to check if our API is up and running.
+
 ### FRONTEND
 
 #### Linting
