@@ -15,8 +15,6 @@ jest.mock('swagger-ui-express', () => ({
     setup: jest.fn().mockImplementation(() => jest.fn()),
 }))
 
-jest.mock('express-actuator', () => jest.fn().mockReturnValue('actuator'))
-
 jest.mock('@mikro-orm/core', () => ({
     RequestContext: {
         create: jest.fn(),
@@ -96,24 +94,20 @@ describe('Router', () => {
             expect(server.use).toHaveBeenNthCalledWith(1, router.createRequestContext)
         })
 
-        it('calls "actuator"', () => {
-            expect(server.use).toHaveBeenNthCalledWith(2, 'actuator')
-        })
-
         it('generates "firebase" route', () => {
-            expect(server.use).toHaveBeenNthCalledWith(3, '/firebase', 'basicAuth', 'firebaseRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(2, '/firebase', 'basicAuth', 'firebaseRoutes')
         })
 
         it('sets sentry middleware', () => {
-            expect(server.use).toHaveBeenNthCalledWith(5, 'errorHandler')
+            expect(server.use).toHaveBeenNthCalledWith(4, 'errorHandler')
         })
 
         it('sets custom 404 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(6, router.custom404)
+            expect(server.use).toHaveBeenNthCalledWith(5, router.custom404)
         })
 
         it('sets custom 500 page', () => {
-            expect(server.use).toHaveBeenNthCalledWith(7, router.custom500)
+            expect(server.use).toHaveBeenNthCalledWith(6, router.custom500)
         })
     })
 
@@ -142,7 +136,7 @@ describe('Router', () => {
             router.initRoutes(routes, authMiddleware, auth as unknown as Auth)
             expect(authMiddleware).toHaveBeenCalledTimes(2)
             expect(authMiddleware).toHaveBeenCalledWith(auth)
-            expect(server.use).toHaveBeenNthCalledWith(3, routes[0].path, 'authMiddleware', 'someRoutes')
+            expect(server.use).toHaveBeenNthCalledWith(2, routes[0].path, 'authMiddleware', 'someRoutes')
         })
     })
 

@@ -1,4 +1,3 @@
-import { Server } from 'node:http'
 import { config } from 'dotenv'
 import { startApplication } from '../../../src/helper/startApplication'
 import { ORM } from '../../../src/orm'
@@ -17,16 +16,11 @@ jest.mock('dotenv', () => ({
 }))
 
 describe('startApplication', () => {
-    let server: Server | string | undefined
-
     beforeEach(() => {
         ORM.init = jest.fn().mockImplementation(() => 'orm-init')
     })
 
     afterEach(() => {
-        if (server && typeof server !== 'string') {
-            server.close()
-        }
         jest.clearAllMocks()
     })
 
@@ -35,11 +29,11 @@ describe('startApplication', () => {
     })
 
     it('should start application without error', () => {
-        expect(async () => { server = await startApplication() }).not.toThrow()
+        expect(async () => startApplication()).not.toThrow()
     })
 
     it('should start application with correct setup', async () => {
-        server = await startApplication()
+        const server = await startApplication()
         expect(config).toHaveBeenCalled()
         expect(ORM.init).toHaveBeenCalled()
         expect(Application).toHaveBeenCalledWith('orm-init', 'express')
@@ -50,7 +44,7 @@ describe('startApplication', () => {
         const error = new Error('test')
         ORM.init = jest.fn().mockImplementation(() => { throw error })
         jest.spyOn(console, 'error').mockImplementation(() => {})
-        server = await startApplication()
+        await startApplication()
         expect(console.error).toHaveBeenCalledWith(error)
     })
 })
