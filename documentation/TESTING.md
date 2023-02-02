@@ -197,6 +197,8 @@ Keep in mind that the integration tests are not testing the database. The databa
 
 ### INTEGRATION TEST CASES
 
+**Problem**: During the integration tests we had a lot of problems with the supertest package. Due to the fact that the package has a lot of issues [Github-Issues](https://github.com/ladjs/supertest/issues) we couldn't test the whole API (only errors).
+
 | directory / file                        | description                                                              |
 |-----------------------------------------|--------------------------------------------------------------------------|
 | footprint/createFootprint               | Create a footprint with given parameters (e.g. title, image, audio, ...) |
