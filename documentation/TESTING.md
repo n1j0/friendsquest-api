@@ -38,6 +38,16 @@ The code coverage is measured with the default "jest" reporter. The coverage is 
 
 The coverage report combines unit and integration test coverage. In the presentation the reports are shown separately and in combination.
 
+We are excluding some directories / files from the coverage report within the "./src" folder. These are:
+
+| directory / file              | reason                                                                                             |
+|-------------------------------|----------------------------------------------------------------------------------------------------|
+| admin                         | is just for developers and therefor wasn't prioritised for tests                                   |
+| docs                          | includes just a config file for swagger                                                            |
+| entities, migrations, seeders | mikro-orm related "helper" files                                                                   |
+| index.ts                      | node entry point                                                                                   |
+| router/_firebaseAuth.ts       | this route is for developers in the swagger docs and is not used by end-users (password protected) |
+
 #### SonarCloud
 
 We use SonarCloud to check our code for several issues (security issues, code smells, bugs, vulnerabilities).
