@@ -10,7 +10,7 @@ import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.config.js'
 import { routes } from './router/routes.js'
-import { actuatorConfig } from './config/actuator.config'
+import { actuatorConfig } from './config/actuator.config.js'
 
 export default class Application {
     server: ExpressApplication
