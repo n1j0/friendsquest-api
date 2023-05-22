@@ -153,6 +153,16 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         return em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
     }
 
+    getFootprintsOfSpecificUser = async (fc: string) => {
+        const em = this.orm.forkEm()
+        const user = await this.userRepository.getUserByFriendsCode(fc)
+        return em.find(
+            'Footprint',
+            { createdBy: user } as any,
+            { populate: ['createdBy'] } as any,
+        )
+    }
+
     getFootprintsOfFriendsAndUser = async (uid: string) => {
         const em = this.orm.forkEm()
         const user = await this.userRepository.getUserByUid(uid)

@@ -14,6 +14,7 @@ import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
+import { SchnitzeljagdRouter } from "./router/_schnitzeljagd";
 
 export class Router {
     private server: Application
@@ -59,6 +60,8 @@ export class Router {
         })
 
         this.server.use('/firebase', basicAuth(), firebaseRoutes)
+
+        this.server.use('/schnitzeljagd', new SchnitzeljagdRouter(ExpressRouter(), this.orm).createAndReturnRoutes())
 
         this.server.set('view engine', 'ejs')
         this.server.set('views', join(currentPath.default, './views'))

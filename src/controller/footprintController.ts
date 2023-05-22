@@ -33,6 +33,14 @@ export class FootprintController {
         }
     }
 
+    getFootprintsOfSpecificUser = async ({ fc }: { fc: string }, response: Response) => {
+        try {
+            return ResponseSender.result(response, 200, await this.footprintRepository.getFootprintsOfSpecificUser(fc))
+        } catch (error: any) {
+            return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
     getFootprintById = async ({ uid, id }: { uid: string, id: number | string }, response: Response) => {
         try {
             const { footprint, points, userPoints } = await this.footprintRepository.getFootprintById(uid, id)
