@@ -11,7 +11,7 @@ export interface FootprintRepositoryInterface {
     deleteFootprint({ id, uid }: { id: number | string, uid: string }): Promise<[void[], void]>
     deleteFootprintReaction({ id, uid }: { id: number | string, uid: string }): Promise<void>
     getAllFootprints(): Promise<object[]>
-    getFootprintsOfSpecificUser(fc: string): Promise<object[]>
+    getFootprintsOfSpecificFriendsCode(fc: string): Promise<object[]>
     getFootprintsOfFriendsAndUser(uid: string): Promise<object[]>
     getFootprintById(
         uid: string,
@@ -24,4 +24,5 @@ export interface FootprintRepositoryInterface {
         footprint: Footprint,
         userId: number
     ): Promise<boolean>
+    schnitzelJagd(fc: string, schnitzelUser?: string): Promise<any>
 }

@@ -14,7 +14,7 @@ import { AdminRouter } from './admin/admin.js'
 // @ts-ignore
 import * as currentPath from './admin/currentPath.cjs'
 import { basicAuth } from './admin/middlewares/basicAuth.js'
-import { SchnitzeljagdRouter } from "./router/_schnitzeljagd";
+import { SchnitzeljagdRouter } from './router/_schnitzeljagd.js'
 
 export class Router {
     private server: Application

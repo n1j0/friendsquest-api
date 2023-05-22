@@ -153,7 +153,34 @@ export class FootprintPostgresRepository implements FootprintRepositoryInterface
         return em.getRepository('Footprint').findAll({ populate: ['createdBy'] } as any)
     }
 
-    getFootprintsOfSpecificUser = async (fc: string) => {
+    schnitzelJagd = async (fc: string, schnitzelUser = process.env.SCHNITZEL_USER || '0000U1') => {
+        const [ userToCheck, footprints ] = await Promise.all([
+            this.userRepository.getUserByFriendsCode(fc),
+            this.getFootprintsOfSpecificFriendsCode(schnitzelUser.toUpperCase()) as Promise<Footprint[]>,
+        ])
+        const [ reactions, viewed ] = await Promise.all([
+            Promise.all(footprints.map(async (f: Footprint) => {
+                if (!f.reactions.isInitialized()) {
+                    await f.reactions.init()
+                }
+                return f.reactions.getItems().find(r => r.createdBy.id === userToCheck.id)
+            })),
+            Promise.all(footprints.map(async (f: Footprint) => {
+                if (!f.users.isInitialized()) {
+                    await f.users.init()
+                }
+                return f.users.getItems().find(u => u.id === userToCheck.id)
+            })),
+        ])
+
+        return {
+            footprints: footprints.length,
+            viewed: viewed.filter(item => !!item).length,
+            reactions: reactions.filter(item => !!item).length,
+        }
+    }
+
+    getFootprintsOfSpecificFriendsCode = async (fc: string) => {
         const em = this.orm.forkEm()
         const user = await this.userRepository.getUserByFriendsCode(fc)
         return em.find(

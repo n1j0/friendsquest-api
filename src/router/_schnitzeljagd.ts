@@ -11,14 +11,9 @@ import { FriendshipPostgresRepository } from '../repositories/friendship/friends
 import { FootprintRepositoryInterface } from '../repositories/footprint/footprintRepositoryInterface.js'
 import { FootprintPostgresRepository } from '../repositories/footprint/footprintPostgresRepository.js'
 import { FootprintController } from '../controller/footprintController.js'
-import { UserController } from '../controller/userController.js'
 
 export class SchnitzeljagdRouter implements RouterInterface {
     readonly router: Router
-
-    private readonly userController: UserController
-
-    private readonly footprintService: FootprintService
 
     private readonly footprintController: FootprintController
 
@@ -29,7 +24,6 @@ export class SchnitzeljagdRouter implements RouterInterface {
         userService: UserService = new UserService(),
         deletionService: DeletionService = new DeletionService(),
         userRepository: UserRepositoryInterface = new UserPostgresRepository(userService, deletionService, orm),
-        userController: UserController = new UserController(userRepository),
         friendshipRepository: FriendshipRepositoryInterface = new FriendshipPostgresRepository(userRepository, orm),
         footprintRepository: FootprintRepositoryInterface = new FootprintPostgresRepository(
             footprintService,
@@ -41,8 +35,6 @@ export class SchnitzeljagdRouter implements RouterInterface {
         footprintController: FootprintController = new FootprintController(footprintRepository),
     ) {
         this.router = router
-        this.userController = userController
-        this.footprintService = footprintService
         this.footprintController = footprintController
     }
 
@@ -52,14 +44,7 @@ export class SchnitzeljagdRouter implements RouterInterface {
             if (!fc) {
                 return response.status(400).send('No fc provided')
             }
-            /* eslint-disable max-len */
-            const footprintsOfSchnitzelJagdUser = await this.footprintController.getFootprintsOfSpecificUser({ fc: '00001' }, response)
-            const userToCheck = await this.userController.getUserByFriendsCode({ fc: fc.toString().toUpperCase() } as any, response)
-            /* eslint-enable max-len */
-            if (!userToCheck) {
-                return response.status(404).send('User not found')
-            }
-            return userToCheck
+            return this.footprintController.schnitzelJagd({ fc: fc.toString().toUpperCase() } as any, response)
         })
     }
 

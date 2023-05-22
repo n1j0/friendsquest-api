@@ -33,9 +33,9 @@ export class FootprintController {
         }
     }
 
-    getFootprintsOfSpecificUser = async ({ fc }: { fc: string }, response: Response) => {
+    schnitzelJagd = async ({ fc }: { fc: string }, response: Response) => {
         try {
-            return ResponseSender.result(response, 200, await this.footprintRepository.getFootprintsOfSpecificUser(fc))
+            return ResponseSender.result(response, 200, await this.footprintRepository.schnitzelJagd(fc))
         } catch (error: any) {
             return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
