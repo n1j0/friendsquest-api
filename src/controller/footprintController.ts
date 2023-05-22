@@ -37,6 +37,9 @@ export class FootprintController {
         try {
             return ResponseSender.result(response, 200, await this.footprintRepository.schnitzelJagd(fc))
         } catch (error: any) {
+            if (error instanceof NotFoundError) {
+                return ResponseSender.error(response, NotFoundError.getErrorDocument('The user'))
+            }
             return ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
         }
     }
