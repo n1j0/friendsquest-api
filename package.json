@@ -29,7 +29,7 @@
   "type": "module",
   "engines": {
     "node": "^16.17.x",
-    "npm": "^9.x.x"
+    "npm": "^8.x.x"
   },
   "dependencies": {
     "@mikro-orm/core": "^5.7.11",
