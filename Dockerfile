@@ -6,5 +6,7 @@ COPY . .
 
 FROM base AS build
 
+ENV NODE_ENV=production
+RUN npm i -g npm@9 pm2
 RUN npm i --prefer-offline --no-audit --ignore-scripts
-CMD npm run start
+CMD npm run start-docker
