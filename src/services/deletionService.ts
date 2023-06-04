@@ -13,8 +13,8 @@ export class DeletionService {
         let imagePath: string = url.replace(BASEURL, '')
 
         imagePath = imagePath.slice(0, Math.max(0, imagePath.indexOf('?')))
-        imagePath = imagePath.replace(/%2F/g, '/')
-        return imagePath.replace(/%20/g, ' ')
+        imagePath = imagePath.replaceAll('%2F', '/')
+        return imagePath.replaceAll('%20', ' ')
     }
 
     deleteFilesOfOneFootprint = async (audioUrl: string, imageUrl: string) => {
