@@ -9,7 +9,7 @@ export class FriendshipAlreadyExistsError extends Error {
         return Mapper.mapError({
             detail: 'The friendship already exists.',
             status: 400,
-            type: `http://tempuri.org/${getReasonPhrase(400).replace(/\s+/g, '')}`,
+            type: `http://tempuri.org/${getReasonPhrase(400).replaceAll(/\s+/g, '')}`,
         })
     }
 }

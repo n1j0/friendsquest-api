@@ -9,7 +9,7 @@ export class NegativeNumbersNotAllowedError extends Error {
         return Mapper.mapError({
             detail: 'Negative numbers not allowed.',
             status: 400,
-            type: `http://tempuri.org/${getReasonPhrase(400).replace(/\s+/g, '')}`,
+            type: `http://tempuri.org/${getReasonPhrase(400).replaceAll(/\s+/g, '')}`,
         })
     }
 }
