@@ -19,12 +19,14 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_HOST: db
       PORT: ${PORT}
+      PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
+      PM2_SECRET_KEY: ${PM2_SECRET_KEY}
     ports:
       - ${PORT}:${PORT}
     volumes:
       - ./src:/app/src/
       - /src/node_modules
-    command: npm run dev
+    command: npm run start-docker
   db:
     container_name: postgres
     image: postgres:13.2
