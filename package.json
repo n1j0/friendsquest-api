@@ -8,6 +8,7 @@
     "clean": "rimraf .out/",
     "copy": "copyfiles -u 1 src/**/*.cjs src/**/*.ejs .out/src",
     "start": "npm run clean && npm run copy && tsc && NODE_OPTIONS=\"--loader ts-node/esm\" NODE_ENV=production node ./.out/src/index.js",
+    "start-docker": "npm run clean && npm run copy && tsc && pm2-docker start ecosystem.config.cjs",
     "lint": "eslint --ext .js,.cjs,.mjs,.ts --color --cache --cache-location temp/.eslintcache --ignore-path ./.gitignore .",
     "lintfix": "npm run lint -- --fix",
     "typecheck": "tsc",
