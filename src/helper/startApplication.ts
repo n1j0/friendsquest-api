@@ -1,10 +1,9 @@
 import { config } from 'dotenv'
 import express from 'express'
-import { Server } from 'node:http'
 import { ORM } from '../orm.js'
 import Application from '../application.js'
 
-export const startApplication = async (): Promise<Server | undefined> => {
+export const startApplication = async (): Promise<express.Application | undefined> => {
     config()
 
     try {

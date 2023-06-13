@@ -9,7 +9,7 @@ export class InternalServerError extends Error {
         return Mapper.mapError({
             detail: `${(ErrorString)}`,
             status: StatusCodes.INTERNAL_SERVER_ERROR,
-            type: `http://tempuri.org/${getReasonPhrase(500).replace(/\s+/g, '')}`,
+            type: `http://tempuri.org/${getReasonPhrase(500).replaceAll(/\s+/g, '')}`,
         })
     }
 }

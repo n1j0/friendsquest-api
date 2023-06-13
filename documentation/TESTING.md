@@ -1,30 +1,173 @@
 # Test Plan Document
 
-- [IDENTIFICATION INFORMATION](#identification-information)
-    - [PRODUCT](#product)
-    - [PROJECT DESCRIPTION](#project-description)
-- [UNIT TEST](#unit-test)
-    - [UNIT TEST STRATEGY](#unit-test-strategy)
-- [REGRESSION TEST](#regression-test)
-    - [REGRESSION TEST STRATEGY](#regression-test-strategy)
-- [INTEGRATION TEST](#integration-test)
-    - [INTEGRATION TEST STRATEGY](#integration-test-strategy)
-    - [INTEGRATION TEST CASES](#integration-test-cases)
-- [E2E TESTS](#e2e-tests)
-    - [USER ACCEPTANCE TEST STRATEGY](#e2e-test-strategy)
-    - [USER ACCEPTANCE TEST CASES](#e2e-test-cases)
+## TESTING TOOLS
 
-## IDENTIFICATION INFORMATION
+### GENERAL
 
-### PRODUCT
+#### SENTRY
 
-- **Product Name:** FriendsQuest
-- **Product Type:** Mobile Application
-- **Product Part:** API (Backend)
+In order to track errors and crashes we use [Sentry](https://sentry.io/). It is used in the Flutter App (frontend) and the Express API (backend).
 
-### PROJECT DESCRIPTION
+### BACKEND
 
-Travel the world and capture the most special moments as footprints on your globe. Follow the footprints of your friends and react on their memories. USE CASE you are too far away to see what's behind the footprint just listen to the sounds behind the memory.
+#### LINTING
+
+The backend is linted with [ESLint](https://eslint.org/). The linting rules are defined in the `.eslintrc.cjs` file.
+
+#### TYPECHECK
+
+Around 97 % of the code is written in TypeScript. We use "tsc" in order to check our files and compile them to js.
+
+#### PRE-COMMIT HOOK
+
+Before a commit all staged files will be analyzed with ESLint, tsc and all related tests will be executed. If any of the steps fails, the developer is not able to make a commit.
+
+This "prevents" general "bad" static code in the repository.
+
+#### JEST
+
+We use "jest" to write our tests. For easier mocking "jest-mock-extended" is just. This library accepts classes / interfaces and automatically creates mocks.
+
+#### SUPERTEST
+
+The integration tests are written with "supertest". This module provides a high-level abstraction for testing APIs (HTTP) and integrates perfectly into "jest".
+
+#### CODE COVERAGE
+
+The code coverage is measured with the default "jest" reporter. The coverage is measured with the `npm run test:coverage` command.
+
+The coverage report combines unit and integration test coverage. In the presentation the reports are shown separately and in combination.
+
+We are excluding some directories / files from the coverage report within the "./src" folder. These are:
+
+| directory / file              | reason                                                                                             |
+|-------------------------------|----------------------------------------------------------------------------------------------------|
+| admin                         | is just for developers and therefor wasn't prioritised for tests                                   |
+| docs                          | includes just a config file for swagger                                                            |
+| entities, migrations, seeders | mikro-orm related "helper" files                                                                   |
+| index.ts                      | node entry point                                                                                   |
+| router/_firebaseAuth.ts       | this route is for developers in the swagger docs and is not used by end-users (password protected) |
+
+#### SonarCloud
+
+We use SonarCloud to check our code for several issues (security issues, code smells, bugs, vulnerabilities).
+
+#### Stryker
+
+In order to check if our Unit Tests are well written, we're using [stryker](https://stryker-mutator.io/). This tool mutates the original code and checks if the corresponding tests will fail. If they still succeed, the mutant wasn't killed and the test itself seems to be not that good.
+
+#### Uptime Robot
+
+We use [Uptime Robot](https://stats.uptimerobot.com/nk7vOfXEJX) to check if our API is up and running.
+
+### FRONTEND
+
+#### Linting
+
+For static code analysis we use the `flutter analyze` command. The linting config is specified in `analysis_options.yaml` (frontend).
+
+#### test 
+
+For unit tests we use the Flutter [test](https://pub.dev/packages/test) package.
+
+#### flutter_test
+
+For widget tests (UI) we use the Flutter [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) package.
+
+#### Mockito
+
+For generating mocks we use the Flutter [mockito](https://pub.dev/packages/mockito) package.
+
+#### Code coverage
+
+The code coverage is measured with the following command: 
+```
+flutter test --coverage
+```
+
+The resulting coverage report combines unit and widget tests. It is generated with the following command: 
+```
+lcov --remove coverage/lcov.info 'lib/api/*' 'lib/exceptions' 'lib/app/*'  'lib/theme/*' 'lib/packages/*' 'lib/screens/_root/*' 'lib/screens/image_viewer/*' 'lib/screens/imprint/*' 'lib/screens/onboarding/*' 'lib/screens/about/*' 'lib/screens/home/*' 'lib/services/*' 'lib/exceptions/*' 'lib/widgets/globe_map.dart' 'lib/screens/footprint_create/footprint_create_camera_screen_controller.dart' 'lib/screens/footprint_create_screen.dart' 'lib/screens/footprint_create/footprint_create_camera_screen.dart' 'lib/screens/privacy/*' -o coverage/exclude_lcov.info
+```
+
+A HTML representation of the report is generated with:
+```
+genhtml coverage/exclude_lcov.info -o coverage/html
+open coverage/html/index.html
+``` 
+
+We are excluding some directories / files from the coverage report within the "lib" folder. These are:
+
+| directory / file                                                        | reason                                                                                                                            |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| api/                                                                    | contains just a wrapper for the Dart `http` package                                                                               |
+| app/                                                                    | contains just config, constants, and routing information/logic                                                                    |
+| exceptions/                                                             | contains just pure Exception classes (no logic)                                                                                   |
+| theme/                                                                  | contains just colors, button styles, text styles, etc.                                                                            |
+| services/                                                               | contains just interfaces and their implementation (which are just wrappers for packages and device features such as camera, etc.) |
+| screens/_root/                                                          | not much code but hard to test                                                                                                    |
+| screens/image_viewer/                                                   | no logic                                                                                                                          |
+| screens/imprint/                                                        | no logic                                                                                                                          |
+| screens/onboarding/                                                     | no logic                                                                                                                          |
+| screens/about/                                                          | no logic                                                                                                                          |
+| screens/home/                                                           | not much code but hard to test                                                                                                    |
+| screens/privacy/                                                        | no logic                                                                                                                          |
+| screens/footprint_create/footprint_create_camera_screen_controller.dart | very hard to test, because it uses the device camera                                                                              |
+| screens/footprint_create/footprint_create_camera_screen.dart | very hard to test, because it uses the device camera                                                                              |
+| widgets/globe_map.dart                                                  | not testable (due to HTTP requests)                                                                                               |
+
+## PIPELINE
+
+### BACKEND
+
+The pipeline includes several steps:
+
+1. npm install
+2. running ESLint
+3. running typecheck
+4. running ALL unit and integration tests
+5. coverage report uploading (as artifact)
+6. showing summarized coverage report as GitHub comment for pull requests
+
+The steps 2 to 4 could run in parallel. But it's faster when they're running in sequence due to the amount of times it takes to upload the node_modules artifact / cache and download it for each step.
+
+These steps will be performed for every push to "feature/*" branches and "develop". Moreover, each pull request for develop or main triggers these steps, too.
+
+For every pull request and every push to "develop" SonarCloud starts to analyze the new code and adds a comment to the pull request regarding the quality of the newly written code.
+
+If every step was successful, it's possible to merge a pull request.
+
+After merging, the deployment process / pipeline starts automatically:
+
+1. Setting up SSH
+2. Pushing to server
+   1. Pushing to staging system (if branch "develop")
+   2. Pushing to production system (if branch "main")
+
+Stryker has its own manual pipeline. This pipeline can be started manually for every branch within the GitHub Actions tab. The process takes a very long time (around 20-30 minutes). Right now, the report can be downloaded from the GitHub artifacts and is not accessible via a URL.
+
+A pull request to the "main" branch is just performed for a new releases.
+
+Before we create a new release branch we manually execute our [E2E Tests](#e2e-tests) just after the deployment to our staging system was successful. Only if all the tests are successful we create a new release.
+
+So the manual tests are kind of part of our pipeline.
+
+### FRONTEND
+
+We use [Codemagic](https://codemagic.io/start/) as CI/CD tool. 
+
+![Pipeline Frontend](/documentation/pipeline-frontend.png)
+
+The pipeline includes several steps:
+
+1. Fetching app sources: fetches the source code from our GitLab
+2. Setup code signing identities: keys and secrets required to sign the app for Android
+3. Installing dependencies: installs all dependencies 
+4. Testing: performs static code analysis and executes all unit and widget tests 
+5. Building Android: builds the app bundle
+6. Publishing: publishes the app in the Google Play Store
+
+The pipeline is triggered each time code is committed or merged into the `main` branch. 
 
 ## UNIT TEST
 
@@ -32,7 +175,11 @@ Travel the world and capture the most special moments as footprints on your glob
 
 Evaluate new features and bug fixes introduced for each new release.
 
-{{ missing information }}
+Generally, we tried to write as much unit tests as possible so the underlying code base for integration tests was well covered.
+
+The backend uses unit tests to test logical behaviour of classes / modules / components. All unit tests are located in the [tests/unit](../tests/unit) folder.
+
+The frontend uses unit tests to test logical behaviour as well as UI-related components (widgets). The unit tests are located in the [test](https://gitlab.mediacube.at/fhs47806/friendsquest/-/tree/main/test) folder.
 
 ## REGRESSION TEST
 
@@ -40,17 +187,32 @@ Ensure that previously developed and tested software still performs after change
 
 ### REGRESSION TEST STRATEGY
 
-Evaluate all tests/reports introduced in the previous releases.
+Evaluation of all tests of the previous releases.
 
-## INTEGRATION TEST
+Mostly done in our pipelines and pre-commit hook. E2E Tests, as stated, manually. 
 
-Combine individual software modules and test as a group.
+## INTEGRATION TEST (only backend)
 
 ### INTEGRATION TEST STRATEGY
 
-Evaluation of the integration between the routers, controllers and repositories.
+Evaluation of the integration between the routers, middlewares, controllers, services and repositories. You can find the integration tests in the [tests/integration](../tests/integration) folder.
+
+Keep in mind that the integration tests are not testing the database. The database is mocked.
 
 ### INTEGRATION TEST CASES
+
+**Problem**: During the integration tests we had a lot of problems with the supertest package. Due to the fact that the package has a lot of issues [Github-Issues](https://github.com/ladjs/supertest/issues) we couldn't test the whole API (only errors).
+
+| directory / file                        | description                                                              |
+|-----------------------------------------|--------------------------------------------------------------------------|
+| footprint/createFootprint               | Create a footprint with given parameters (e.g. title, image, audio, ...) |
+| footprint/getAllFootprints              | Return all footprints of all users                                       |
+| footprint/getFootprintsOfFriendsAndUser | Return all footprints from friends and the user itself with given uid    |
+| friendship/acceptFriendship             | Accept a friendship with given id                                        |
+| friendship/createFriendship             | Create a friendship with given friendscode                               |
+| user/createUser                         | Create an user with given email and username                             |
+| user/getUserByFriendsCode               | Return an user with given friendscode                                    |
+
 
 ## E2E TESTS
 
@@ -64,11 +226,15 @@ After a pull request into `develop` was closed successfully the api will be depl
 
 Currently, the E2E tests are executed locally with different virtual devices in Android Studio and Xcode using the "dev" branch of the frontend.
 
-The beta programm of the different App Stores will be used in the near future to connect to the staging environment and run the E2E Tests. 
+The beta programm of the different App Stores will be used in the near future to connect to the staging environment and run the E2E Tests on real devices.
 
 ### E2E TEST CASES
 
 All the test cases are written for the English UI (so labels might differ for other languages).
+
+**Note:** The test cases are written for the current state of the app. The test cases will be updated accordingly.
+
+**ATTENTION:** For every test case the user has to be online. If the user is offline the app cannot be used.
 
 #### Account
 

@@ -5,11 +5,12 @@ import compression from 'compression'
 import { cert, initializeApp } from 'firebase-admin/app'
 import * as Sentry from '@sentry/node'
 import * as Tracing from '@sentry/tracing'
-import * as http from 'node:http'
+import actuator from 'express-actuator'
 import { Router } from './router.js'
 import { ORM } from './orm.js'
 import { serviceAccountConfig } from './config/firebaseServiceAccount.config.js'
 import { routes } from './router/routes.js'
+import { actuatorConfig } from './config/actuator.config.js'
 
 export default class Application {
     server: ExpressApplication
@@ -25,6 +26,7 @@ export default class Application {
         this.server = server
         this.router = new Router(this.server, this.orm)
         this.port = Number.parseInt(process.env.PORT as string, 10)
+
         initializeApp({
             credential: cert(serviceAccountConfig),
             storageBucket: `gs://${process.env.FIREBASE_STORAGE_BUCKET}/`,
@@ -45,6 +47,9 @@ export default class Application {
             tracesSampleRate: 1,
             release: `friendsquest-api@${process.env.npm_package_version}`,
         })
+
+        this.server.use(Sentry.Handlers.requestHandler())
+        this.server.use(Sentry.Handlers.tracingHandler())
     }
 
     migrate = async (): Promise<void> => {
@@ -59,7 +64,7 @@ export default class Application {
         }
     }
 
-    init = async (): Promise<http.Server | undefined> => {
+    init = async (): Promise<ExpressApplication | undefined> => {
         await this.migrate()
 
         this.server.use(json())
@@ -67,15 +72,18 @@ export default class Application {
         this.server.use(helmet())
         this.server.use(cors())
         this.server.use(compression())
-        this.server.use(Sentry.Handlers.requestHandler())
-        this.server.use(Sentry.Handlers.tracingHandler())
+        this.server.use(actuator(actuatorConfig))
 
         this.server.disable('x-powered-by')
 
         this.router.initRoutes(routes)
 
         try {
-            return this.server.listen(this.port)
+            // @see https://github.com/ladjs/supertest/issues/697#issuecomment-1312146374
+            if (process.env.NODE_ENV !== 'testing') {
+                this.server.listen(this.port)
+            }
+            return this.server
         } catch (error: any) {
             console.error('Could not start server', error)
             return undefined

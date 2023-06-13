@@ -1,1 +1,5 @@
+WAIT=10
+TIMEOUT=30
+ATTEMPTS=10
+
 /health-plain UP

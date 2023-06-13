@@ -18,4 +18,9 @@ export interface FootprintRepositoryInterface {
     ): Promise<{ footprint: Footprint, points?: number, userPoints?: number }>
     getFootprintReactions(id: number | string): Promise<any[]>
     findFootprintById(id: number | string): Promise<Footprint>
+    hasUserReactedToOrCreatedFootprint(
+        reactions: FootprintReaction[],
+        footprint: Footprint,
+        userId: number
+    ): Promise<boolean>
 }

@@ -9,7 +9,7 @@ export class UnauthorizedError extends Error {
         return Mapper.mapError({
             detail: `${(ErrorString)}`,
             status: StatusCodes.UNAUTHORIZED,
-            type: `http://tempuri.org/${getReasonPhrase(401).replace(/\s+/g, '')}`,
+            type: `http://tempuri.org/${getReasonPhrase(401).replaceAll(/\s+/g, '')}`,
         })
     }
 }
