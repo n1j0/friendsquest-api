@@ -11,4 +11,5 @@ export interface UserRepositoryInterface {
                userData: { username: string, email: string }): Promise<{ user: User, points: number }>
     deleteUser(id: number | string): Promise<[void, void[]]>
     addPoints(uid: string, points: number): Promise<User>
+    updateMessageToken(uid: string, messageToken: string): Promise<void>
 }

@@ -27,6 +27,9 @@ export class User extends BaseEntity {
     @ManyToMany()
     public footprints: Collection<Footprint> = new Collection<Footprint>(this)
 
+    @Property()
+    public msgToken?: string
+
     constructor(email: string, uid: string, username: string) {
         super()
         this.email = email

@@ -83,6 +83,13 @@ export class UserPostgresRepository implements UserRepositoryInterface {
         return { user, points: Points.PROFILE_EDITED }
     }
 
+    updateMessageToken = async (uid: string, messageToken: string): Promise<void> => {
+        const em = this.orm.forkEm()
+        const userByUid = await this.getUserByUid(uid)
+        const userWithNewToken = em.assign(userByUid, { msgToken: messageToken })
+        return em.persistAndFlush(userWithNewToken)
+    }
+
     deleteUser = async (uid: string) => {
         const em = this.orm.forkEm()
         const user = await this.getUserByUid(uid)

@@ -373,6 +373,57 @@ export class UserRouter implements RouterInterface {
         )
     }
 
+    updateMessageTokenHandler = (request: Request, response: Response) => this.userController.updateMessageToken(
+        { token: request.body.token, uid: request.headers[String(AUTH_HEADER_UID)] as string },
+        response,
+    )
+
+    generateUpdateMessageTokenRoute = () => {
+        /**
+         * @openapi
+         * /users/message-token:
+         *   patch:
+         *     summary: Update/set the message token of a user
+         *     tags:
+         *       - User
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               token:
+         *                 type: string
+         *                 description: The message token of the user
+         *             required:
+         *               - token
+         *     responses:
+         *       204:
+         *         description: Returns nothing
+         *       400:
+         *         $ref: '#/components/responses/BadRequest'
+         *       404:
+         *         $ref: '#/components/responses/NotFound'
+         */
+        this.router.patch(
+            '/message-token',
+            [
+                body('token')
+                    .isString()
+                    .withMessage(
+                        {
+                            message: 'Token must be a string',
+                            type: AttributeInvalidError,
+                        },
+                    )
+                    .trim(),
+            ],
+            errorHandler,
+            this.updateMessageTokenHandler,
+        )
+    }
+
     deleteUserHandler = (request: Request, response: Response) => this.userController.deleteUser(
         { uid: request.headers[String(AUTH_HEADER_UID)] as string },
         response,
@@ -405,6 +456,7 @@ export class UserRouter implements RouterInterface {
         this.generateCreateUserRoute()
         this.generateUpdateUserRoute()
         this.generateDeleteUserRoute()
+        this.generateUpdateMessageTokenRoute()
 
         return this.router
     }

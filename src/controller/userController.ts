@@ -97,6 +97,17 @@ export class UserController {
         }
     }
 
+    updateMessageToken = async ({ token, uid }: { token: string, uid: string }, response: Response) => {
+        try {
+            await this.userRepository.updateMessageToken(uid, token)
+            return response.sendStatus(204)
+        } catch (error: any) {
+            return error instanceof NotFoundError
+                ? this.userNotFoundError(response)
+                : ResponseSender.error(response, InternalServerError.getErrorDocument(error.message))
+        }
+    }
+
     updateUser = async (
         { email, username, uid }: { email: string, username: string, uid: string },
         response: Response,

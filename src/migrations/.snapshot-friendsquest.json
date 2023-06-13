@@ -89,6 +89,15 @@
           "nullable": false,
           "default": "0",
           "mappedType": "integer"
+        },
+        "msg_token": {
+          "name": "msg_token",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
         }
       },
       "name": "user",
