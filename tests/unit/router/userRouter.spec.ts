@@ -74,6 +74,7 @@ describe('UserRouter', () => {
         const generateCreateUserRouteSpy = jest.spyOn(userRouter, 'generateCreateUserRoute')
         const generateUpdateUserRouteSpy = jest.spyOn(userRouter, 'generateUpdateUserRoute')
         const generateDeleteUserRouteSpy = jest.spyOn(userRouter, 'generateDeleteUserRoute')
+        const generateUpdateMessageTokenRouteSpy = jest.spyOn(userRouter, 'generateUpdateMessageTokenRoute')
 
         const routes = userRouter.createAndReturnRoutes()
         expect(routes).toBe(userRouter.router)
@@ -85,6 +86,7 @@ describe('UserRouter', () => {
         expect(generateCreateUserRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateUpdateUserRouteSpy).toHaveBeenCalledTimes(1)
         expect(generateDeleteUserRouteSpy).toHaveBeenCalledTimes(1)
+        expect(generateUpdateMessageTokenRouteSpy).toHaveBeenCalledTimes(1)
     })
 
     describe('handler functions', () => {
@@ -164,6 +166,20 @@ describe('UserRouter', () => {
             userRouter.deleteUserHandler(request, response)
             expect(userController.deleteUser).toHaveBeenCalledWith({ uid }, response)
         })
+        it('handles updateMessageToken', () => {
+            const uid = 'uid'
+            const token = 'asgfkhgirw'
+            const request = {
+                body: {
+                    token,
+                },
+                headers: {
+                    uidHeader: uid,
+                },
+            } as unknown as Request
+            userRouter.updateMessageTokenHandler(request, response)
+            expect(userController.updateMessageToken).toHaveBeenCalledWith({ token, uid }, response)
+        })
     })
 
     describe('routes', () => {
@@ -199,6 +215,15 @@ describe('UserRouter', () => {
                 expect.any(Array),
                 'errorHandler',
                 userRouter.updateUserHandler,
+            )
+        })
+        it('generates updateMessageToken route', () => {
+            userRouter.generateUpdateMessageTokenRoute()
+            expect(router.patch).toHaveBeenCalledWith(
+                '/message-token',
+                expect.any(Array),
+                'errorHandler',
+                userRouter.updateMessageTokenHandler,
             )
         })
         it('generates deleteUser route', () => {
