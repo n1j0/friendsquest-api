@@ -216,6 +216,36 @@ describe('UserController', () => {
         })
     })
 
+    describe('updateMessageToken', () => {
+        it('updates the message token', async () => {
+            const uid = 'uid'
+            const token = 'token'
+            // @ts-ignore
+            userRepository.updateMessageToken.mockResolvedValue()
+            await userController.updateMessageToken({ token, uid }, response)
+            expect(userRepository.updateMessageToken).toHaveBeenCalledWith(uid, token)
+            expect(response.sendStatus).toHaveBeenCalledWith(204)
+        })
+        it('sends an error if user not found', async () => {
+            // @ts-ignore
+            userRepository.updateMessageToken.mockImplementation(() => {
+                throw new NotFoundError()
+            })
+            jest.spyOn(userController, 'userNotFoundError')
+            await userController.updateMessageToken({ token: '', uid: '' }, response)
+            expect(userController.userNotFoundError).toHaveBeenCalledWith(response)
+        })
+        it('sends an error if something goes wrong', async () => {
+            const error = new Error('test')
+            // @ts-ignore
+            userRepository.updateMessageToken.mockImplementation(() => {
+                throw error
+            })
+            await userController.updateMessageToken({ token: '', uid: '' }, response)
+            expect(errorSpy).toHaveBeenCalledWith(response, InternalServerError.getErrorDocument(error.message))
+        })
+    })
+
     describe('updateUser', () => {
         it('updates user data (username, mail)', async () => {
             const username = 'name'
