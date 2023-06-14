@@ -292,6 +292,30 @@ describe(
             expect(exampleUser).toEqual({ user: 'user', points: points.PROFILE_EDITED })
         })
 
+        describe('updateMessageToken', () => {
+            it('updates message token of user', async () => {
+                const uid = 'uid'
+                const token = 'token'
+                const user = 'user'
+                const persistResult = 'result'
+                const assign = jest.fn().mockReturnValue(user)
+                const persistAndFlush = jest.fn().mockReturnValue(persistResult)
+                // @ts-ignore
+                orm.forkEm.mockImplementation(() => ({
+                    assign,
+                    persistAndFlush,
+                }))
+                const getUserByUidMock = jest.fn().mockResolvedValue(user)
+                userPostgresRepository.getUserByUid = getUserByUidMock
+                const result = await userPostgresRepository.updateMessageToken(uid, token)
+                expect(orm.forkEm).toHaveBeenCalled()
+                expect(getUserByUidMock).toHaveBeenCalledWith(uid)
+                expect(assign).toHaveBeenCalledWith(user, { msgToken: token })
+                expect(persistAndFlush).toHaveBeenCalledWith(user)
+                expect(result).toBe(persistResult)
+            })
+        })
+
         describe('deleteUser', () => {
             let promiseSpy: jest.SpyInstance
             let isInitialized: jest.Mock
