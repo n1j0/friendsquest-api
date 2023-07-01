@@ -32,7 +32,7 @@
     "npm": "^8.x.x"
   },
   "dependencies": {
-    "@mikro-orm/core": "^5.7.11",
+    "@mikro-orm/core": "^5.7.12",
     "@mikro-orm/migrations": "^5.7.11",
     "@mikro-orm/postgresql": "^5.7.11",
     "@mikro-orm/reflection": "^5.7.11",
